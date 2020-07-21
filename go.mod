@@ -3,6 +3,7 @@ module knative.dev/discovery
 go 1.14
 
 require (
+	github.com/google/go-cmp v0.5.0
 	github.com/google/licenseclassifier v0.0.0-20200708223521-3d09a0ea2f39
 	go.uber.org/zap v1.14.1
 	k8s.io/api v0.17.6
