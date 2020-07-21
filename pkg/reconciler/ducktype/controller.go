@@ -19,16 +19,12 @@ package ducktype
 import (
 	"context"
 
-	"knative.dev/pkg/tracker"
-
-	corev1 "k8s.io/api/core/v1"
 	"knative.dev/pkg/configmap"
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/logging"
 
 	ducktypeinformer "knative.dev/discovery/pkg/client/injection/informers/discovery/v1alpha1/ducktype"
 	ducktypereconciler "knative.dev/discovery/pkg/client/injection/reconciler/discovery/v1alpha1/ducktype"
-	svcinformer "knative.dev/pkg/client/injection/kube/informers/core/v1/service"
 )
 
 // NewController creates a Reconciler and returns the result of NewImpl.
@@ -39,27 +35,15 @@ func NewController(
 	logger := logging.FromContext(ctx)
 
 	ducktypeInformer := ducktypeinformer.Get(ctx)
-	svcInformer := svcinformer.Get(ctx)
 
-	r := &Reconciler{
-		ServiceLister: svcInformer.Lister(),
-	}
+	// TODO: watch CRDs, etc.
+
+	r := &Reconciler{}
 	impl := ducktypereconciler.NewImpl(ctx, r)
-	r.Tracker = tracker.New(impl.EnqueueKey, controller.GetTrackerLease(ctx))
 
 	logger.Info("Setting up event handlers.")
 
 	ducktypeInformer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
-
-	svcInformer.Informer().AddEventHandler(controller.HandleAll(
-		// Call the tracker's OnChanged method, but we've seen the objects
-		// coming through this path missing TypeMeta, so ensure it is properly
-		// populated.
-		controller.EnsureTypeMeta(
-			r.Tracker.OnChanged,
-			corev1.SchemeGroupVersion.WithKind("Service"),
-		),
-	))
 
 	return impl
 }

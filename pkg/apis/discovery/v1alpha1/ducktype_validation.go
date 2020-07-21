@@ -29,8 +29,5 @@ func (dt *DuckType) Validate(ctx context.Context) *apis.FieldError {
 
 // Validate implements apis.Validatable
 func (dts *DuckTypeSpec) Validate(ctx context.Context) *apis.FieldError {
-	if dts.ServiceName == "" {
-		return apis.ErrMissingField("serviceName")
-	}
 	return nil
 }

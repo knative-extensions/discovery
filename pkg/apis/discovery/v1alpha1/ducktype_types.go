@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
@@ -27,8 +28,7 @@ import (
 // +genreconciler
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// DuckType is a Knative abstraction that encapsulates the interface by which Knative
-// components express a desire to have a particular image cached.
+// DuckType is a query and identifier for Knative-style duck types installed in a cluster.
 type DuckType struct {
 	metav1.TypeMeta `json:",inline"`
 	// +optional
@@ -54,8 +54,85 @@ var (
 
 // DuckTypeSpec holds the desired state of the DuckType (from the client).
 type DuckTypeSpec struct {
-	// ServiceName holds the name of the Kubernetes Service to expose as an "addressable".
-	ServiceName string `json:"serviceName"`
+	// Group is the API group of the defined duck type.
+	// Must match the name of the DuckType (in the form `<names.plural>.<group>`).
+	Group string `json:"group"`
+
+	// Names holds the naming conventions for this duck type.
+	Names DuckTypeNames `json:"names"`
+
+	// Versions holds the schema and printer column mappings for specific
+	// versions fo duck types.
+	Versions []DuckVersion `json:"versions"`
+
+	// SelectorType is a selector for CustomResourceDefinitions to identify a duck type.
+	// +optional
+	SelectorType []CustomResourceDefinitionType `json:"selectors,omitempty"`
+}
+
+// DuckTypeNames provides the naming rules for this duck type.
+type DuckTypeNames struct {
+	// Name is the serialized name of the resource. It is normally CamelCase and singular.
+	Name string `json:"name"`
+
+	// Plural is the plural name of the duck type.
+	// Must match the name of the DuckType (in the form `<names.plural>.<group>`).
+	// Must be all lowercase.
+	Plural string `json:"plural"`
+
+	// Singular is the singular name of the duck type. It must be all lowercase.
+	// Defaults to lowercased `name`.
+	// +optional
+	Singular string `json:"singular"`
+}
+
+// DuckVersion
+type DuckVersion struct {
+	// Name is the name of this duck type version.
+	Name string `json:"name"`
+
+	// RefsList is a list of GVRKs that implement this duck type.
+	// Used for manual discovery.
+	// +optional
+	RefsList []GroupVersionResourceKind `json:"refs,omitempty"`
+
+	// Custom Columns to be used to pretty print the duck type at this version.
+	// +optional
+	AdditionalPrinterColumns []apiextensionsv1.CustomResourceColumnDefinition `json:"additionalPrinterColumns,omitempty"`
+
+	// Partial Schema of this version of the duck type.
+	// +optional
+	Schema *apiextensionsv1.CustomResourceValidation `json:"schema,omitempty"`
+}
+
+// CustomResourceDefinitionType
+type CustomResourceDefinitionType struct {
+	// Selector is a label selector used to find CRDs that associate with the
+	// duck type.
+	// Typically this will be in the form:
+	//   `<group>/<names.singular>=true`
+	// Annotations are used to map the versions of the CRD to the correct ducktype.
+	// The annotation is expected to be in the form:
+	//   `<names.plural>.<group>/<versions[x].name>=[CRD.Version]`
+	// and results in `x = CRD.Version`.
+	// If the version mapping annotation is missing, it is assumed this
+	Selector string `json:"selector,omitempty"`
+}
+
+// GroupVersionResourceKind
+type GroupVersionResourceKind struct {
+	Group    string `json:"group,omitempty"`
+	Version  string `json:"version,omitempty"`
+	Resource string `json:"resource,omitempty"`
+	Kind     string `json:"kind,omitempty"`
+}
+
+// FoundDuckVersion
+type FoundDuck struct {
+	// Version is the version of the duck found.
+	DuckVersion string `json:"duckVersion"`
+	// Refs is a list of the GVRKs that adhere to this duck type version.
+	Refs GroupVersionResourceKind `json:"ref,omitempty"`
 }
 
 const (
@@ -68,9 +145,11 @@ const (
 type DuckTypeStatus struct {
 	duckv1.Status `json:",inline"`
 
-	// Address holds the information needed to connect this Addressable up to receive events.
-	// +optional
-	Address *duckv1.Addressable `json:"address,omitempty"`
+	// DuckList is a list of GVRK's that implement this duck.
+	DuckList []FoundDuck `json:"ducks,omitempty"`
+
+	// DuckCount
+	DuckCount int `json:"duckCount,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -84,6 +163,6 @@ type DuckTypeList struct {
 }
 
 // GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (as *DuckType) GetStatus() *duckv1.Status {
-	return &as.Status.Status
+func (dt *DuckType) GetStatus() *duckv1.Status {
+	return &dt.Status.Status
 }
