@@ -26,9 +26,9 @@ import (
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/logging"
 
-	svcinformer "knative.dev/pkg/client/injection/kube/informers/core/v1/service"
 	ducktypeinformer "knative.dev/discovery/pkg/client/injection/informers/discovery/v1alpha1/ducktype"
 	ducktypereconciler "knative.dev/discovery/pkg/client/injection/reconciler/discovery/v1alpha1/ducktype"
+	svcinformer "knative.dev/pkg/client/injection/kube/informers/core/v1/service"
 )
 
 // NewController creates a Reconciler and returns the result of NewImpl.

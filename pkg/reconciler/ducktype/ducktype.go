@@ -23,14 +23,14 @@ import (
 	apierrs "k8s.io/apimachinery/pkg/api/errors"
 	corev1listers "k8s.io/client-go/listers/core/v1"
 
+	samplesv1alpha1 "knative.dev/discovery/pkg/apis/discovery/v1alpha1"
+	ducktypereconciler "knative.dev/discovery/pkg/client/injection/reconciler/discovery/v1alpha1/ducktype"
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 	"knative.dev/pkg/logging"
 	"knative.dev/pkg/network"
 	"knative.dev/pkg/reconciler"
 	"knative.dev/pkg/tracker"
-	samplesv1alpha1 "knative.dev/discovery/pkg/apis/discovery/v1alpha1"
-	ducktypereconciler "knative.dev/discovery/pkg/client/injection/reconciler/discovery/v1alpha1/ducktype"
 )
 
 // newReconciledNormal makes a new reconciler event with event type Normal, and
