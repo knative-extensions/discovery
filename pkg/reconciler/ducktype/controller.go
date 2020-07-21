@@ -49,5 +49,11 @@ func NewController(
 
 	ducktypeInformer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
 
+	// Watch custom resource definitions.
+	grDt := func(obj interface{}) {
+		impl.GlobalResync(ducktypeInformer.Informer())
+	}
+	crdInformer.Informer().AddEventHandler(controller.HandleAll(grDt))
+
 	return impl
 }
