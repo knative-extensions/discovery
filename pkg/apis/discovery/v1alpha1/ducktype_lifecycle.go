@@ -37,14 +37,3 @@ func (dt *DuckType) GetConditionSet() apis.ConditionSet {
 func (dts *DuckTypeStatus) InitializeConditions() {
 	condSet.Manage(dts).InitializeConditions()
 }
-
-func (dts *DuckTypeStatus) MarkServiceUnavailable(name string) {
-	condSet.Manage(dts).MarkFalse(
-		DuckTypeConditionReady,
-		"ServiceUnavailable",
-		"Service %q wasn't found.", name)
-}
-
-func (dts *DuckTypeStatus) MarkServiceAvailable() {
-	condSet.Manage(dts).MarkTrue(DuckTypeConditionReady)
-}
