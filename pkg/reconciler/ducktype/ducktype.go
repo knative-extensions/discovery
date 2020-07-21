@@ -47,7 +47,12 @@ var _ ducktypereconciler.Interface = (*Reconciler)(nil)
 func (r *Reconciler) ReconcileKind(ctx context.Context, o *discoveryv1alpha1.DuckType) reconciler.Event {
 	logger := logging.FromContext(ctx)
 
-	logger.Debug("TODO: implement this.")
+	crd, err := r.crdLister.Get("channels.messaging.knative.dev") // TODO generalize past testing
+	if err != nil {
+		logger.Errorf("error getting crd: %q", err)
+	} else {
+		logger.Errorf("found crd: %q", crd)
+	}
 
 	return newReconciledNormal(o.Namespace, o.Name)
 }
