@@ -178,7 +178,7 @@ func TestDuckTypeValidation(t *testing.T) {
 					},
 					Versions: []DuckVersion{{
 						Name: "v1",
-						RefsList: []GroupVersionResourceKind{{
+						Refs: []GroupVersionResourceKind{{
 							Version: "v2",
 						}},
 					}},
@@ -202,7 +202,7 @@ func TestDuckTypeValidation(t *testing.T) {
 					},
 					Versions: []DuckVersion{{
 						Name: "v1",
-						RefsList: []GroupVersionResourceKind{{
+						Refs: []GroupVersionResourceKind{{
 							Version:  "v2",
 							Kind:     "Foo",
 							Resource: "bars",
@@ -228,7 +228,7 @@ func TestDuckTypeValidation(t *testing.T) {
 					},
 					Versions: []DuckVersion{{
 						Name: "v1",
-						RefsList: []GroupVersionResourceKind{{
+						Refs: []GroupVersionResourceKind{{
 							Kind: "Foo",
 						}},
 					}},

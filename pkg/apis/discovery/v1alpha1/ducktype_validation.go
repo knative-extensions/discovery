@@ -91,7 +91,7 @@ func (dv *DuckVersion) Validate(ctx context.Context) (errs *apis.FieldError) {
 	if dv.Name == "" {
 		errs = errs.Also(apis.ErrMissingField("name"))
 	}
-	for i, ref := range dv.RefsList {
+	for i, ref := range dv.Refs {
 		errs = errs.Also(ref.Validate(ctx).ViaFieldIndex("refs", i))
 	}
 	return errs

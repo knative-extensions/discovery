@@ -19,6 +19,8 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"gopkg.in/yaml.v2"
+
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 )
 
@@ -32,5 +34,56 @@ func TestDuckTypeGetStatus(t *testing.T) {
 
 	if !cmp.Equal(config.GetStatus(), status) {
 		t.Errorf("GetStatus did not retrieve status. Got=%v Want=%v", config.GetStatus(), status)
+	}
+}
+
+func TestDuckTypeRoundTrips_YAML(t *testing.T) {
+	y := `
+spec:
+  group: example.com
+  names:
+    name: ThisDuck
+    singular: thisduck
+    plural: thisducks
+  versions:
+  - name: v1
+    refs:
+    - group: foo.com
+      kind: Bar
+      version: v2
+  selectors:
+  - labelSelector: "example.com/thisduck=true"
+
+`
+
+	want := &DuckType{
+		Spec: DuckTypeSpec{
+			Group: "example.com",
+			Names: DuckTypeNames{
+				Name:     "ThisDuck",
+				Plural:   "thisducks",
+				Singular: "thisduck",
+			},
+			Versions: []DuckVersion{{
+				Name: "v1",
+				Refs: []GroupVersionResourceKind{{
+					Group:   "foo.com",
+					Version: "v2",
+					Kind:    "Bar",
+				}},
+			}},
+			Selectors: []CustomResourceDefinitionSelector{{
+				LabelSelector: "example.com/thisduck=true",
+			}},
+		}}
+
+	got := &DuckType{}
+	if err := yaml.Unmarshal([]byte(y), got); err != nil {
+		t.Fail()
+	}
+
+	if !cmp.Equal(got, want) {
+		t.Errorf("From YAML (-want, +got) = %v",
+			cmp.Diff(want, got))
 	}
 }

@@ -90,10 +90,10 @@ type DuckVersion struct {
 	// Name is the name of this duck type version.
 	Name string `json:"name"`
 
-	// RefsList is a list of GVRKs that implement this duck type.
+	// Refs is a list of GVRKs that implement this duck type.
 	// Used for manual discovery.
 	// +optional
-	RefsList []GroupVersionResourceKind `json:"refs,omitempty"`
+	Refs []GroupVersionResourceKind `json:"refs,omitempty"`
 
 	// Custom Columns to be used to pretty print the duck type at this version.
 	// +optional
@@ -121,7 +121,7 @@ type CustomResourceDefinitionSelector struct {
 	// If the version mapping annotation is missing, it is assumed this applies
 	// as the match.
 	// Must be a valid Kubernetes Label Selector.
-	LabelSelector string `json:"labelSelector,omitempty"`
+	LabelSelector string `json:"labelSelector,omitempty" yaml:"labelSelector,omitempty"`
 }
 
 // GroupVersionResourceKind
