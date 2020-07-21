@@ -20,7 +20,7 @@ import (
 	"context"
 
 	corev1 "k8s.io/api/core/v1"
-	samplesv1alpha1 "knative.dev/discovery/pkg/apis/discovery/v1alpha1"
+	discoveryv1alpha1 "knative.dev/discovery/pkg/apis/discovery/v1alpha1"
 	ducktypereconciler "knative.dev/discovery/pkg/client/injection/reconciler/discovery/v1alpha1/ducktype"
 	"knative.dev/pkg/logging"
 	"knative.dev/pkg/reconciler"
@@ -41,7 +41,7 @@ type Reconciler struct {
 var _ ducktypereconciler.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *Reconciler) ReconcileKind(ctx context.Context, o *samplesv1alpha1.DuckType) reconciler.Event {
+func (r *Reconciler) ReconcileKind(ctx context.Context, o *discoveryv1alpha1.DuckType) reconciler.Event {
 	logger := logging.FromContext(ctx)
 
 	logger.Debug("TODO: implement this.")
