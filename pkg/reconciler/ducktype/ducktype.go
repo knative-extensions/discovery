@@ -20,6 +20,8 @@ import (
 	"context"
 
 	corev1 "k8s.io/api/core/v1"
+	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/client/listers/apiextensions/v1"
+
 	discoveryv1alpha1 "knative.dev/discovery/pkg/apis/discovery/v1alpha1"
 	ducktypereconciler "knative.dev/discovery/pkg/client/injection/reconciler/discovery/v1alpha1/ducktype"
 	"knative.dev/pkg/logging"
@@ -35,6 +37,7 @@ func newReconciledNormal(namespace, name string) reconciler.Event {
 // Reconciler implements ducktypereconciler.Interface for
 // DuckType resources.
 type Reconciler struct {
+	crdLister apiextensionsv1.CustomResourceDefinitionLister
 }
 
 // Check that our Reconciler implements Interface
@@ -44,7 +47,12 @@ var _ ducktypereconciler.Interface = (*Reconciler)(nil)
 func (r *Reconciler) ReconcileKind(ctx context.Context, o *discoveryv1alpha1.DuckType) reconciler.Event {
 	logger := logging.FromContext(ctx)
 
-	logger.Debug("TODO: implement this.")
+	crd, err := r.crdLister.Get("channels.messaging.knative.dev") // TODO generalize past testing
+	if err != nil {
+		logger.Errorf("error getting crd: %q", err)
+	} else {
+		logger.Errorf("found crd: %q", crd)
+	}
 
 	return newReconciledNormal(o.Namespace, o.Name)
 }

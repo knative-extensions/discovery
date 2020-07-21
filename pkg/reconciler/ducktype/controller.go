@@ -25,6 +25,7 @@ import (
 
 	ducktypeinformer "knative.dev/discovery/pkg/client/injection/informers/discovery/v1alpha1/ducktype"
 	ducktypereconciler "knative.dev/discovery/pkg/client/injection/reconciler/discovery/v1alpha1/ducktype"
+	crdinformer "knative.dev/pkg/client/injection/apiextensions/informers/apiextensions/v1/customresourcedefinition"
 )
 
 // NewController creates a Reconciler and returns the result of NewImpl.
@@ -35,15 +36,24 @@ func NewController(
 	logger := logging.FromContext(ctx)
 
 	ducktypeInformer := ducktypeinformer.Get(ctx)
+	crdInformer := crdinformer.Get(ctx)
 
 	// TODO: watch CRDs, etc.
 
-	r := &Reconciler{}
+	r := &Reconciler{
+		crdLister: crdInformer.Lister(),
+	}
 	impl := ducktypereconciler.NewImpl(ctx, r)
 
 	logger.Info("Setting up event handlers.")
 
 	ducktypeInformer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
+
+	// Watch custom resource definitions.
+	grDt := func(obj interface{}) {
+		impl.GlobalResync(ducktypeInformer.Informer())
+	}
+	crdInformer.Informer().AddEventHandler(controller.HandleAll(grDt))
 
 	return impl
 }
