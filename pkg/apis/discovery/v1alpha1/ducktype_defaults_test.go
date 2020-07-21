@@ -17,8 +17,9 @@ package v1alpha1
 
 import (
 	"context"
-	"github.com/google/go-cmp/cmp"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestDuckTypeDefaulting(t *testing.T) {

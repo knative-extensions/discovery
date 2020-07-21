@@ -18,8 +18,9 @@ package v1alpha1
 
 import (
 	"context"
-	"knative.dev/pkg/apis"
 	"strings"
+
+	"knative.dev/pkg/apis"
 )
 
 // SetDefaults implements apis.Defaultable

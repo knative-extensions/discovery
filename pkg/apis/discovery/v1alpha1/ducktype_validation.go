@@ -19,8 +19,9 @@ package v1alpha1
 import (
 	"context"
 	"fmt"
-	"k8s.io/apimachinery/pkg/labels"
 	"strings"
+
+	"k8s.io/apimachinery/pkg/labels"
 
 	"knative.dev/pkg/apis"
 )

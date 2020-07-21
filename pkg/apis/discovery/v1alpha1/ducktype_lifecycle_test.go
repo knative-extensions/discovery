@@ -16,12 +16,13 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"sort"
+	"testing"
+
 	"github.com/google/go-cmp/cmp"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"knative.dev/pkg/apis"
 	"knative.dev/pkg/apis/duck"
-	"sort"
-	"testing"
 
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 )

@@ -17,10 +17,11 @@ package v1alpha1
 
 import (
 	"context"
+	"testing"
+
 	"github.com/google/go-cmp/cmp"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"knative.dev/pkg/apis"
-	"testing"
 )
 
 func TestDuckTypeValidation(t *testing.T) {
