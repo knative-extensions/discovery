@@ -63,11 +63,11 @@ type DuckTypeSpec struct {
 
 	// Versions holds the schema and printer column mappings for specific
 	// versions fo duck types.
-	Versions []DuckVersion `json:"versions"`
+	Versions []DuckVersion `json:"versions" patchStrategy:"merge" patchMergeKey:"name"`
 
-	// SelectorType is a selector for CustomResourceDefinitions to identify a duck type.
+	// Selectors is a list of selectors for CustomResourceDefinitions to identify a duck type.
 	// +optional
-	SelectorType []CustomResourceDefinitionType `json:"selectors,omitempty"`
+	Selectors []CustomResourceDefinitionSelector `json:"selectors,omitempty"`
 }
 
 // DuckTypeNames provides the naming rules for this duck type.
@@ -82,7 +82,6 @@ type DuckTypeNames struct {
 
 	// Singular is the singular name of the duck type. It must be all lowercase.
 	// Defaults to lowercased `name`.
-	// +optional
 	Singular string `json:"singular"`
 }
 
@@ -91,10 +90,10 @@ type DuckVersion struct {
 	// Name is the name of this duck type version.
 	Name string `json:"name"`
 
-	// RefsList is a list of GVRKs that implement this duck type.
+	// Refs is a list of GVRKs that implement this duck type.
 	// Used for manual discovery.
 	// +optional
-	RefsList []GroupVersionResourceKind `json:"refs,omitempty"`
+	Refs []GroupVersionResourceKind `json:"refs,omitempty"`
 
 	// Custom Columns to be used to pretty print the duck type at this version.
 	// +optional
@@ -105,26 +104,39 @@ type DuckVersion struct {
 	Schema *apiextensionsv1.CustomResourceValidation `json:"schema,omitempty"`
 }
 
-// CustomResourceDefinitionType
-type CustomResourceDefinitionType struct {
-	// Selector is a label selector used to find CRDs that associate with the
-	// duck type.
+// CustomResourceDefinitionSelector
+type CustomResourceDefinitionSelector struct {
+	// Note: in the future we could also add a filtering component here to
+	// limit the matches based on another field or annotation. Leaving this as
+	// a sub-object for that future.
+
+	// LabelSelector is a label selector used to find CRDs that associate with
+	// the duck type.
 	// Typically this will be in the form:
 	//   `<group>/<names.singular>=true`
-	// Annotations are used to map the versions of the CRD to the correct ducktype.
-	// The annotation is expected to be in the form:
+	// Annotations are used to map the versions of the CRD to the correct
+	// ducktype. The annotation is expected to be in the form:
 	//   `<names.plural>.<group>/<versions[x].name>=[CRD.Version]`
 	// and results in `x = CRD.Version`.
-	// If the version mapping annotation is missing, it is assumed this
-	Selector string `json:"selector,omitempty"`
+	// If the version mapping annotation is missing, it is assumed this applies
+	// as the match.
+	// Must be a valid Kubernetes Label Selector.
+	LabelSelector string `json:"labelSelector,omitempty" yaml:"labelSelector,omitempty"`
 }
 
 // GroupVersionResourceKind
 type GroupVersionResourceKind struct {
-	Group    string `json:"group,omitempty"`
-	Version  string `json:"version,omitempty"`
+	// Group is the resource group.
+	// +optional
+	Group string `json:"group,omitempty"`
+	// Version is the version the duck type applies to for the resource.
+	Version string `json:"version,omitempty"`
+	// Resource is the plural resource name.
+	// +optional, one of [Resource, Kind] required.
 	Resource string `json:"resource,omitempty"`
-	Kind     string `json:"kind,omitempty"`
+	// Kind is the CamelCased resource kind.
+	// +optional, one of [Resource, Kind] required.
+	Kind string `json:"kind,omitempty"`
 }
 
 // FoundDuckVersion

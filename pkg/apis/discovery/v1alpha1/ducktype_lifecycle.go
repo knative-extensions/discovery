@@ -21,7 +21,7 @@ import (
 	"knative.dev/pkg/apis"
 )
 
-var condSet = apis.NewLivingConditionSet()
+var duckTypeCondSet = apis.NewLivingConditionSet()
 
 // GetGroupVersionKind implements kmeta.OwnerRefable
 func (*DuckType) GetGroupVersionKind() schema.GroupVersionKind {
@@ -29,11 +29,11 @@ func (*DuckType) GetGroupVersionKind() schema.GroupVersionKind {
 }
 
 // GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (dt *DuckType) GetConditionSet() apis.ConditionSet {
-	return condSet
+func (*DuckType) GetConditionSet() apis.ConditionSet {
+	return duckTypeCondSet
 }
 
 // InitializeConditions sets the initial values to the conditions.
 func (dts *DuckTypeStatus) InitializeConditions() {
-	condSet.Manage(dts).InitializeConditions()
+	duckTypeCondSet.Manage(dts).InitializeConditions()
 }
