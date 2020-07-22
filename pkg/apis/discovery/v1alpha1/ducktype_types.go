@@ -143,8 +143,8 @@ type GroupVersionResourceKind struct {
 type FoundDuck struct {
 	// Version is the version of the duck found.
 	DuckVersion string `json:"duckVersion"`
-	// Refs is a list of the GVRKs that adhere to this duck type version.
-	Refs GroupVersionResourceKind `json:"ref,omitempty"`
+	// Ref is the GVRK that adheres to this duck type version.
+	Ref GroupVersionResourceKind `json:"ref,omitempty"`
 }
 
 const (
