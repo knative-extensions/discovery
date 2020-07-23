@@ -37,6 +37,12 @@ spec:
           # see issue: https://github.com/knative/serving/issues/912
           x-kubernetes-preserve-unknown-fields: true
       additionalPrinterColumns:
+        - name: Short Name
+          type: string
+          JSONPath: .spec.names.name
+        - name: Ducks
+          type: integer
+          JSONPath: .status.duckCount
         - name: Ready
           type: string
           jsonPath: ".status.conditions[?(@.type=='Ready')].status"
@@ -52,4 +58,4 @@ spec:
     - knative
     shortNames:
     - ducks
-  scope: Namespaced
+  scope: Cluster
