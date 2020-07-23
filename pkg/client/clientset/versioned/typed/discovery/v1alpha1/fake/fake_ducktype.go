@@ -31,7 +31,6 @@ import (
 // FakeDuckTypes implements DuckTypeInterface
 type FakeDuckTypes struct {
 	Fake *FakeDiscoveryV1alpha1
-	ns   string
 }
 
 var ducktypesResource = schema.GroupVersionResource{Group: "discovery.knative.dev", Version: "v1alpha1", Resource: "ducktypes"}
@@ -41,8 +40,7 @@ var ducktypesKind = schema.GroupVersionKind{Group: "discovery.knative.dev", Vers
 // Get takes name of the duckType, and returns the corresponding duckType object, and an error if there is any.
 func (c *FakeDuckTypes) Get(name string, options v1.GetOptions) (result *v1alpha1.DuckType, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(ducktypesResource, c.ns, name), &v1alpha1.DuckType{})
-
+		Invokes(testing.NewRootGetAction(ducktypesResource, name), &v1alpha1.DuckType{})
 	if obj == nil {
 		return nil, err
 	}
@@ -52,8 +50,7 @@ func (c *FakeDuckTypes) Get(name string, options v1.GetOptions) (result *v1alpha
 // List takes label and field selectors, and returns the list of DuckTypes that match those selectors.
 func (c *FakeDuckTypes) List(opts v1.ListOptions) (result *v1alpha1.DuckTypeList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(ducktypesResource, ducktypesKind, c.ns, opts), &v1alpha1.DuckTypeList{})
-
+		Invokes(testing.NewRootListAction(ducktypesResource, ducktypesKind, opts), &v1alpha1.DuckTypeList{})
 	if obj == nil {
 		return nil, err
 	}
@@ -74,15 +71,13 @@ func (c *FakeDuckTypes) List(opts v1.ListOptions) (result *v1alpha1.DuckTypeList
 // Watch returns a watch.Interface that watches the requested duckTypes.
 func (c *FakeDuckTypes) Watch(opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewWatchAction(ducktypesResource, c.ns, opts))
-
+		InvokesWatch(testing.NewRootWatchAction(ducktypesResource, opts))
 }
 
 // Create takes the representation of a duckType and creates it.  Returns the server's representation of the duckType, and an error, if there is any.
 func (c *FakeDuckTypes) Create(duckType *v1alpha1.DuckType) (result *v1alpha1.DuckType, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(ducktypesResource, c.ns, duckType), &v1alpha1.DuckType{})
-
+		Invokes(testing.NewRootCreateAction(ducktypesResource, duckType), &v1alpha1.DuckType{})
 	if obj == nil {
 		return nil, err
 	}
@@ -92,8 +87,7 @@ func (c *FakeDuckTypes) Create(duckType *v1alpha1.DuckType) (result *v1alpha1.Du
 // Update takes the representation of a duckType and updates it. Returns the server's representation of the duckType, and an error, if there is any.
 func (c *FakeDuckTypes) Update(duckType *v1alpha1.DuckType) (result *v1alpha1.DuckType, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(ducktypesResource, c.ns, duckType), &v1alpha1.DuckType{})
-
+		Invokes(testing.NewRootUpdateAction(ducktypesResource, duckType), &v1alpha1.DuckType{})
 	if obj == nil {
 		return nil, err
 	}
@@ -104,8 +98,7 @@ func (c *FakeDuckTypes) Update(duckType *v1alpha1.DuckType) (result *v1alpha1.Du
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
 func (c *FakeDuckTypes) UpdateStatus(duckType *v1alpha1.DuckType) (*v1alpha1.DuckType, error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceAction(ducktypesResource, "status", c.ns, duckType), &v1alpha1.DuckType{})
-
+		Invokes(testing.NewRootUpdateSubresourceAction(ducktypesResource, "status", duckType), &v1alpha1.DuckType{})
 	if obj == nil {
 		return nil, err
 	}
@@ -115,14 +108,13 @@ func (c *FakeDuckTypes) UpdateStatus(duckType *v1alpha1.DuckType) (*v1alpha1.Duc
 // Delete takes name of the duckType and deletes it. Returns an error if one occurs.
 func (c *FakeDuckTypes) Delete(name string, options *v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(ducktypesResource, c.ns, name), &v1alpha1.DuckType{})
-
+		Invokes(testing.NewRootDeleteAction(ducktypesResource, name), &v1alpha1.DuckType{})
 	return err
 }
 
 // DeleteCollection deletes a collection of objects.
 func (c *FakeDuckTypes) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(ducktypesResource, c.ns, listOptions)
+	action := testing.NewRootDeleteCollectionAction(ducktypesResource, listOptions)
 
 	_, err := c.Fake.Invokes(action, &v1alpha1.DuckTypeList{})
 	return err
@@ -131,8 +123,7 @@ func (c *FakeDuckTypes) DeleteCollection(options *v1.DeleteOptions, listOptions 
 // Patch applies the patch and returns the patched duckType.
 func (c *FakeDuckTypes) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.DuckType, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(ducktypesResource, c.ns, name, pt, data, subresources...), &v1alpha1.DuckType{})
-
+		Invokes(testing.NewRootPatchSubresourceAction(ducktypesResource, name, pt, data, subresources...), &v1alpha1.DuckType{})
 	if obj == nil {
 		return nil, err
 	}
