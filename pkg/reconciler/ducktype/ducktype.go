@@ -46,5 +46,9 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *discoveryv1alpha1.Duc
 	} else {
 		logger.Errorf("found crd: %q", crd)
 	}
+
+	// TODO: remove this when there is real logic here.
+	o.Status.MarkReady()
+
 	return nil
 }

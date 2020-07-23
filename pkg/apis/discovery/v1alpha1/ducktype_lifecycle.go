@@ -37,3 +37,8 @@ func (*DuckType) GetConditionSet() apis.ConditionSet {
 func (dts *DuckTypeStatus) InitializeConditions() {
 	duckTypeCondSet.Manage(dts).InitializeConditions()
 }
+
+// TODO: temp function, delete later as we develop the reconciler.
+func (dts *DuckTypeStatus) MarkReady() {
+	duckTypeCondSet.Manage(dts).MarkTrue(DuckTypeConditionReady)
+}
