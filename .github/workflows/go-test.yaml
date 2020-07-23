@@ -33,7 +33,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 1
-          path: ./src/knative.dev/${{ github.repository }}
+          path: ./src/knative.dev/discovery
 
       - name: Test
-        run: go test -race knative.dev/${{ github.repository }}/...
+        run: go test -race knative.dev/discovery/...
