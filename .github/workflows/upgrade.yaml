@@ -50,6 +50,7 @@ jobs:
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v3
       with:
+        path: ./src/knative.dev/discovery
         token: ${{ secrets.GITHUB_TOKEN }}
         commit-message: 'upgrade to latest dependencies'
         title: '[Automated] Upgrade to latest dependencies'
