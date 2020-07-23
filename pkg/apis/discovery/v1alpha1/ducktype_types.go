@@ -24,7 +24,7 @@ import (
 	"knative.dev/pkg/kmeta"
 )
 
-// +genclient
+// +genclient:nonNamespaced
 // +genreconciler
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 

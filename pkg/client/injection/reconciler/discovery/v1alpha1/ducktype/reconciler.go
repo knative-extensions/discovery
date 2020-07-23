@@ -205,7 +205,7 @@ func (r *reconcilerImpl) Reconcile(ctx context.Context, key string) error {
 
 	// Get the resource with this namespace/name.
 
-	getter := r.Lister.DuckTypes(namespace)
+	getter := r.Lister
 
 	original, err := getter.Get(name)
 
@@ -316,7 +316,7 @@ func (r *reconcilerImpl) updateStatus(existing *v1alpha1.DuckType, desired *v1al
 		// The first iteration tries to use the injectionInformer's state, subsequent attempts fetch the latest state via API.
 		if attempts > 0 {
 
-			getter := r.Client.DiscoveryV1alpha1().DuckTypes(desired.Namespace)
+			getter := r.Client.DiscoveryV1alpha1().DuckTypes()
 
 			existing, err = getter.Get(desired.Name, metav1.GetOptions{})
 			if err != nil {
@@ -331,7 +331,7 @@ func (r *reconcilerImpl) updateStatus(existing *v1alpha1.DuckType, desired *v1al
 
 		existing.Status = desired.Status
 
-		updater := r.Client.DiscoveryV1alpha1().DuckTypes(existing.Namespace)
+		updater := r.Client.DiscoveryV1alpha1().DuckTypes()
 
 		_, err = updater.UpdateStatus(existing)
 		return err
@@ -343,7 +343,7 @@ func (r *reconcilerImpl) updateStatus(existing *v1alpha1.DuckType, desired *v1al
 // updates defaultFinalizerName or its override.
 func (r *reconcilerImpl) updateFinalizersFiltered(ctx context.Context, resource *v1alpha1.DuckType) (*v1alpha1.DuckType, error) {
 
-	getter := r.Lister.DuckTypes(resource.Namespace)
+	getter := r.Lister
 
 	actual, err := getter.Get(resource.Name)
 	if err != nil {
@@ -388,7 +388,7 @@ func (r *reconcilerImpl) updateFinalizersFiltered(ctx context.Context, resource 
 		return resource, err
 	}
 
-	patcher := r.Client.DiscoveryV1alpha1().DuckTypes(resource.Namespace)
+	patcher := r.Client.DiscoveryV1alpha1().DuckTypes()
 
 	resourceName := resource.Name
 	resource, err = patcher.Patch(resourceName, types.MergePatchType, patch)
