@@ -254,12 +254,12 @@ func TestDuckTypeValidation(t *testing.T) {
 						Name: "v1",
 					}},
 					Selectors: []CustomResourceDefinitionSelector{{
-						LabelSelector: "turn down for what",
+						LabelSelector: "turn down for duck",
 					}},
 				},
 			},
 			want: &apis.FieldError{
-				Message: "invalid value: turn down for what",
+				Message: "invalid value: turn down for duck",
 				Paths:   []string{"spec.selectors[0].labelSelector"},
 			},
 		},
