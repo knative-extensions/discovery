@@ -17,5 +17,4 @@ kind: Namespace
 metadata:
   name: knative-discovery
   labels:
-    istio-injection: enabled
     discovery.knative.dev/release: devel
