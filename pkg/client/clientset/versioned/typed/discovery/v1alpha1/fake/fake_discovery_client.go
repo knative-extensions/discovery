@@ -28,8 +28,8 @@ type FakeDiscoveryV1alpha1 struct {
 	*testing.Fake
 }
 
-func (c *FakeDiscoveryV1alpha1) DuckTypes(namespace string) v1alpha1.DuckTypeInterface {
-	return &FakeDuckTypes{c, namespace}
+func (c *FakeDiscoveryV1alpha1) DuckTypes() v1alpha1.DuckTypeInterface {
+	return &FakeDuckTypes{c}
 }
 
 // RESTClient returns a RESTClient that is used to communicate

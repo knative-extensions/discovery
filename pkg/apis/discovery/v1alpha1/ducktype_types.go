@@ -25,6 +25,7 @@ import (
 )
 
 // +genclient
+// +genclient:nonNamespaced
 // +genreconciler
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 

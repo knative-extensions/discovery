@@ -21,7 +21,3 @@ package v1alpha1
 // DuckTypeListerExpansion allows custom methods to be added to
 // DuckTypeLister.
 type DuckTypeListerExpansion interface{}
-
-// DuckTypeNamespaceListerExpansion allows custom methods to be added to
-// DuckTypeNamespaceLister.
-type DuckTypeNamespaceListerExpansion interface{}

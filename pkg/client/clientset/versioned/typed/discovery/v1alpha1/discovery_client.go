@@ -34,8 +34,8 @@ type DiscoveryV1alpha1Client struct {
 	restClient rest.Interface
 }
 
-func (c *DiscoveryV1alpha1Client) DuckTypes(namespace string) DuckTypeInterface {
-	return newDuckTypes(c, namespace)
+func (c *DiscoveryV1alpha1Client) DuckTypes() DuckTypeInterface {
+	return newDuckTypes(c)
 }
 
 // NewForConfig creates a new DiscoveryV1alpha1Client for the given config.

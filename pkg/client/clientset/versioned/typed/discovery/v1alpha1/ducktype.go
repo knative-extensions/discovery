@@ -32,7 +32,7 @@ import (
 // DuckTypesGetter has a method to return a DuckTypeInterface.
 // A group's client should implement this interface.
 type DuckTypesGetter interface {
-	DuckTypes(namespace string) DuckTypeInterface
+	DuckTypes() DuckTypeInterface
 }
 
 // DuckTypeInterface has methods to work with DuckType resources.
@@ -52,14 +52,12 @@ type DuckTypeInterface interface {
 // duckTypes implements DuckTypeInterface
 type duckTypes struct {
 	client rest.Interface
-	ns     string
 }
 
 // newDuckTypes returns a DuckTypes
-func newDuckTypes(c *DiscoveryV1alpha1Client, namespace string) *duckTypes {
+func newDuckTypes(c *DiscoveryV1alpha1Client) *duckTypes {
 	return &duckTypes{
 		client: c.RESTClient(),
-		ns:     namespace,
 	}
 }
 
@@ -67,7 +65,6 @@ func newDuckTypes(c *DiscoveryV1alpha1Client, namespace string) *duckTypes {
 func (c *duckTypes) Get(name string, options v1.GetOptions) (result *v1alpha1.DuckType, err error) {
 	result = &v1alpha1.DuckType{}
 	err = c.client.Get().
-		Namespace(c.ns).
 		Resource("ducktypes").
 		Name(name).
 		VersionedParams(&options, scheme.ParameterCodec).
@@ -84,7 +81,6 @@ func (c *duckTypes) List(opts v1.ListOptions) (result *v1alpha1.DuckTypeList, er
 	}
 	result = &v1alpha1.DuckTypeList{}
 	err = c.client.Get().
-		Namespace(c.ns).
 		Resource("ducktypes").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
@@ -101,7 +97,6 @@ func (c *duckTypes) Watch(opts v1.ListOptions) (watch.Interface, error) {
 	}
 	opts.Watch = true
 	return c.client.Get().
-		Namespace(c.ns).
 		Resource("ducktypes").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
@@ -112,7 +107,6 @@ func (c *duckTypes) Watch(opts v1.ListOptions) (watch.Interface, error) {
 func (c *duckTypes) Create(duckType *v1alpha1.DuckType) (result *v1alpha1.DuckType, err error) {
 	result = &v1alpha1.DuckType{}
 	err = c.client.Post().
-		Namespace(c.ns).
 		Resource("ducktypes").
 		Body(duckType).
 		Do().
@@ -124,7 +118,6 @@ func (c *duckTypes) Create(duckType *v1alpha1.DuckType) (result *v1alpha1.DuckTy
 func (c *duckTypes) Update(duckType *v1alpha1.DuckType) (result *v1alpha1.DuckType, err error) {
 	result = &v1alpha1.DuckType{}
 	err = c.client.Put().
-		Namespace(c.ns).
 		Resource("ducktypes").
 		Name(duckType.Name).
 		Body(duckType).
@@ -139,7 +132,6 @@ func (c *duckTypes) Update(duckType *v1alpha1.DuckType) (result *v1alpha1.DuckTy
 func (c *duckTypes) UpdateStatus(duckType *v1alpha1.DuckType) (result *v1alpha1.DuckType, err error) {
 	result = &v1alpha1.DuckType{}
 	err = c.client.Put().
-		Namespace(c.ns).
 		Resource("ducktypes").
 		Name(duckType.Name).
 		SubResource("status").
@@ -152,7 +144,6 @@ func (c *duckTypes) UpdateStatus(duckType *v1alpha1.DuckType) (result *v1alpha1.
 // Delete takes name of the duckType and deletes it. Returns an error if one occurs.
 func (c *duckTypes) Delete(name string, options *v1.DeleteOptions) error {
 	return c.client.Delete().
-		Namespace(c.ns).
 		Resource("ducktypes").
 		Name(name).
 		Body(options).
@@ -167,7 +158,6 @@ func (c *duckTypes) DeleteCollection(options *v1.DeleteOptions, listOptions v1.L
 		timeout = time.Duration(*listOptions.TimeoutSeconds) * time.Second
 	}
 	return c.client.Delete().
-		Namespace(c.ns).
 		Resource("ducktypes").
 		VersionedParams(&listOptions, scheme.ParameterCodec).
 		Timeout(timeout).
@@ -180,7 +170,6 @@ func (c *duckTypes) DeleteCollection(options *v1.DeleteOptions, listOptions v1.L
 func (c *duckTypes) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.DuckType, err error) {
 	result = &v1alpha1.DuckType{}
 	err = c.client.Patch(pt).
-		Namespace(c.ns).
 		Resource("ducktypes").
 		SubResource(subresources...).
 		Name(name).

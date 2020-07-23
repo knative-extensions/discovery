@@ -41,5 +41,5 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 
 // DuckTypes returns a DuckTypeInformer.
 func (v *version) DuckTypes() DuckTypeInformer {
-	return &duckTypeInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+	return &duckTypeInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
