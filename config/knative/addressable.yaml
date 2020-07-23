@@ -1,0 +1,30 @@
+apiVersion: discovery.knative.dev/v1alpha1
+kind: DuckType
+metadata:
+  name: addressables.duck.knative.dev
+  labels:
+    discovery.knative.dev/release: devel
+spec:
+  selectors:
+    - labelSelector: "duck.knative.dev/addressable=true"
+  names:
+    name: "addressable"
+    plural: "addressables"
+    singular: "addressable"
+  versions:
+    - name: "v1"
+      refs:
+        - group: "duck.knative.dev"
+          version: "v1"
+          kind: "Addressable"
+    - name: "v1beta1"
+      refs:
+        - group: "duck.knative.dev"
+          version: "v1beta1"
+          resource: "addressable"
+    - name: "v1alpha1"
+      refs:
+        - group: "duck.knative.dev"
+          version: "v1alpha1"
+          kind: "Addressable"
+  group: duck.knative.dev
