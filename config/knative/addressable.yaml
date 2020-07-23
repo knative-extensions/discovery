@@ -8,7 +8,7 @@ spec:
   selectors:
     - labelSelector: "duck.knative.dev/addressable=true"
   names:
-    name: "addressable"
+    name: "Addressable"
     plural: "addressables"
     singular: "addressable"
   versions:
