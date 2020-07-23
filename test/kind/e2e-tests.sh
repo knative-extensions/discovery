@@ -16,7 +16,9 @@
 
 set -o errexit
 
-pwd
+readonly ROOT_DIR=$(dirname $0)/../..
+[[ ! -v REPO_ROOT_DIR ]] && REPO_ROOT_DIR="$(git rev-parse --show-toplevel)"
+readonly REPO_ROOT_DIR
 
 readonly reg_port='5000'
 
@@ -24,4 +26,4 @@ export KO_DOCKER_REPO=localhost:${reg_port}
 
 echo "Starting End-to-End tests for Discovery API"
 
-go test -v -tags=e2e -count=1 ../../test/e2e
+go test -v -tags=e2e -count=1 ${REPO_ROOT_DIR}/test/e2e
