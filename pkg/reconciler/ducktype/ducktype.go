@@ -19,7 +19,6 @@ package ducktype
 import (
 	"context"
 
-	corev1 "k8s.io/api/core/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/client/listers/apiextensions/v1"
 
 	discoveryv1alpha1 "knative.dev/discovery/pkg/apis/discovery/v1alpha1"
@@ -27,12 +26,6 @@ import (
 	"knative.dev/pkg/logging"
 	"knative.dev/pkg/reconciler"
 )
-
-// newReconciledNormal makes a new reconciler event with event type Normal, and
-// reason DuckTypeReconciled.
-func newReconciledNormal(namespace, name string) reconciler.Event {
-	return reconciler.NewEvent(corev1.EventTypeNormal, "DuckTypeReconciled", "DuckType reconciled: \"%s/%s\"", namespace, name)
-}
 
 // Reconciler implements ducktypereconciler.Interface for
 // DuckType resources.
@@ -53,6 +46,5 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *discoveryv1alpha1.Duc
 	} else {
 		logger.Errorf("found crd: %q", crd)
 	}
-
-	return newReconciledNormal(o.Namespace, o.Name)
+	return nil
 }
