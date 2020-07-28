@@ -211,6 +211,7 @@ func (r *reconcilerImpl) Reconcile(ctx context.Context, key string) error {
 	// Get the resource with this namespace/name.
 
 	getter := r.Lister
+
 	original, err := getter.Get(s.name)
 
 	if errors.IsNotFound(err) {
