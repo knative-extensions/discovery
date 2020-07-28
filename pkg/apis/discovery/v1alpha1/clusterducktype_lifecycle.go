@@ -24,21 +24,21 @@ import (
 var duckTypeCondSet = apis.NewLivingConditionSet()
 
 // GetGroupVersionKind implements kmeta.OwnerRefable
-func (*DuckType) GetGroupVersionKind() schema.GroupVersionKind {
-	return SchemeGroupVersion.WithKind("DuckType")
+func (*ClusterDuckType) GetGroupVersionKind() schema.GroupVersionKind {
+	return SchemeGroupVersion.WithKind("ClusterDuckType")
 }
 
 // GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (*DuckType) GetConditionSet() apis.ConditionSet {
+func (*ClusterDuckType) GetConditionSet() apis.ConditionSet {
 	return duckTypeCondSet
 }
 
 // InitializeConditions sets the initial values to the conditions.
-func (dts *DuckTypeStatus) InitializeConditions() {
+func (dts *ClusterDuckTypeStatus) InitializeConditions() {
 	duckTypeCondSet.Manage(dts).InitializeConditions()
 }
 
 // TODO: temp function, delete later as we develop the reconciler.
-func (dts *DuckTypeStatus) MarkReady() {
+func (dts *ClusterDuckTypeStatus) MarkReady() {
 	duckTypeCondSet.Manage(dts).MarkTrue(DuckTypeConditionReady)
 }

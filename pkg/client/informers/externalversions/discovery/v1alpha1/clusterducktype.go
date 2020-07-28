@@ -31,58 +31,58 @@ import (
 	v1alpha1 "knative.dev/discovery/pkg/client/listers/discovery/v1alpha1"
 )
 
-// DuckTypeInformer provides access to a shared informer and lister for
-// DuckTypes.
-type DuckTypeInformer interface {
+// ClusterDuckTypeInformer provides access to a shared informer and lister for
+// ClusterDuckTypes.
+type ClusterDuckTypeInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.DuckTypeLister
+	Lister() v1alpha1.ClusterDuckTypeLister
 }
 
-type duckTypeInformer struct {
+type clusterDuckTypeInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
 	tweakListOptions internalinterfaces.TweakListOptionsFunc
 }
 
-// NewDuckTypeInformer constructs a new informer for DuckType type.
+// NewClusterDuckTypeInformer constructs a new informer for ClusterDuckType type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewDuckTypeInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
-	return NewFilteredDuckTypeInformer(client, resyncPeriod, indexers, nil)
+func NewClusterDuckTypeInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return NewFilteredClusterDuckTypeInformer(client, resyncPeriod, indexers, nil)
 }
 
-// NewFilteredDuckTypeInformer constructs a new informer for DuckType type.
+// NewFilteredClusterDuckTypeInformer constructs a new informer for ClusterDuckType type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredDuckTypeInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredClusterDuckTypeInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.DiscoveryV1alpha1().DuckTypes().List(options)
+				return client.DiscoveryV1alpha1().ClusterDuckTypes().List(options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.DiscoveryV1alpha1().DuckTypes().Watch(options)
+				return client.DiscoveryV1alpha1().ClusterDuckTypes().Watch(options)
 			},
 		},
-		&discoveryv1alpha1.DuckType{},
+		&discoveryv1alpha1.ClusterDuckType{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *duckTypeInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredDuckTypeInformer(client, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *clusterDuckTypeInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+	return NewFilteredClusterDuckTypeInformer(client, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *duckTypeInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&discoveryv1alpha1.DuckType{}, f.defaultInformer)
+func (f *clusterDuckTypeInformer) Informer() cache.SharedIndexInformer {
+	return f.factory.InformerFor(&discoveryv1alpha1.ClusterDuckType{}, f.defaultInformer)
 }
 
-func (f *duckTypeInformer) Lister() v1alpha1.DuckTypeLister {
-	return v1alpha1.NewDuckTypeLister(f.Informer().GetIndexer())
+func (f *clusterDuckTypeInformer) Lister() v1alpha1.ClusterDuckTypeLister {
+	return v1alpha1.NewClusterDuckTypeLister(f.Informer().GetIndexer())
 }

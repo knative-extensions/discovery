@@ -18,6 +18,6 @@ limitations under the License.
 
 package v1alpha1
 
-// DuckTypeListerExpansion allows custom methods to be added to
-// DuckTypeLister.
-type DuckTypeListerExpansion interface{}
+// ClusterDuckTypeListerExpansion allows custom methods to be added to
+// ClusterDuckTypeLister.
+type ClusterDuckTypeListerExpansion interface{}

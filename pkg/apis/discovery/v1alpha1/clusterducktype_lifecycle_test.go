@@ -38,15 +38,15 @@ func TestDuckTypeDuckTypes(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			err := duck.VerifyType(&DuckType{}, test.t)
+			err := duck.VerifyType(&ClusterDuckType{}, test.t)
 			if err != nil {
-				t.Errorf("VerifyType(DuckType, %T) = %v", test.t, err)
+				t.Errorf("VerifyType(ClusterDuckType, %T) = %v", test.t, err)
 			}
 		})
 	}
 }
 func TestDuckTypeGetConditionSet(t *testing.T) {
-	r := &DuckType{}
+	r := &ClusterDuckType{}
 
 	if got, want := r.GetConditionSet().GetTopLevelConditionType(), apis.ConditionReady; got != want {
 		t.Errorf("GetTopLevelCondition=%v, want=%v", got, want)
@@ -54,11 +54,11 @@ func TestDuckTypeGetConditionSet(t *testing.T) {
 }
 
 func TestDuckTypeGetGroupVersionKind(t *testing.T) {
-	r := &DuckType{}
+	r := &ClusterDuckType{}
 	want := schema.GroupVersionKind{
 		Group:   "discovery.knative.dev",
 		Version: "v1alpha1",
-		Kind:    "DuckType",
+		Kind:    "ClusterDuckType",
 	}
 	if got := r.GetGroupVersionKind(); got != want {
 		t.Errorf("GVK: %v, want: %v", got, want)
@@ -66,7 +66,7 @@ func TestDuckTypeGetGroupVersionKind(t *testing.T) {
 }
 
 func TestDuckTypeInitializeConditions(t *testing.T) {
-	rs := &DuckTypeStatus{}
+	rs := &ClusterDuckTypeStatus{}
 	rs.InitializeConditions()
 
 	types := make([]string, 0, len(rs.Conditions))

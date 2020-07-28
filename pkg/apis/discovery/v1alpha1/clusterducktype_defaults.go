@@ -24,13 +24,13 @@ import (
 )
 
 // SetDefaults implements apis.Defaultable
-func (dt *DuckType) SetDefaults(ctx context.Context) {
+func (dt *ClusterDuckType) SetDefaults(ctx context.Context) {
 	ctx = apis.WithinParent(ctx, dt.ObjectMeta)
 	dt.Spec.SetDefaults(apis.WithinSpec(ctx))
 }
 
 // SetDefaults implements apis.Defaultable
-func (dts *DuckTypeSpec) SetDefaults(ctx context.Context) {
+func (dts *ClusterDuckTypeSpec) SetDefaults(ctx context.Context) {
 	// names.singular defaults to lowercase names.name if not set.
 	if dts.Names.Singular == "" {
 		dts.Names.Singular = strings.ToLower(dts.Names.Name)

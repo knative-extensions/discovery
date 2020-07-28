@@ -24,10 +24,10 @@ import (
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 )
 
-func TestDuckTypeGetStatus(t *testing.T) {
+func TestClusterDuckTypeGetStatus(t *testing.T) {
 	status := &duckv1.Status{}
-	config := DuckType{
-		Status: DuckTypeStatus{
+	config := ClusterDuckType{
+		Status: ClusterDuckTypeStatus{
 			Status: *status,
 		},
 	}
@@ -37,7 +37,7 @@ func TestDuckTypeGetStatus(t *testing.T) {
 	}
 }
 
-func TestDuckTypeRoundTrips_YAML(t *testing.T) {
+func TestClusterDuckTypeRoundTrips_YAML(t *testing.T) {
 	y := `
 spec:
   group: example.com
@@ -56,8 +56,8 @@ spec:
 
 `
 
-	want := &DuckType{
-		Spec: DuckTypeSpec{
+	want := &ClusterDuckType{
+		Spec: ClusterDuckTypeSpec{
 			Group: "example.com",
 			Names: DuckTypeNames{
 				Name:     "ThisDuck",
@@ -77,7 +77,7 @@ spec:
 			}},
 		}}
 
-	got := &DuckType{}
+	got := &ClusterDuckType{}
 	if err := yaml.Unmarshal([]byte(y), got); err != nil {
 		t.Fail()
 	}

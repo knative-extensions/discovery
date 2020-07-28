@@ -53,8 +53,8 @@ func (f *genericInformer) Lister() cache.GenericLister {
 func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
 	switch resource {
 	// Group=discovery.knative.dev, Version=v1alpha1
-	case v1alpha1.SchemeGroupVersion.WithResource("ducktypes"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Discovery().V1alpha1().DuckTypes().Informer()}, nil
+	case v1alpha1.SchemeGroupVersion.WithResource("clusterducktypes"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Discovery().V1alpha1().ClusterDuckTypes().Informer()}, nil
 
 	}
 

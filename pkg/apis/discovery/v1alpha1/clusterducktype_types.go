@@ -29,34 +29,34 @@ import (
 // +genreconciler
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// DuckType is a query and identifier for Knative-style duck types installed in a cluster.
-type DuckType struct {
+// ClusterDuckType is a query and identifier for Knative-style duck types installed in a cluster.
+type ClusterDuckType struct {
 	metav1.TypeMeta `json:",inline"`
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Spec holds the desired state of the DuckType (from the client).
+	// Spec holds the desired state of the ClusterDuckType (from the client).
 	// +optional
-	Spec DuckTypeSpec `json:"spec,omitempty"`
+	Spec ClusterDuckTypeSpec `json:"spec,omitempty"`
 
-	// Status communicates the observed state of the DuckType (from the controller).
+	// Status communicates the observed state of the ClusterDuckType (from the controller).
 	// +optional
-	Status DuckTypeStatus `json:"status,omitempty"`
+	Status ClusterDuckTypeStatus `json:"status,omitempty"`
 }
 
 var (
-	// Check that DuckType can be validated and defaulted.
-	_ apis.Validatable   = (*DuckType)(nil)
-	_ apis.Defaultable   = (*DuckType)(nil)
-	_ kmeta.OwnerRefable = (*DuckType)(nil)
+	// Check that ClusterDuckType can be validated and defaulted.
+	_ apis.Validatable   = (*ClusterDuckType)(nil)
+	_ apis.Defaultable   = (*ClusterDuckType)(nil)
+	_ kmeta.OwnerRefable = (*ClusterDuckType)(nil)
 	// Check that the type conforms to the duck Knative Resource shape.
-	_ duckv1.KRShaped = (*DuckType)(nil)
+	_ duckv1.KRShaped = (*ClusterDuckType)(nil)
 )
 
-// DuckTypeSpec holds the desired state of the DuckType (from the client).
-type DuckTypeSpec struct {
+// ClusterDuckTypeSpec holds the desired state of the ClusterDuckType (from the client).
+type ClusterDuckTypeSpec struct {
 	// Group is the API group of the defined duck type.
-	// Must match the name of the DuckType (in the form `<names.plural>.<group>`).
+	// Must match the name of the ClusterDuckType (in the form `<names.plural>.<group>`).
 	Group string `json:"group"`
 
 	// Names holds the naming conventions for this duck type.
@@ -77,7 +77,7 @@ type DuckTypeNames struct {
 	Name string `json:"name"`
 
 	// Plural is the plural name of the duck type.
-	// Must match the name of the DuckType (in the form `<names.plural>.<group>`).
+	// Must match the name of the ClusterDuckType (in the form `<names.plural>.<group>`).
 	// Must be all lowercase.
 	Plural string `json:"plural"`
 
@@ -154,8 +154,8 @@ const (
 	DuckTypeConditionReady = apis.ConditionReady
 )
 
-// DuckTypeStatus communicates the observed state of the DuckType (from the controller).
-type DuckTypeStatus struct {
+// ClusterDuckTypeStatus communicates the observed state of the ClusterDuckType (from the controller).
+type ClusterDuckTypeStatus struct {
 	duckv1.Status `json:",inline"`
 
 	// DuckList is a list of GVRK's that implement this duck.
@@ -167,15 +167,15 @@ type DuckTypeStatus struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// DuckTypeList is a list of DuckType resources
-type DuckTypeList struct {
+// ClusterDuckTypeList is a list of ClusterDuckType resources
+type ClusterDuckTypeList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
 
-	Items []DuckType `json:"items"`
+	Items []ClusterDuckType `json:"items"`
 }
 
 // GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (dt *DuckType) GetStatus() *duckv1.Status {
+func (dt *ClusterDuckType) GetStatus() *duckv1.Status {
 	return &dt.Status.Status
 }

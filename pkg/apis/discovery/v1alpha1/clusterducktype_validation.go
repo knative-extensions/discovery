@@ -27,7 +27,7 @@ import (
 )
 
 // Validate implements apis.Validatable
-func (dt *DuckType) Validate(ctx context.Context) (errs *apis.FieldError) {
+func (dt *ClusterDuckType) Validate(ctx context.Context) (errs *apis.FieldError) {
 	if dt.Name != fmt.Sprintf("%s.%s", dt.Spec.Names.Plural, dt.Spec.Group) {
 		errs = errs.Also(apis.ErrInvalidValue(dt.Name, "name"))
 	}
@@ -36,7 +36,7 @@ func (dt *DuckType) Validate(ctx context.Context) (errs *apis.FieldError) {
 }
 
 // Validate implements apis.Validatable
-func (dts *DuckTypeSpec) Validate(ctx context.Context) (errs *apis.FieldError) {
+func (dts *ClusterDuckTypeSpec) Validate(ctx context.Context) (errs *apis.FieldError) {
 	if dts.Group == "" {
 		errs = errs.Also(apis.ErrMissingField("group"))
 	}

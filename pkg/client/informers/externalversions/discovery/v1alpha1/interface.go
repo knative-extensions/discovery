@@ -24,8 +24,8 @@ import (
 
 // Interface provides access to all the informers in this group version.
 type Interface interface {
-	// DuckTypes returns a DuckTypeInformer.
-	DuckTypes() DuckTypeInformer
+	// ClusterDuckTypes returns a ClusterDuckTypeInformer.
+	ClusterDuckTypes() ClusterDuckTypeInformer
 }
 
 type version struct {
@@ -39,7 +39,7 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// DuckTypes returns a DuckTypeInformer.
-func (v *version) DuckTypes() DuckTypeInformer {
-	return &duckTypeInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+// ClusterDuckTypes returns a ClusterDuckTypeInformer.
+func (v *version) ClusterDuckTypes() ClusterDuckTypeInformer {
+	return &clusterDuckTypeInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }

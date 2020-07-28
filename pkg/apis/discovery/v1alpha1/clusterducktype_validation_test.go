@@ -26,11 +26,11 @@ import (
 
 func TestDuckTypeValidation(t *testing.T) {
 	tests := map[string]struct {
-		in   *DuckType
+		in   *ClusterDuckType
 		want *apis.FieldError
 	}{
 		"empty": {
-			in: &DuckType{},
+			in: &ClusterDuckType{},
 			want: (&apis.FieldError{
 				Message: "invalid value: ",
 				Paths:   []string{"name"},
@@ -41,11 +41,11 @@ func TestDuckTypeValidation(t *testing.T) {
 				}),
 		},
 		"missing versions": {
-			in: &DuckType{
+			in: &ClusterDuckType{
 				ObjectMeta: v1.ObjectMeta{
 					Name: "thisducks.example.com",
 				},
-				Spec: DuckTypeSpec{
+				Spec: ClusterDuckTypeSpec{
 					Group: "example.com",
 					Names: DuckTypeNames{
 						Name:     "thisduck",
@@ -60,11 +60,11 @@ func TestDuckTypeValidation(t *testing.T) {
 			},
 		},
 		"invalid name": {
-			in: &DuckType{
+			in: &ClusterDuckType{
 				ObjectMeta: v1.ObjectMeta{
 					Name: "ThisDucks.example.com",
 				},
-				Spec: DuckTypeSpec{
+				Spec: ClusterDuckTypeSpec{
 					Group: "example.com",
 					Names: DuckTypeNames{
 						Name:     "ThisDuck",
@@ -81,11 +81,11 @@ func TestDuckTypeValidation(t *testing.T) {
 			},
 		},
 		"plural not lowercase": {
-			in: &DuckType{
+			in: &ClusterDuckType{
 				ObjectMeta: v1.ObjectMeta{
 					Name: "ThisDucks.example.com",
 				},
-				Spec: DuckTypeSpec{
+				Spec: ClusterDuckTypeSpec{
 					Group: "example.com",
 					Names: DuckTypeNames{
 						Name:     "ThisDuck",
@@ -102,11 +102,11 @@ func TestDuckTypeValidation(t *testing.T) {
 			},
 		},
 		"singular not lowercase": {
-			in: &DuckType{
+			in: &ClusterDuckType{
 				ObjectMeta: v1.ObjectMeta{
 					Name: "thisducks.example.com",
 				},
-				Spec: DuckTypeSpec{
+				Spec: ClusterDuckTypeSpec{
 					Group: "example.com",
 					Names: DuckTypeNames{
 						Name:     "ThisDuck",
@@ -123,11 +123,11 @@ func TestDuckTypeValidation(t *testing.T) {
 			},
 		},
 		"dup versions": {
-			in: &DuckType{
+			in: &ClusterDuckType{
 				ObjectMeta: v1.ObjectMeta{
 					Name: "thisducks.example.com",
 				},
-				Spec: DuckTypeSpec{
+				Spec: ClusterDuckTypeSpec{
 					Group: "example.com",
 					Names: DuckTypeNames{
 						Name:     "ThisDuck",
@@ -146,11 +146,11 @@ func TestDuckTypeValidation(t *testing.T) {
 			},
 		},
 		"version with no name": {
-			in: &DuckType{
+			in: &ClusterDuckType{
 				ObjectMeta: v1.ObjectMeta{
 					Name: "thisducks.example.com",
 				},
-				Spec: DuckTypeSpec{
+				Spec: ClusterDuckTypeSpec{
 					Group: "example.com",
 					Names: DuckTypeNames{
 						Name:     "ThisDuck",
@@ -165,11 +165,11 @@ func TestDuckTypeValidation(t *testing.T) {
 			},
 		},
 		"version with invalid ref, no kind or resource": {
-			in: &DuckType{
+			in: &ClusterDuckType{
 				ObjectMeta: v1.ObjectMeta{
 					Name: "thisducks.example.com",
 				},
-				Spec: DuckTypeSpec{
+				Spec: ClusterDuckTypeSpec{
 					Group: "example.com",
 					Names: DuckTypeNames{
 						Name:     "ThisDuck",
@@ -189,11 +189,11 @@ func TestDuckTypeValidation(t *testing.T) {
 			},
 		},
 		"version with invalid ref, both kind and resource": {
-			in: &DuckType{
+			in: &ClusterDuckType{
 				ObjectMeta: v1.ObjectMeta{
 					Name: "thisducks.example.com",
 				},
-				Spec: DuckTypeSpec{
+				Spec: ClusterDuckTypeSpec{
 					Group: "example.com",
 					Names: DuckTypeNames{
 						Name:     "ThisDuck",
@@ -215,11 +215,11 @@ func TestDuckTypeValidation(t *testing.T) {
 			},
 		},
 		"version with invalid ref, missing version": {
-			in: &DuckType{
+			in: &ClusterDuckType{
 				ObjectMeta: v1.ObjectMeta{
 					Name: "thisducks.example.com",
 				},
-				Spec: DuckTypeSpec{
+				Spec: ClusterDuckTypeSpec{
 					Group: "example.com",
 					Names: DuckTypeNames{
 						Name:     "ThisDuck",
@@ -239,11 +239,11 @@ func TestDuckTypeValidation(t *testing.T) {
 			},
 		},
 		"bad selector": {
-			in: &DuckType{
+			in: &ClusterDuckType{
 				ObjectMeta: v1.ObjectMeta{
 					Name: "thisducks.example.com",
 				},
-				Spec: DuckTypeSpec{
+				Spec: ClusterDuckTypeSpec{
 					Group: "example.com",
 					Names: DuckTypeNames{
 						Name:     "ThisDuck",
@@ -264,11 +264,11 @@ func TestDuckTypeValidation(t *testing.T) {
 			},
 		},
 		"valid": {
-			in: &DuckType{
+			in: &ClusterDuckType{
 				ObjectMeta: v1.ObjectMeta{
 					Name: "thisducks.example.com",
 				},
-				Spec: DuckTypeSpec{
+				Spec: ClusterDuckTypeSpec{
 					Group: "example.com",
 					Names: DuckTypeNames{
 						Name:     "ThisDuck",

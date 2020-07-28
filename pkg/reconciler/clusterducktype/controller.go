@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package ducktype
+package clusterducktype
 
 import (
 	"context"
@@ -23,8 +23,8 @@ import (
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/logging"
 
-	ducktypeinformer "knative.dev/discovery/pkg/client/injection/informers/discovery/v1alpha1/ducktype"
-	ducktypereconciler "knative.dev/discovery/pkg/client/injection/reconciler/discovery/v1alpha1/ducktype"
+	ducktypeinformer "knative.dev/discovery/pkg/client/injection/informers/discovery/v1alpha1/clusterducktype"
+	ducktypereconciler "knative.dev/discovery/pkg/client/injection/reconciler/discovery/v1alpha1/clusterducktype"
 	crdinformer "knative.dev/pkg/client/injection/apiextensions/informers/apiextensions/v1/customresourcedefinition"
 )
 

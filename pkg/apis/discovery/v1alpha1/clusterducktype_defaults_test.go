@@ -24,22 +24,22 @@ import (
 
 func TestDuckTypeDefaulting(t *testing.T) {
 	tests := map[string]struct {
-		in   *DuckType
-		want *DuckType
+		in   *ClusterDuckType
+		want *ClusterDuckType
 	}{
 		"empty": {
-			in:   &DuckType{},
-			want: &DuckType{},
+			in:   &ClusterDuckType{},
+			want: &ClusterDuckType{},
 		},
 		"name set - lowercase": {
-			in: &DuckType{
-				Spec: DuckTypeSpec{
+			in: &ClusterDuckType{
+				Spec: ClusterDuckTypeSpec{
 					Names: DuckTypeNames{
 						Name: "thisduck",
 					},
 				}},
-			want: &DuckType{
-				Spec: DuckTypeSpec{
+			want: &ClusterDuckType{
+				Spec: ClusterDuckTypeSpec{
 					Names: DuckTypeNames{
 						Name:     "thisduck",
 						Singular: "thisduck",
@@ -47,14 +47,14 @@ func TestDuckTypeDefaulting(t *testing.T) {
 				}},
 		},
 		"name set - camelcase": {
-			in: &DuckType{
-				Spec: DuckTypeSpec{
+			in: &ClusterDuckType{
+				Spec: ClusterDuckTypeSpec{
 					Names: DuckTypeNames{
 						Name: "ThisDuck",
 					},
 				}},
-			want: &DuckType{
-				Spec: DuckTypeSpec{
+			want: &ClusterDuckType{
+				Spec: ClusterDuckTypeSpec{
 					Names: DuckTypeNames{
 						Name:     "ThisDuck",
 						Singular: "thisduck",

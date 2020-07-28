@@ -21,13 +21,13 @@ package fake
 import (
 	context "context"
 
-	ducktype "knative.dev/discovery/pkg/client/injection/informers/discovery/v1alpha1/ducktype"
+	clusterducktype "knative.dev/discovery/pkg/client/injection/informers/discovery/v1alpha1/clusterducktype"
 	fake "knative.dev/discovery/pkg/client/injection/informers/factory/fake"
 	controller "knative.dev/pkg/controller"
 	injection "knative.dev/pkg/injection"
 )
 
-var Get = ducktype.Get
+var Get = clusterducktype.Get
 
 func init() {
 	injection.Fake.RegisterInformer(withInformer)
@@ -35,6 +35,6 @@ func init() {
 
 func withInformer(ctx context.Context) (context.Context, controller.Informer) {
 	f := fake.Get(ctx)
-	inf := f.Discovery().V1alpha1().DuckTypes()
-	return context.WithValue(ctx, ducktype.Key{}, inf), inf.Informer()
+	inf := f.Discovery().V1alpha1().ClusterDuckTypes()
+	return context.WithValue(ctx, clusterducktype.Key{}, inf), inf.Informer()
 }

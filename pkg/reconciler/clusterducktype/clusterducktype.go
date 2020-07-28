@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package ducktype
+package clusterducktype
 
 import (
 	"context"
@@ -22,13 +22,13 @@ import (
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/client/listers/apiextensions/v1"
 
 	discoveryv1alpha1 "knative.dev/discovery/pkg/apis/discovery/v1alpha1"
-	ducktypereconciler "knative.dev/discovery/pkg/client/injection/reconciler/discovery/v1alpha1/ducktype"
+	ducktypereconciler "knative.dev/discovery/pkg/client/injection/reconciler/discovery/v1alpha1/clusterducktype"
 	"knative.dev/pkg/logging"
 	"knative.dev/pkg/reconciler"
 )
 
 // Reconciler implements ducktypereconciler.Interface for
-// DuckType resources.
+// ClusterDuckType resources.
 type Reconciler struct {
 	crdLister apiextensionsv1.CustomResourceDefinitionLister
 }
@@ -37,7 +37,7 @@ type Reconciler struct {
 var _ ducktypereconciler.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *Reconciler) ReconcileKind(ctx context.Context, o *discoveryv1alpha1.DuckType) reconciler.Event {
+func (r *Reconciler) ReconcileKind(ctx context.Context, o *discoveryv1alpha1.ClusterDuckType) reconciler.Event {
 	logger := logging.FromContext(ctx)
 
 	crd, err := r.crdLister.Get("channels.messaging.knative.dev") // TODO generalize past testing

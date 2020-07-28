@@ -15,7 +15,7 @@
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  name: ducktypes.discovery.knative.dev
+  name: clusterducktypes.discovery.knative.dev
   labels:
     discovery.knative.dev/release: devel
     knative.dev/crd-install: "true"
@@ -50,12 +50,12 @@ spec:
           type: string
           jsonPath: ".status.conditions[?(@.type=='Ready')].reason"
   names:
-    kind: DuckType
-    plural: ducktypes
-    singular: ducktype
+    kind: ClusterDuckType
+    plural: clusterducktypes
+    singular: clusterducktype
     categories:
     - all
     - knative
     shortNames:
-    - ducks
+    - cducks
   scope: Cluster
