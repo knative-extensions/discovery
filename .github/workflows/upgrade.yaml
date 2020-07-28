@@ -1,0 +1,63 @@
+name: deps-upgrade
+
+on: 
+  schedule:
+  - cron:  '0 2,14 * * *'
+
+jobs:
+  upgrade:
+    name: Upgrade
+    strategy:
+      matrix:
+        go-version: [1.14.x]
+        platform: [ubuntu-latest]
+
+    runs-on: ${{ matrix.platform }}
+
+    env:
+      GOPATH: ${{ github.workspace }}
+      GO111MODULE: off
+
+    steps:
+
+    - name: Set up Go ${{ matrix.go-version }}
+      uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go-version }}
+      id: go
+
+    - name: Check out code onto GOPATH
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        path: ./src/knative.dev/discovery
+
+    - name: Upgrade
+      shell: bash
+      run: |
+        pushd ./src/knative.dev/discovery
+        ./hack/update-deps.sh --upgrade
+        popd
+
+    - name: Codegen
+      shell: bash
+      run: |
+        pushd ./src/knative.dev/discovery
+        rm -rf ./pkg/client
+        ./hack/update-codegen.sh
+        popd
+
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v3
+      with:
+        path: ./src/knative.dev/discovery
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: 'upgrade to latest dependencies'
+        title: '[Automated] Upgrade to latest dependencies'
+        body: |
+          Produced via,
+          ```
+          ./hack/update-deps.sh --upgrade
+          rm -rf ./pkg/client
+          ./hack/update-codegen.sh
+          ```
