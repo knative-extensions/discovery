@@ -16,9 +16,7 @@ limitations under the License.
 
 package controller
 
-import (
-	"k8s.io/client-go/util/workqueue"
-)
+import "k8s.io/client-go/util/workqueue"
 
 // twoLaneQueue is a rate limited queue that wraps around two queues
 // -- fast queue (anonymously aliased), whose contents are processed with priority.
@@ -39,8 +37,7 @@ type twoLaneQueue struct {
 }
 
 // Creates a new twoLaneQueue.
-func newTwoLaneWorkQueue(name string) *twoLaneQueue {
-	rl := workqueue.DefaultControllerRateLimiter()
+func newTwoLaneWorkQueue(name string, rl workqueue.RateLimiter) *twoLaneQueue {
 	tlq := &twoLaneQueue{
 		RateLimitingInterface: workqueue.NewNamedRateLimitingQueue(
 			rl,
@@ -72,8 +69,8 @@ func process(q workqueue.Interface, ch chan interface{}) {
 		if d {
 			break
 		}
-		ch <- i
 		q.Done(i)
+		ch <- i
 	}
 }
 
