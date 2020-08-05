@@ -92,9 +92,9 @@ And get the full DuckType `addressable.duck.knative.dev` resource:
 _(note this is pending finalization)_
 
 ```shell
-$ kubectl get ducktypes addressable.duck.knative.dev -oyaml
+$ kubectl get clusterducktypes addressable.duck.knative.dev -oyaml
 apiVersion: discovery.knative.dev/v1alpha1
-kind: DuckType
+kind: CluserDuckType
 metadata:
   generation: 1
   name: addressables.duck.knative.dev
@@ -158,7 +158,7 @@ the cluster becomes easier to get:
 _(note this is pending finalization)_
 
 ```shell
-$ kubectl get ducktypes
+$ kubectl get clusterducktypes
 NAME                                  DUCK NAME      DUCKS   READY   REASON
 addressables.duck.knative.dev         Addressable    10      True
 bindings.duck.knative.dev             Binding        2       True
