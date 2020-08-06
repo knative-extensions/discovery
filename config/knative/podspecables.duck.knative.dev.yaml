@@ -14,8 +14,8 @@ spec:
   versions:
     - name: "v1"
       refs:
-        - group: extensions
-          version: v1beta1
+        - group: apps
+          version: v1
           kind: Deployment
         - group: apps
           version: v1
