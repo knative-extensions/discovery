@@ -13,10 +13,9 @@
 # limitations under the License.
 
 apiVersion: discovery.knative.dev/v1alpha1
-kind: DuckType
+kind: ClusterDuckType
 metadata:
   name: minimums.smoke.knative.dev
-  namespace: {{ .namespace }}
 spec:
   group: smoke.knative.dev
   names:
