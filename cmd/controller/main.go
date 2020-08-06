@@ -18,7 +18,7 @@ package main
 
 import (
 	// The set of controllers this controller process runs.
-	"knative.dev/discovery/pkg/reconciler/ducktype"
+	"knative.dev/discovery/pkg/reconciler/clusterducktype"
 
 	// This defines the shared main for injected controllers.
 	"knative.dev/pkg/injection/sharedmain"
@@ -26,6 +26,6 @@ import (
 
 func main() {
 	sharedmain.Main("controller",
-		ducktype.NewController,
+		clusterducktype.NewController,
 	)
 }

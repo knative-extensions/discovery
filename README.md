@@ -10,7 +10,7 @@ design doc.
 ko apply -f ./config
 ```
 
-## DuckType.discovery.knative.dev
+## ClusterDuckType:discovery.knative.dev/v1alpha1
 
 The goal is to have a custom type that is use installable to help a developer,
 cluster admin, or tooling to better understand the duck types that are installed

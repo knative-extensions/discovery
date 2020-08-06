@@ -26,7 +26,7 @@ import (
 
 type DiscoveryV1alpha1Interface interface {
 	RESTClient() rest.Interface
-	DuckTypesGetter
+	ClusterDuckTypesGetter
 }
 
 // DiscoveryV1alpha1Client is used to interact with features provided by the discovery.knative.dev group.
@@ -34,8 +34,8 @@ type DiscoveryV1alpha1Client struct {
 	restClient rest.Interface
 }
 
-func (c *DiscoveryV1alpha1Client) DuckTypes() DuckTypeInterface {
-	return newDuckTypes(c)
+func (c *DiscoveryV1alpha1Client) ClusterDuckTypes() ClusterDuckTypeInterface {
+	return newClusterDuckTypes(c)
 }
 
 // NewForConfig creates a new DiscoveryV1alpha1Client for the given config.

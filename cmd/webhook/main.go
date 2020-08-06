@@ -40,7 +40,7 @@ import (
 
 var types = map[schema.GroupVersionKind]resourcesemantics.GenericCRD{
 	// List the types to validate.
-	v1alpha1.SchemeGroupVersion.WithKind("DuckType"): &v1alpha1.DuckType{},
+	v1alpha1.SchemeGroupVersion.WithKind("ClusterDuckType"): &v1alpha1.ClusterDuckType{},
 }
 
 var callbacks = map[schema.GroupVersionKind]validation.Callback{}
