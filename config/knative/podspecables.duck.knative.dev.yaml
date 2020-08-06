@@ -1,0 +1,33 @@
+apiVersion: discovery.knative.dev/v1alpha1
+kind: ClusterDuckType
+metadata:
+  name: podspecables.duck.knative.dev
+  labels:
+    discovery.knative.dev/release: devel
+spec:
+  selectors:
+    - labelSelector: "duck.knative.dev/podspecable=true"
+  names:
+    name: "PodSpecable"
+    plural: "podspecables"
+    singular: "podspecable"
+  versions:
+    - name: "v1"
+      refs:
+        - group: extensions
+          version: v1beta1
+          kind: Deployment
+        - group: apps
+          version: v1
+          kind: ReplicaSet
+        - group: apps
+          version: v1
+          kind: DaemonSet
+        - group: apps
+          version: v1
+          kind: StatefulSet
+        - group: batch
+          version: v1
+          kind: Job
+       #schema: # TODO
+  group: duck.knative.dev
