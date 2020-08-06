@@ -90,7 +90,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, dt *v1alpha1.ClusterDuck
 	return nil
 }
 
-// Ducks returns CRDs labeled as given.
+// getCRDsWith returns CRDs labeled as given.
 // labelSelector should be in the form "duck.knative.dev/source=true"
 func (r *Reconciler) getCRDsWith(labelSelector string) ([]*apiextensionsv1.CustomResourceDefinition, error) {
 	ls, err := labels.Parse(labelSelector)
