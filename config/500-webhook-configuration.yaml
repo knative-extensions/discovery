@@ -49,7 +49,7 @@ kind: ValidatingWebhookConfiguration
 metadata:
   name: config.webhook.knative-discovery.knative.dev
   labels:
-    serving.knative.dev/release: devel
+    discovery.knative.dev/release: devel
 webhooks:
 - admissionReviewVersions:
   - v1beta1

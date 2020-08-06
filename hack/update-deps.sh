@@ -61,3 +61,8 @@ rm -rf $(find vendor/ -name 'OWNERS')
 rm -rf $(find vendor/ -name '*_test.go')
 
 update_licenses third_party/VENDOR-LICENSE "./..."
+
+
+### HACK HACK HACK
+## Until we solve https://github.com/knative/pkg/issues/1590, let's do this:
+git apply ${ROOT_DIR}/hack/az-control-plane.patch

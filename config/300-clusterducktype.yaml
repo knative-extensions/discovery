@@ -39,10 +39,10 @@ spec:
       additionalPrinterColumns:
         - name: Short Name
           type: string
-          JSONPath: .spec.names.name
+          jsonPath: .spec.names.name
         - name: Ducks
           type: integer
-          JSONPath: .status.duckCount
+          jsonPath: .status.duckCount
         - name: Ready
           type: string
           jsonPath: ".status.conditions[?(@.type=='Ready')].status"
