@@ -94,7 +94,7 @@ type DuckVersion struct {
 	// Refs is a list of GVRKs that implement this duck type.
 	// Used for manual discovery.
 	// +optional
-	Refs []GroupVersionResourceKind `json:"refs,omitempty"`
+	Refs []ResourceRef `json:"refs,omitempty"`
 
 	// Custom Columns to be used to pretty print the duck type at this version.
 	// +optional
@@ -125,27 +125,65 @@ type CustomResourceDefinitionSelector struct {
 	LabelSelector string `json:"labelSelector,omitempty" yaml:"labelSelector,omitempty"`
 }
 
-// GroupVersionResourceKind
-type GroupVersionResourceKind struct {
+// ResourceScope is an enum defining the different scopes available to a custom resource
+type ResourceScope string
+
+const (
+	ClusterScoped   ResourceScope = "Cluster"
+	NamespaceScoped ResourceScope = "Namespaced"
+)
+
+// ResourceRef points to a Kubernetes Resource kind.
+type ResourceRef struct {
 	// Group is the resource group.
-	// +optional
+	// +optional, must not be set if APIVersion is set.
 	Group string `json:"group,omitempty"`
 	// Version is the version the duck type applies to for the resource.
+	// +optional
+	// +optional, one of [Version, APIVersion] required.
 	Version string `json:"version,omitempty"`
+
+	// APIVersion is the group and version of the resource combined.
+	// - if group is non-empty, `group/version`
+	// - if group is empty, `version`
+	// +optional, one of [Version, APIVersion] required.
+	APIVersion string `json:"apiVersion,omitempty"`
+
 	// Resource is the plural resource name.
 	// +optional, one of [Resource, Kind] required.
 	Resource string `json:"resource,omitempty"`
 	// Kind is the CamelCased resource kind.
 	// +optional, one of [Resource, Kind] required.
 	Kind string `json:"kind,omitempty"`
+
+	// Scope indicates whether the resource is cluster- or namespace-scoped.
+	// +optional, allowed values are `Cluster` and `Namespaced`, defaults to "Namespaced".
+	Scope ResourceScope `json:"scope"`
 }
 
-// FoundDuckVersion
-type FoundDuck struct {
-	// Version is the version of the duck found.
-	DuckVersion string `json:"duckVersion"`
-	// Ref is the GVRK that adheres to this duck type version.
-	Ref GroupVersionResourceKind `json:"ref,omitempty"`
+// APIVersion puts "group" and "version" into a single "group/version" string
+// or returns APIVersion.
+func APIVersion(r ResourceRef) string {
+	if len(r.APIVersion) > 0 {
+		return r.APIVersion
+	}
+	if len(r.Group) > 0 {
+		return r.Group + "/" + r.Version
+	}
+	return r.Version
+}
+
+// ResourceMeta is a resolved ResourceRef.
+type ResourceMeta struct {
+	// APIVersion is the group and version of the resource combined.
+	APIVersion string `json:"apiVersion,omitempty"`
+
+	// Kind is the CamelCased resource kind.
+	Kind string `json:"kind"`
+
+	// Scope indicates whether the resource is cluster- or namespace-scoped.
+	// Allowed values are `Cluster` and `Namespaced`.
+	Scope ResourceScope `json:"scope"`
 }
 
 const (
@@ -158,10 +196,13 @@ const (
 type ClusterDuckTypeStatus struct {
 	duckv1.Status `json:",inline"`
 
-	// DuckList is a list of GVRK's that implement this duck.
-	DuckList []FoundDuck `json:"ducks,omitempty"`
+	// Ducks is a versioned mapping of the found resources that implement this duck.
+	Ducks map[string]ResourceMeta `json:"ducks,omitempty"`
 
-	// DuckCount
+	// TODO: look into changing ducks to:
+	// Ducks map[DuckVersion]metav1.ListMeta `json:"ducks,omitempty"`
+
+	// DuckCount is the count of unique duck types found post-hunt.
 	DuckCount int `json:"duckCount,omitempty"`
 }
 

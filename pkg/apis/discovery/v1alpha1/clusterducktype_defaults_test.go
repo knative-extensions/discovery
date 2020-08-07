@@ -61,6 +61,37 @@ func TestDuckTypeDefaulting(t *testing.T) {
 					},
 				}},
 		},
+		"default to namespaced": {
+			in: &ClusterDuckType{
+				Spec: ClusterDuckTypeSpec{
+					Names: DuckTypeNames{
+						Name:     "ThisDuck",
+						Singular: "thisduck",
+					},
+					Versions: []DuckVersion{{
+						Name: "v1",
+						Refs: []ResourceRef{{
+							APIVersion: "needs.scope/v1",
+							Kind:       "NeedsScope",
+						}},
+					}},
+				}},
+			want: &ClusterDuckType{
+				Spec: ClusterDuckTypeSpec{
+					Names: DuckTypeNames{
+						Name:     "ThisDuck",
+						Singular: "thisduck",
+					},
+					Versions: []DuckVersion{{
+						Name: "v1",
+						Refs: []ResourceRef{{
+							APIVersion: "needs.scope/v1",
+							Kind:       "NeedsScope",
+							Scope:      NamespaceScoped,
+						}},
+					}},
+				}},
+		},
 	}
 
 	for name, tc := range tests {

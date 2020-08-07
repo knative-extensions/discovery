@@ -35,4 +35,20 @@ func (dts *ClusterDuckTypeSpec) SetDefaults(ctx context.Context) {
 	if dts.Names.Singular == "" {
 		dts.Names.Singular = strings.ToLower(dts.Names.Name)
 	}
+	for v := range dts.Versions {
+		dts.Versions[v].SetDefaults(ctx)
+	}
+}
+
+// SetDefaults implements apis.Defaultable
+func (dv *DuckVersion) SetDefaults(ctx context.Context) {
+	for r := range dv.Refs {
+		dv.Refs[r].SetDefaults(ctx)
+	}
+}
+
+func (rr *ResourceRef) SetDefaults(ctx context.Context) {
+	if rr.Scope == "" {
+		rr.Scope = NamespaceScoped
+	}
 }

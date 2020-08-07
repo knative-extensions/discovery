@@ -66,7 +66,7 @@ spec:
 			},
 			Versions: []DuckVersion{{
 				Name: "v1",
-				Refs: []GroupVersionResourceKind{{
+				Refs: []ResourceRef{{
 					Group:   "foo.com",
 					Version: "v2",
 					Kind:    "Bar",
@@ -85,5 +85,60 @@ spec:
 	if !cmp.Equal(got, want) {
 		t.Errorf("From YAML (-want, +got) = %v",
 			cmp.Diff(want, got))
+	}
+}
+
+func TestAPIVersion(t *testing.T) {
+	tests := map[string]struct {
+		in   ResourceRef
+		want string
+	}{
+		"empty": {
+			in:   ResourceRef{},
+			want: "",
+		},
+		"version and group set": {
+			in: ResourceRef{
+				Group:   "this.group",
+				Version: "v1",
+			},
+			want: "this.group/v1",
+		},
+		"only version": {
+			in: ResourceRef{
+				Version: "v1",
+			},
+			want: "v1",
+		},
+		"only group": {
+			in: ResourceRef{
+				Group: "this.group",
+			},
+			want: "this.group/",
+		},
+		"only apiVersion": {
+			in: ResourceRef{
+				APIVersion: "this.group/v1",
+			},
+			want: "this.group/v1",
+		},
+		"apiVersion+group+version": {
+			in: ResourceRef{
+				Group:      "that.group",
+				Version:    "v0",
+				APIVersion: "this.group/v1",
+			},
+			want: "this.group/v1",
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			got := APIVersion(tc.in)
+			if !cmp.Equal(got, tc.want) {
+				t.Errorf("APIVersion (-want, +got) = %v",
+					cmp.Diff(tc.want, got))
+			}
+		})
 	}
 }

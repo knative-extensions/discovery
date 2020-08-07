@@ -98,14 +98,24 @@ func (dv *DuckVersion) Validate(ctx context.Context) (errs *apis.FieldError) {
 }
 
 // Validate implements apis.Validatable
-func (g *GroupVersionResourceKind) Validate(ctx context.Context) (errs *apis.FieldError) {
-	if g.Version == "" {
-		errs = errs.Also(apis.ErrMissingField("version"))
+func (g *ResourceRef) Validate(ctx context.Context) (errs *apis.FieldError) {
+	// Version OR APIVersion
+	if g.Version != "" && g.APIVersion != "" {
+		errs = errs.Also(apis.ErrMultipleOneOf("version", "apiVersion"))
+	} else if g.Version == "" && g.APIVersion == "" {
+		errs = errs.Also(apis.ErrMissingOneOf("version", "apiVersion"))
 	}
+
+	// Kind OR Resource
 	if g.Kind != "" && g.Resource != "" {
 		errs = errs.Also(apis.ErrMultipleOneOf("kind", "resource"))
 	} else if g.Kind == "" && g.Resource == "" {
 		errs = errs.Also(apis.ErrMissingOneOf("kind", "resource"))
+	}
+
+	// If Group, then APIVersion should not be set.
+	if g.Group != "" && g.APIVersion != "" {
+		errs = errs.Also(apis.ErrMultipleOneOf("group", "apiVersion"))
 	}
 	return errs
 }
