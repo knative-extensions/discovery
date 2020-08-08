@@ -18,6 +18,7 @@ package clusterducktype
 
 import (
 	"context"
+	"k8s.io/client-go/discovery"
 
 	"knative.dev/pkg/configmap"
 	"knative.dev/pkg/controller"
@@ -55,5 +56,6 @@ func NewController(
 	}
 	crdInformer.Informer().AddEventHandler(controller.HandleAll(grDt))
 
+	discovery.NewDiscoveryClient()
 	return impl
 }

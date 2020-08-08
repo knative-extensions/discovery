@@ -18,6 +18,9 @@ package clusterducktype
 
 import (
 	"context"
+	"fmt"
+	"github.com/go-openapi/errors"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sort"
 
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
@@ -108,34 +111,15 @@ func (r *Reconciler) getCRDsWith(labelSelector string) ([]*apiextensionsv1.Custo
 
 // ByFoundDuck implements sort.Interface for []v1alpha1.FoundDuck based on
 // the group and resource fields.
-type ByFoundDuck []v1alpha1.FoundDuck
+type ByFoundDuck []v1alpha1.ResourceMeta
 
 func (a ByFoundDuck) Len() int      { return len(a) }
 func (a ByFoundDuck) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 func (a ByFoundDuck) Less(i, j int) bool {
 	// TODO: this needs to sort like this, but also group by duck version.
-	keyI := a[i].Ref.Group + a[i].Ref.Resource
-	keyJ := a[j].Ref.Group + a[j].Ref.Resource
+	keyI := fmt.Sprintf("%s-%s", a[i].APIVersion, a[i].Kind)
+	keyJ := fmt.Sprintf("%s-%s", a[j].APIVersion, a[j].Kind)
 	return keyI < keyJ
-}
-
-func CRDToFoundDuck(duckVersion string, crd *apiextensionsv1.CustomResourceDefinition) v1alpha1.FoundDuck {
-	for _, v := range crd.Spec.Versions {
-		if !v.Served {
-			continue
-		}
-
-		return v1alpha1.FoundDuck{
-			DuckVersion: duckVersion,
-			Ref: v1alpha1.GroupVersionResourceKind{
-				Group:    crd.Spec.Group,
-				Version:  v.Name,
-				Resource: crd.Spec.Names.Plural,
-				Kind:     crd.Spec.Names.Kind,
-			},
-		}
-	}
-	return v1alpha1.FoundDuck{}
 }
 
 func DuckCount(ducks []v1alpha1.FoundDuck) int {
