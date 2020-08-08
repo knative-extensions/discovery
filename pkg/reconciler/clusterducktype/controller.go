@@ -18,6 +18,7 @@ package clusterducktype
 
 import (
 	"context"
+
 	"k8s.io/client-go/discovery"
 
 	"knative.dev/pkg/configmap"

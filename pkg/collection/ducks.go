@@ -17,10 +17,11 @@ limitations under the License.
 package collection
 
 import (
-	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
-	"knative.dev/discovery/pkg/apis/discovery/v1alpha1"
 	"sort"
 	"strings"
+
+	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	"knative.dev/discovery/pkg/apis/discovery/v1alpha1"
 )
 
 type DuckHunter interface {
@@ -79,17 +80,6 @@ func (dh *duckHunter) AddCRD(crd *apiextensionsv1.CustomResourceDefinition) {
 	if crd == nil {
 		return
 	}
-	// TODO: the crds that come in might be labeled with duck version limitations.
-	// if they are not, then assume all matching served versions of the CRD
-	// adhere to the duck.
-
-	/*
-		// TODO: use match filter rules:
-		//   `<group>/<names.singular>=true`
-		// Annotations are used to map the versions of the CRD to the correct
-		// ducktype. The annotation is expected to be in the form:
-		//   `<names.plural>.<group>/<versions[x].name>=[CRD.Version]`
-	*/
 	if metas := crdToResourceMeta(crd); len(metas) > 0 {
 		dh.collectVersionsByFilter(crd)
 		for _, meta := range metas {
@@ -127,7 +117,7 @@ func (dh *duckHunter) collectVersionsByFilter(crd *apiextensionsv1.CustomResourc
 	if dh.filters == nil || dh.filters.DuckVersionPrefix == "" {
 		return
 	}
-	for k, _ := range crd.Annotations {
+	for k := range crd.Annotations {
 		if strings.HasPrefix(k, dh.filters.DuckVersionPrefix+"/") {
 			version := strings.TrimPrefix(k, dh.filters.DuckVersionPrefix+"/")
 			if _, found := dh.ducks[version]; !found {
@@ -172,7 +162,7 @@ func (dh *duckHunter) AddRef(duckVersion string, ref v1alpha1.ResourceRef) {
 }
 
 func (dh *duckHunter) Ducks() map[string][]v1alpha1.ResourceMeta {
-	for v, _ := range dh.ducks {
+	for v := range dh.ducks {
 		sort.Sort(ByResourceMeta(dh.ducks[v]))
 	}
 	return dh.ducks

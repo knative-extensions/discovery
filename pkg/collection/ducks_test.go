@@ -1,12 +1,13 @@
 package collection
 
 import (
+	"reflect"
+	"testing"
+
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"knative.dev/discovery/pkg/apis/discovery/v1alpha1"
-	"reflect"
-	"testing"
 )
 
 func makeCRD(group, kind string, versions map[string]bool) *apiextensionsv1.CustomResourceDefinition {
