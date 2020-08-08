@@ -19,13 +19,10 @@ package clusterducktype
 import (
 	"context"
 	"fmt"
-	"github.com/go-openapi/errors"
-	"k8s.io/apimachinery/pkg/runtime/schema"
-	"sort"
-
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	apiextensionslisters "k8s.io/apiextensions-apiserver/pkg/client/listers/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	"knative.dev/discovery/pkg/collection"
 
 	v1alpha1 "knative.dev/discovery/pkg/apis/discovery/v1alpha1"
 	ducktypereconciler "knative.dev/discovery/pkg/client/injection/reconciler/discovery/v1alpha1/clusterducktype"
@@ -43,9 +40,12 @@ var _ ducktypereconciler.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface
 func (r *Reconciler) ReconcileKind(ctx context.Context, dt *v1alpha1.ClusterDuckType) reconciler.Event {
-	/// By query
+	hunter := collection.NewDuckHunter(nil, &collection.DuckFilters{
+		DuckLabel:         fmt.Sprintf("%s/%s", dt.Spec.Group, dt.Spec.Names.Singular),
+		DuckVersionPrefix: fmt.Sprintf("%s.%s", dt.Spec.Names.Plural, dt.Spec.Group),
+	})
 
-	kinds := make(map[string]*apiextensionsv1.CustomResourceDefinition, 0)
+	/// By query
 
 	for _, st := range dt.Spec.Selectors {
 		crds, err := r.getCRDsWith(st.LabelSelector)
@@ -53,17 +53,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, dt *v1alpha1.ClusterDuck
 			// TODO: this should be a condition that reports back that RBAC is incorrect for getting CRDs?
 			return err
 		}
-		for _, crd := range crds {
-			key := crd.Name
-			if _, found := kinds[key]; !found {
-				kinds[key] = crd
-			}
-		}
-	}
-
-	foundDucks := make([]v1alpha1.FoundDuck, 0)
-	for _, crd := range kinds {
-		foundDucks = append(foundDucks, CRDToFoundDuck("", crd))
+		hunter.AddCRDs(crds)
 	}
 
 	/// By ref
@@ -71,30 +61,19 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, dt *v1alpha1.ClusterDuck
 	for _, dv := range dt.Spec.Versions {
 		for _, ref := range dv.Refs {
 			// TODO we should query and test that the Ref is installed and works on this cluster.
-			foundDucks = append(foundDucks, v1alpha1.FoundDuck{
-				DuckVersion: dv.Name,
-				Ref:         ref,
-			})
+			hunter.AddRef(dv.Name, ref)
 		}
 	}
 
-	// TODO: the above logic needs to pop out the label selected found ducks to
-	// each version supported that is not overwritten. This will likely be
-	// slightly complicated and needs a bunch of tests. Break it apart into
-	// some smaller component that we can encapsulate those tests.
-
-	// Sort and store.
-
-	sort.Sort(ByFoundDuck(foundDucks))
-	dt.Status.DuckList = foundDucks
-	dt.Status.DuckCount = DuckCount(foundDucks)
+	dt.Status.Ducks = hunter.Ducks()
+	dt.Status.DuckCount = DuckCount(dt.Status.Ducks)
 
 	dt.Status.MarkReady()
 	return nil
 }
 
 // getCRDsWith returns CRDs labeled as given.
-// labelSelector should be in the form "duck.knative.dev/source=true"
+// labelSelector should be in the form "<group>/<names.singular>=true"
 func (r *Reconciler) getCRDsWith(labelSelector string) ([]*apiextensionsv1.CustomResourceDefinition, error) {
 	ls, err := labels.Parse(labelSelector)
 	if err != nil {
@@ -109,20 +88,16 @@ func (r *Reconciler) getCRDsWith(labelSelector string) ([]*apiextensionsv1.Custo
 	return list, nil
 }
 
-// ByFoundDuck implements sort.Interface for []v1alpha1.FoundDuck based on
-// the group and resource fields.
-type ByFoundDuck []v1alpha1.ResourceMeta
-
-func (a ByFoundDuck) Len() int      { return len(a) }
-func (a ByFoundDuck) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
-func (a ByFoundDuck) Less(i, j int) bool {
-	// TODO: this needs to sort like this, but also group by duck version.
-	keyI := fmt.Sprintf("%s-%s", a[i].APIVersion, a[i].Kind)
-	keyJ := fmt.Sprintf("%s-%s", a[j].APIVersion, a[j].Kind)
-	return keyI < keyJ
-}
-
-func DuckCount(ducks []v1alpha1.FoundDuck) int {
-	// TODO: this is the wrong number, for now it is close enough.
-	return len(ducks)
+func DuckCount(ducks map[string][]v1alpha1.ResourceMeta) (count int) {
+	kinds := make(map[string]bool, 0)
+	for _, metas := range ducks {
+		for _, meta := range metas {
+			key := fmt.Sprintf("%s-%s", meta.APIVersion, meta.Kind)
+			if _, found := kinds[key]; !found {
+				kinds[key] = true
+				count++
+			}
+		}
+	}
+	return count
 }

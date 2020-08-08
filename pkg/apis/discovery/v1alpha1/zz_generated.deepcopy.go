@@ -121,9 +121,17 @@ func (in *ClusterDuckTypeStatus) DeepCopyInto(out *ClusterDuckTypeStatus) {
 	in.Status.DeepCopyInto(&out.Status)
 	if in.Ducks != nil {
 		in, out := &in.Ducks, &out.Ducks
-		*out = make(map[string]ResourceMeta, len(*in))
+		*out = make(map[string][]ResourceMeta, len(*in))
 		for key, val := range *in {
-			(*out)[key] = val
+			var outVal []ResourceMeta
+			if val == nil {
+				(*out)[key] = nil
+			} else {
+				in, out := &val, &outVal
+				*out = make([]ResourceMeta, len(*in))
+				copy(*out, *in)
+			}
+			(*out)[key] = outVal
 		}
 	}
 	return

@@ -197,10 +197,7 @@ type ClusterDuckTypeStatus struct {
 	duckv1.Status `json:",inline"`
 
 	// Ducks is a versioned mapping of the found resources that implement this duck.
-	Ducks map[string]ResourceMeta `json:"ducks,omitempty"`
-
-	// TODO: look into changing ducks to:
-	// Ducks map[DuckVersion]metav1.ListMeta `json:"ducks,omitempty"`
+	Ducks map[string][]ResourceMeta `json:"ducks,omitempty"`
 
 	// DuckCount is the count of unique duck types found post-hunt.
 	DuckCount int `json:"duckCount,omitempty"`

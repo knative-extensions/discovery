@@ -50,7 +50,7 @@ func makeCRDAnnotated(group, kind string, versions map[string]bool, labels, anno
 	return crd
 }
 
-func TestNewDuckCollector(t *testing.T) {
+func TestNewDuckHunter(t *testing.T) {
 	tests := map[string]struct {
 		versions []v1alpha1.DuckVersion
 		want     *duckHunter
@@ -97,14 +97,14 @@ func TestNewDuckCollector(t *testing.T) {
 	}
 }
 
-func Test_duckCollector_AddCRD(t *testing.T) {
+func Test_DuckHunter_AddCRD(t *testing.T) {
 	tests := map[string]struct {
-		dc   DuckHunter
+		dh   DuckHunter
 		crd  *apiextensionsv1.CustomResourceDefinition
 		want map[string][]v1alpha1.ResourceMeta
 	}{
 		"one duck version, one crd version": {
-			dc:  NewDuckHunter([]v1alpha1.DuckVersion{{Name: "v1"}}, nil),
+			dh:  NewDuckHunter([]v1alpha1.DuckVersion{{Name: "v1"}}, nil),
 			crd: makeCRD("teach.me.how", "Ducky", map[string]bool{"v2": true}),
 			want: map[string][]v1alpha1.ResourceMeta{
 				"v1": {{
@@ -115,7 +115,7 @@ func Test_duckCollector_AddCRD(t *testing.T) {
 			},
 		},
 		"one duck version, two crd version": {
-			dc:  NewDuckHunter([]v1alpha1.DuckVersion{{Name: "v1"}}, nil),
+			dh:  NewDuckHunter([]v1alpha1.DuckVersion{{Name: "v1"}}, nil),
 			crd: makeCRD("teach.me.how", "Ducky", map[string]bool{"v2": true, "v3": true}),
 			want: map[string][]v1alpha1.ResourceMeta{
 				"v1": {{
@@ -130,7 +130,7 @@ func Test_duckCollector_AddCRD(t *testing.T) {
 			},
 		},
 		"three duck versions, one crd version": {
-			dc:  NewDuckHunter([]v1alpha1.DuckVersion{{Name: "v1"}, {Name: "v2"}, {Name: "v3"}}, nil),
+			dh:  NewDuckHunter([]v1alpha1.DuckVersion{{Name: "v1"}, {Name: "v2"}, {Name: "v3"}}, nil),
 			crd: makeCRD("teach.me.how", "Ducky", map[string]bool{"v2": true}),
 			want: map[string][]v1alpha1.ResourceMeta{
 				"v1": {{
@@ -153,22 +153,22 @@ func Test_duckCollector_AddCRD(t *testing.T) {
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			tc.dc.AddCRD(tc.crd)
-			if got := tc.dc.Ducks(); !reflect.DeepEqual(got, tc.want) {
+			tc.dh.AddCRD(tc.crd)
+			if got := tc.dh.Ducks(); !reflect.DeepEqual(got, tc.want) {
 				t.Errorf("Ducks() = %v, want %v", got, tc.want)
 			}
 		})
 	}
 }
 
-func Test_duckCollector_AddCRD_filtered(t *testing.T) {
+func Test_DuckHunter_AddCRD_filtered(t *testing.T) {
 	tests := map[string]struct {
-		dc   DuckHunter
+		dh   DuckHunter
 		crd  *apiextensionsv1.CustomResourceDefinition
 		want map[string][]v1alpha1.ResourceMeta
 	}{
 		"match filter": {
-			dc: NewDuckHunter(nil, &DuckFilters{
+			dh: NewDuckHunter(nil, &DuckFilters{
 				DuckLabel:         "teach.me.how/ducky",
 				DuckVersionPrefix: "duckies.teach.me.how",
 			}),
@@ -183,7 +183,7 @@ func Test_duckCollector_AddCRD_filtered(t *testing.T) {
 			},
 		},
 		"one matching version of two": {
-			dc: NewDuckHunter(nil, &DuckFilters{
+			dh: NewDuckHunter(nil, &DuckFilters{
 				DuckLabel:         "teach.me.how/ducky",
 				DuckVersionPrefix: "duckies.teach.me.how",
 			}),
@@ -198,7 +198,7 @@ func Test_duckCollector_AddCRD_filtered(t *testing.T) {
 			},
 		},
 		"twp matching version of two": {
-			dc: NewDuckHunter(nil, &DuckFilters{
+			dh: NewDuckHunter(nil, &DuckFilters{
 				DuckLabel:         "teach.me.how/ducky",
 				DuckVersionPrefix: "duckies.teach.me.how",
 			}),
@@ -218,7 +218,7 @@ func Test_duckCollector_AddCRD_filtered(t *testing.T) {
 			},
 		},
 		"no match": {
-			dc: NewDuckHunter(nil, &DuckFilters{
+			dh: NewDuckHunter(nil, &DuckFilters{
 				DuckLabel:         "teach.me.how/ducky",
 				DuckVersionPrefix: "duckies.teach.me.how",
 			}),
@@ -231,8 +231,43 @@ func Test_duckCollector_AddCRD_filtered(t *testing.T) {
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			tc.dc.AddCRD(tc.crd)
-			if got := tc.dc.Ducks(); !reflect.DeepEqual(got, tc.want) {
+			tc.dh.AddCRD(tc.crd)
+			if got := tc.dh.Ducks(); !reflect.DeepEqual(got, tc.want) {
+				t.Errorf("Ducks() = %v, want %v", got, tc.want)
+			}
+		})
+	}
+}
+
+func Test_DuckHunter_AddRef(t *testing.T) {
+	tests := map[string]struct {
+		dh          DuckHunter
+		duckVersion string
+		ref         v1alpha1.ResourceRef
+		want        map[string][]v1alpha1.ResourceMeta
+	}{
+		"GVK, one duck type version": {
+			dh:          NewDuckHunter([]v1alpha1.DuckVersion{{Name: "v1"}}, nil),
+			duckVersion: "v1",
+			ref: v1alpha1.ResourceRef{
+				Group:   "teach.me.how",
+				Version: "v2",
+				Kind:    "Ducky",
+				Scope:   "Namespaced",
+			},
+			want: map[string][]v1alpha1.ResourceMeta{
+				"v1": {{
+					APIVersion: "teach.me.how/v2",
+					Kind:       "Ducky",
+					Scope:      "Namespaced",
+				}},
+			},
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			tc.dh.AddRef(tc.duckVersion, tc.ref)
+			if got := tc.dh.Ducks(); !reflect.DeepEqual(got, tc.want) {
 				t.Errorf("Ducks() = %v, want %v", got, tc.want)
 			}
 		})
