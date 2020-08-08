@@ -19,6 +19,7 @@ package clusterducktype
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	apiextensionslisters "k8s.io/apiextensions-apiserver/pkg/client/listers/apiextensions/v1"
@@ -93,7 +94,8 @@ func DuckCount(ducks map[string][]v1alpha1.ResourceMeta) (count int) {
 	kinds := make(map[string]bool, 0)
 	for _, metas := range ducks {
 		for _, meta := range metas {
-			key := fmt.Sprintf("%s-%s", meta.APIVersion, meta.Kind)
+
+			key := strings.ToLower(fmt.Sprintf("%s-%s", group(meta), meta.Kind))
 			if _, found := kinds[key]; !found {
 				kinds[key] = true
 				count++
@@ -101,4 +103,14 @@ func DuckCount(ducks map[string][]v1alpha1.ResourceMeta) (count int) {
 		}
 	}
 	return count
+}
+
+// TODO: it might be better to have meta be a GVK, and display the APIVersion.
+func group(meta v1alpha1.ResourceMeta) string {
+	if strings.Contains(meta.APIVersion, "/") {
+		sp := strings.Split(meta.APIVersion, "/")
+		group := strings.TrimSuffix(meta.APIVersion, sp[len(sp)-1])
+		return group
+	}
+	return ""
 }
