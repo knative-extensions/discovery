@@ -178,7 +178,7 @@ func TestDuckTypeValidation(t *testing.T) {
 					},
 					Versions: []DuckVersion{{
 						Name: "v1",
-						Refs: []GroupVersionResourceKind{{
+						Refs: []ResourceRef{{
 							Version: "v2",
 						}},
 					}},
@@ -202,7 +202,7 @@ func TestDuckTypeValidation(t *testing.T) {
 					},
 					Versions: []DuckVersion{{
 						Name: "v1",
-						Refs: []GroupVersionResourceKind{{
+						Refs: []ResourceRef{{
 							Version:  "v2",
 							Kind:     "Foo",
 							Resource: "bars",
@@ -228,14 +228,14 @@ func TestDuckTypeValidation(t *testing.T) {
 					},
 					Versions: []DuckVersion{{
 						Name: "v1",
-						Refs: []GroupVersionResourceKind{{
+						Refs: []ResourceRef{{
 							Kind: "Foo",
 						}},
 					}},
 				}},
 			want: &apis.FieldError{
-				Message: "missing field(s)",
-				Paths:   []string{"spec.versions[0].refs[0].version"},
+				Message: "expected exactly one, got neither",
+				Paths:   []string{"spec.versions[0].refs[0].apiVersion, spec.versions[0].refs[0].version"},
 			},
 		},
 		"bad selector": {
@@ -279,6 +279,245 @@ func TestDuckTypeValidation(t *testing.T) {
 						Name: "v1",
 					}},
 				}},
+		},
+		"valid - GVR": {
+			in: &ClusterDuckType{
+				ObjectMeta: v1.ObjectMeta{
+					Name: "thisducks.example.com",
+				},
+				Spec: ClusterDuckTypeSpec{
+					Group: "example.com",
+					Names: DuckTypeNames{
+						Name:     "ThisDuck",
+						Plural:   "thisducks",
+						Singular: "thisduck",
+					},
+					Versions: []DuckVersion{{
+						Name: "v1",
+						Refs: []ResourceRef{{
+							Group:    "a.group",
+							Version:  "v2",
+							Resource: "bills",
+						}},
+					}},
+				}},
+		},
+		"valid - GVK": {
+			in: &ClusterDuckType{
+				ObjectMeta: v1.ObjectMeta{
+					Name: "thisducks.example.com",
+				},
+				Spec: ClusterDuckTypeSpec{
+					Group: "example.com",
+					Names: DuckTypeNames{
+						Name:     "ThisDuck",
+						Plural:   "thisducks",
+						Singular: "thisduck",
+					},
+					Versions: []DuckVersion{{
+						Name: "v1",
+						Refs: []ResourceRef{{
+							Group:   "a.group",
+							Version: "v2",
+							Kind:    "Bill",
+						}},
+					}},
+				}},
+		},
+		"valid - AK": {
+			in: &ClusterDuckType{
+				ObjectMeta: v1.ObjectMeta{
+					Name: "thisducks.example.com",
+				},
+				Spec: ClusterDuckTypeSpec{
+					Group: "example.com",
+					Names: DuckTypeNames{
+						Name:     "ThisDuck",
+						Plural:   "thisducks",
+						Singular: "thisduck",
+					},
+					Versions: []DuckVersion{{
+						Name: "v1",
+						Refs: []ResourceRef{{
+							APIVersion: "a.group/v2",
+							Kind:       "Bill",
+						}},
+					}},
+				}},
+		},
+		"valid - AR": {
+			in: &ClusterDuckType{
+				ObjectMeta: v1.ObjectMeta{
+					Name: "thisducks.example.com",
+				},
+				Spec: ClusterDuckTypeSpec{
+					Group: "example.com",
+					Names: DuckTypeNames{
+						Name:     "ThisDuck",
+						Plural:   "thisducks",
+						Singular: "thisduck",
+					},
+					Versions: []DuckVersion{{
+						Name: "v1",
+						Refs: []ResourceRef{{
+							APIVersion: "a.group/v2",
+							Resource:   "bills",
+						}},
+					}},
+				}},
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			got := tc.in.Validate(context.Background())
+			if !cmp.Equal(tc.want.Error(), got.Error()) {
+				t.Errorf("Validate (-want, +got) = %v",
+					cmp.Diff(tc.want.Error(), got.Error()))
+			}
+		})
+	}
+
+}
+
+func TestDuckTypeValidation_Refs(t *testing.T) {
+	tests := map[string]struct {
+		in   *ClusterDuckType
+		want *apis.FieldError
+	}{
+		"invalid - GVR+K": {
+			in: &ClusterDuckType{
+				ObjectMeta: v1.ObjectMeta{
+					Name: "thisducks.example.com",
+				},
+				Spec: ClusterDuckTypeSpec{
+					Group: "example.com",
+					Names: DuckTypeNames{
+						Name:     "ThisDuck",
+						Plural:   "thisducks",
+						Singular: "thisduck",
+					},
+					Versions: []DuckVersion{{
+						Name: "v1",
+						Refs: []ResourceRef{{
+							Group:    "a.group",
+							Version:  "v2",
+							Resource: "bills",
+							Kind:     "Bills",
+						}},
+					}},
+				}},
+			want: &apis.FieldError{
+				Message: "expected exactly one, got both",
+				Paths:   []string{"spec.versions[0].refs[0].kind, spec.versions[0].refs[0].resource"},
+			},
+		},
+		"invalid - GVR+A": {
+			in: &ClusterDuckType{
+				ObjectMeta: v1.ObjectMeta{
+					Name: "thisducks.example.com",
+				},
+				Spec: ClusterDuckTypeSpec{
+					Group: "example.com",
+					Names: DuckTypeNames{
+						Name:     "ThisDuck",
+						Plural:   "thisducks",
+						Singular: "thisduck",
+					},
+					Versions: []DuckVersion{{
+						Name: "v1",
+						Refs: []ResourceRef{{
+							APIVersion: "a.group/v2",
+							Group:      "a.group",
+							Version:    "v2",
+							Resource:   "bills",
+						}},
+					}},
+				}},
+			want: &apis.FieldError{
+				Message: "expected exactly one, got both",
+				Paths:   []string{"spec.versions[0].refs[0].apiVersion, spec.versions[0].refs[0].group, spec.versions[0].refs[0].version"},
+			},
+		},
+		"invalid - GVR+A+K": {
+			in: &ClusterDuckType{
+				ObjectMeta: v1.ObjectMeta{
+					Name: "thisducks.example.com",
+				},
+				Spec: ClusterDuckTypeSpec{
+					Group: "example.com",
+					Names: DuckTypeNames{
+						Name:     "ThisDuck",
+						Plural:   "thisducks",
+						Singular: "thisduck",
+					},
+					Versions: []DuckVersion{{
+						Name: "v1",
+						Refs: []ResourceRef{{
+							APIVersion: "a.group/v2",
+							Group:      "a.group",
+							Version:    "v2",
+							Resource:   "bills",
+							Kind:       "Bill",
+						}},
+					}},
+				}},
+			want: &apis.FieldError{
+				Message: "expected exactly one, got both",
+				Paths:   []string{"spec.versions[0].refs[0].apiVersion, spec.versions[0].refs[0].group, spec.versions[0].refs[0].kind, spec.versions[0].refs[0].resource, spec.versions[0].refs[0].version"},
+			},
+		},
+		"invalid - AK+G": {
+			in: &ClusterDuckType{
+				ObjectMeta: v1.ObjectMeta{
+					Name: "thisducks.example.com",
+				},
+				Spec: ClusterDuckTypeSpec{
+					Group: "example.com",
+					Names: DuckTypeNames{
+						Name:     "ThisDuck",
+						Plural:   "thisducks",
+						Singular: "thisduck",
+					},
+					Versions: []DuckVersion{{
+						Name: "v1",
+						Refs: []ResourceRef{{
+							APIVersion: "a.group/v2",
+							Kind:       "Bill",
+							Group:      "a.group",
+						}},
+					}},
+				}},
+			want: &apis.FieldError{
+				Message: "expected exactly one, got both",
+				Paths:   []string{"spec.versions[0].refs[0].apiVersion, spec.versions[0].refs[0].group"},
+			},
+		},
+		"invalid - AK+V": {
+			in: &ClusterDuckType{
+				ObjectMeta: v1.ObjectMeta{
+					Name: "thisducks.example.com",
+				},
+				Spec: ClusterDuckTypeSpec{
+					Group: "example.com",
+					Names: DuckTypeNames{
+						Name:     "ThisDuck",
+						Plural:   "thisducks",
+						Singular: "thisduck",
+					},
+					Versions: []DuckVersion{{
+						Name: "v1",
+						Refs: []ResourceRef{{
+							APIVersion: "a.group/v2",
+							Kind:       "Bill",
+							Version:    "v2",
+						}},
+					}},
+				}},
+			want: &apis.FieldError{
+				Message: "expected exactly one, got both",
+				Paths:   []string{"spec.versions[0].refs[0].apiVersion, spec.versions[0].refs[0].version"},
+			},
 		},
 	}
 
