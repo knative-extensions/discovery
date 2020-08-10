@@ -91,7 +91,7 @@ type DuckVersion struct {
 	// Name is the name of this duck type version.
 	Name string `json:"name"`
 
-	// Refs is a list of GVRKs that implement this duck type.
+	// Refs is a list of ResourceRefs that implement this duck type.
 	// Used for manual discovery.
 	// +optional
 	Refs []ResourceRef `json:"refs,omitempty"`

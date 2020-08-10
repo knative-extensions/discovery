@@ -90,11 +90,15 @@ func (r *Reconciler) getCRDsWith(labelSelector string) ([]*apiextensionsv1.Custo
 	return list, nil
 }
 
+// DuckCount de-dupes the number of ducks inside the mapped collection of found
+// duck types. Some resources could apply to several duck types, throwing the
+// count off in the status of ClusterDuckType.
 func DuckCount(ducks map[string][]v1alpha1.ResourceMeta) (count int) {
 	kinds := make(map[string]bool, 0)
 	for _, metas := range ducks {
 		for _, meta := range metas {
 
+			// TODO: it would be nice if ResourceMeta had a version-free unique hash to do this.
 			key := strings.ToLower(fmt.Sprintf("%s-%s", group(meta), meta.Kind))
 			if _, found := kinds[key]; !found {
 				kinds[key] = true
@@ -105,6 +109,7 @@ func DuckCount(ducks map[string][]v1alpha1.ResourceMeta) (count int) {
 	return count
 }
 
+// group returns the correct group for a ResourceMeta.
 // TODO: it might be better to have meta be a GVK, and display the APIVersion.
 func group(meta v1alpha1.ResourceMeta) string {
 	if strings.Contains(meta.APIVersion, "/") {
