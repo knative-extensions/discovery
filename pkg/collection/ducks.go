@@ -24,7 +24,7 @@ import (
 	"knative.dev/discovery/pkg/apis/discovery/v1alpha1"
 )
 
-// DuckHunter is used to collect, sort and bucket Kubernetes resources. This is
+// DuckHunter is used to collect, sort and bucket Kubernetes mappings. This is
 // based on adding CRDs and inspecting labels and annotations, or by adding
 // references directly. The DuckHunter will determine which version of the
 // duck type should be used for each kind of Add function. The current collection
@@ -60,8 +60,9 @@ type DuckFilters struct {
 
 // NewDuckHunter
 // versions are used to default all the DuckType versions that apply to unfiltered CRDs.
-func NewDuckHunter(versions []v1alpha1.DuckVersion, filters *DuckFilters) DuckHunter {
+func NewDuckHunter(mapper ResourceMapper, versions []v1alpha1.DuckVersion, filters *DuckFilters) DuckHunter {
 	dh := &duckHunter{
+		mapper:   mapper,
 		filters:  filters,
 		versions: make([]string, 0),
 		ducks:    make(map[string][]v1alpha1.ResourceMeta, len(versions)),
@@ -79,6 +80,10 @@ func NewDuckHunter(versions []v1alpha1.DuckVersion, filters *DuckFilters) DuckHu
 
 // duckHunter is an internal implementation of the duck hunter logic.
 type duckHunter struct {
+	// mapper is used to convert between resource and kind, and validate
+	// resources exist on the cluster.
+	mapper ResourceMapper
+
 	filters *DuckFilters
 	// versions are the versions to use for unfiltered CRDs being added to the ducks map.
 	versions []string

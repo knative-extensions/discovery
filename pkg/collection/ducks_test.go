@@ -1,3 +1,19 @@
+/*
+Copyright 2020 The Knative Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package collection
 
 import (
@@ -91,7 +107,7 @@ func TestNewDuckHunter(t *testing.T) {
 		}}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			if got := NewDuckHunter(tc.versions, nil); !reflect.DeepEqual(got, tc.want) {
+			if got := NewDuckHunter(nil, tc.versions, nil); !reflect.DeepEqual(got, tc.want) {
 				t.Errorf("NewDuckHunter() = %v, want %v", got, tc.want)
 			}
 		})
@@ -105,7 +121,7 @@ func Test_DuckHunter_AddCRD(t *testing.T) {
 		want map[string][]v1alpha1.ResourceMeta
 	}{
 		"one duck version, one crd version": {
-			dh:  NewDuckHunter([]v1alpha1.DuckVersion{{Name: "v1"}}, nil),
+			dh:  NewDuckHunter(nil, []v1alpha1.DuckVersion{{Name: "v1"}}, nil),
 			crd: makeCRD("teach.me.how", "Ducky", map[string]bool{"v2": true}),
 			want: map[string][]v1alpha1.ResourceMeta{
 				"v1": {{
@@ -116,7 +132,7 @@ func Test_DuckHunter_AddCRD(t *testing.T) {
 			},
 		},
 		"one duck version, two crd version": {
-			dh:  NewDuckHunter([]v1alpha1.DuckVersion{{Name: "v1"}}, nil),
+			dh:  NewDuckHunter(nil, []v1alpha1.DuckVersion{{Name: "v1"}}, nil),
 			crd: makeCRD("teach.me.how", "Ducky", map[string]bool{"v2": true, "v3": true}),
 			want: map[string][]v1alpha1.ResourceMeta{
 				"v1": {{
@@ -131,7 +147,7 @@ func Test_DuckHunter_AddCRD(t *testing.T) {
 			},
 		},
 		"three duck versions, one crd version": {
-			dh:  NewDuckHunter([]v1alpha1.DuckVersion{{Name: "v1"}, {Name: "v2"}, {Name: "v3"}}, nil),
+			dh:  NewDuckHunter(nil, []v1alpha1.DuckVersion{{Name: "v1"}, {Name: "v2"}, {Name: "v3"}}, nil),
 			crd: makeCRD("teach.me.how", "Ducky", map[string]bool{"v2": true}),
 			want: map[string][]v1alpha1.ResourceMeta{
 				"v1": {{
@@ -169,7 +185,7 @@ func Test_DuckHunter_AddCRD_filtered(t *testing.T) {
 		want map[string][]v1alpha1.ResourceMeta
 	}{
 		"match filter": {
-			dh: NewDuckHunter(nil, &DuckFilters{
+			dh: NewDuckHunter(nil, nil, &DuckFilters{
 				DuckLabel:         "teach.me.how/ducky",
 				DuckVersionPrefix: "duckies.teach.me.how",
 			}),
@@ -184,7 +200,7 @@ func Test_DuckHunter_AddCRD_filtered(t *testing.T) {
 			},
 		},
 		"one matching version of two": {
-			dh: NewDuckHunter(nil, &DuckFilters{
+			dh: NewDuckHunter(nil, nil, &DuckFilters{
 				DuckLabel:         "teach.me.how/ducky",
 				DuckVersionPrefix: "duckies.teach.me.how",
 			}),
@@ -199,7 +215,7 @@ func Test_DuckHunter_AddCRD_filtered(t *testing.T) {
 			},
 		},
 		"twp matching version of two": {
-			dh: NewDuckHunter(nil, &DuckFilters{
+			dh: NewDuckHunter(nil, nil, &DuckFilters{
 				DuckLabel:         "teach.me.how/ducky",
 				DuckVersionPrefix: "duckies.teach.me.how",
 			}),
@@ -219,7 +235,7 @@ func Test_DuckHunter_AddCRD_filtered(t *testing.T) {
 			},
 		},
 		"no match": {
-			dh: NewDuckHunter(nil, &DuckFilters{
+			dh: NewDuckHunter(nil, nil, &DuckFilters{
 				DuckLabel:         "teach.me.how/ducky",
 				DuckVersionPrefix: "duckies.teach.me.how",
 			}),
@@ -248,7 +264,7 @@ func Test_DuckHunter_AddRef(t *testing.T) {
 		want        map[string][]v1alpha1.ResourceMeta
 	}{
 		"GVK, one duck type version": {
-			dh:          NewDuckHunter([]v1alpha1.DuckVersion{{Name: "v1"}}, nil),
+			dh:          NewDuckHunter(nil, []v1alpha1.DuckVersion{{Name: "v1"}}, nil),
 			duckVersion: "v1",
 			ref: v1alpha1.ResourceRef{
 				Group:   "teach.me.how",
