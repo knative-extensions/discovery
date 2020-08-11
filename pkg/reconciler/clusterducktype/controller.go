@@ -58,8 +58,3 @@ func NewController(
 
 	return impl
 }
-
-type ResourceMapping struct {
-	ResourceToKind map[string]string
-	KindToResource map[string]string
-}
