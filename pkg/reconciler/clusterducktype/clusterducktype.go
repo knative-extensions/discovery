@@ -19,11 +19,15 @@ package clusterducktype
 import (
 	"context"
 	"fmt"
+	"go.uber.org/zap"
+	"knative.dev/pkg/logging"
 	"strings"
+	"sync"
 
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	apiextensionslisters "k8s.io/apiextensions-apiserver/pkg/client/listers/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/kubernetes"
 	"knative.dev/discovery/pkg/collection"
 
 	v1alpha1 "knative.dev/discovery/pkg/apis/discovery/v1alpha1"
@@ -34,7 +38,11 @@ import (
 // Reconciler implements ducktypereconciler.Interface for
 // ClusterDuckType resources.
 type Reconciler struct {
+	client    kubernetes.Interface
 	crdLister apiextensionslisters.CustomResourceDefinitionLister
+
+	resourceMapper collection.ResourceMapper
+	rmx            sync.Mutex
 }
 
 // Check that our Reconciler implements Interface
@@ -42,7 +50,9 @@ var _ ducktypereconciler.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface
 func (r *Reconciler) ReconcileKind(ctx context.Context, dt *v1alpha1.ClusterDuckType) reconciler.Event {
-	hunter := collection.NewDuckHunter(nil, &collection.DuckFilters{
+	// TODO: I might want to wrap this entire call with a rmx lock, but it will block the other threads.
+	// To prevent this, we could copy the resourceMapper?
+	hunter := collection.NewDuckHunter(r.resourceMapper, nil, &collection.DuckFilters{
 		DuckLabel:         fmt.Sprintf("%s/%s", dt.Spec.Group, dt.Spec.Names.Singular),
 		DuckVersionPrefix: fmt.Sprintf("%s.%s", dt.Spec.Names.Plural, dt.Spec.Group),
 	})
@@ -88,6 +98,21 @@ func (r *Reconciler) getCRDsWith(labelSelector string) ([]*apiextensionsv1.Custo
 	}
 
 	return list, nil
+}
+
+// resyncResourceMapper will make a call to the Kubernetes APIServer to request
+// the full list of resources on this cluster and then process the list to
+// create a lookup table between GroupVersions, Kinds and Resources.
+func (r *Reconciler) resyncResourceMapper(ctx context.Context) {
+	r.rmx.Lock()
+	defer r.rmx.Unlock()
+
+	_, apiResources, err := r.client.Discovery().ServerGroupsAndResources()
+	if err != nil {
+		logging.FromContext(ctx).Errorf("Failed to resync resource mapper.", zap.Error(err))
+		return
+	}
+	r.resourceMapper = collection.NewResourceMapper(apiResources)
 }
 
 // DuckCount de-dupes the number of ducks inside the mapped collection of found

@@ -19,13 +19,13 @@ package clusterducktype
 import (
 	"context"
 
-	"knative.dev/pkg/configmap"
-	"knative.dev/pkg/controller"
-	"knative.dev/pkg/logging"
-
 	ducktypeinformer "knative.dev/discovery/pkg/client/injection/informers/discovery/v1alpha1/clusterducktype"
 	ducktypereconciler "knative.dev/discovery/pkg/client/injection/reconciler/discovery/v1alpha1/clusterducktype"
 	crdinformer "knative.dev/pkg/client/injection/apiextensions/informers/apiextensions/v1/customresourcedefinition"
+	kubeclient "knative.dev/pkg/client/injection/kube/client"
+	"knative.dev/pkg/configmap"
+	"knative.dev/pkg/controller"
+	"knative.dev/pkg/logging"
 )
 
 // NewController creates a Reconciler and returns the result of NewImpl.
@@ -38,11 +38,11 @@ func NewController(
 	ducktypeInformer := ducktypeinformer.Get(ctx)
 	crdInformer := crdinformer.Get(ctx)
 
-	// TODO: watch CRDs, etc.
-
 	r := &Reconciler{
+		client:    kubeclient.Get(ctx),
 		crdLister: crdInformer.Lister(),
 	}
+	r.resyncResourceMapper(ctx)
 	impl := ducktypereconciler.NewImpl(ctx, r)
 
 	logger.Info("Setting up event handlers.")
@@ -51,6 +51,7 @@ func NewController(
 
 	// Watch custom resource definitions.
 	grDt := func(obj interface{}) {
+		r.resyncResourceMapper(ctx)
 		impl.GlobalResync(ducktypeInformer.Informer())
 	}
 	crdInformer.Informer().AddEventHandler(controller.HandleAll(grDt))
