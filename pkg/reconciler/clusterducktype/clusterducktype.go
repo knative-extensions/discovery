@@ -78,7 +78,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, dt *v1alpha1.ClusterDuck
 		for _, ref := range dv.Refs {
 			// TODO we should query and test that the Ref is installed and works on this cluster.
 			if err := hunter.AddRef(dv.Name, ref); err != nil {
-				logging.FromContext(ctx).Errorf("unable to add resource ref: %s", err)
+				logging.FromContext(ctx).Warnw("unable to add resource ref: %s", zap.Error(err))
 			}
 		}
 	}
@@ -124,11 +124,11 @@ func (r *Reconciler) resyncResourceMapper(ctx context.Context) {
 // DuckCount de-dupes the number of ducks inside the mapped collection of found
 // duck types. Some resources could apply to several duck types, throwing the
 // count off in the status of ClusterDuckType.
-func DuckCount(ducks map[string][]v1alpha1.ResourceMeta) (count int) {
+func DuckCount(ducks map[string][]v1alpha1.ResourceMeta) int {
+	count := 0
 	kinds := make(map[string]bool, 0)
 	for _, metas := range ducks {
 		for _, meta := range metas {
-
 			// TODO: it would be nice if ResourceMeta had a version-free unique hash to do this.
 			key := strings.ToLower(fmt.Sprintf("%s-%s", group(meta), meta.Kind))
 			if _, found := kinds[key]; !found {

@@ -219,7 +219,7 @@ type ClusterDuckTypeStatus struct {
 	Ducks map[string][]ResourceMeta `json:"ducks,omitempty"`
 
 	// DuckCount is the count of unique duck types found post-hunt.
-	DuckCount int `json:"duckCount,omitempty"`
+	DuckCount int `json:"duckCount"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
