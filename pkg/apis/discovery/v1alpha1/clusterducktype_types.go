@@ -22,6 +22,7 @@ import (
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 	"knative.dev/pkg/kmeta"
+	"strings"
 )
 
 // +genclient
@@ -163,7 +164,7 @@ type ResourceRef struct {
 
 // APIVersion puts "group" and "version" into a single "group/version" string
 // or returns APIVersion.
-func APIVersion(r ResourceRef) string {
+func (r *ResourceRef) GroupVersion() string {
 	if len(r.APIVersion) > 0 {
 		return r.APIVersion
 	}
@@ -184,6 +185,24 @@ type ResourceMeta struct {
 	// Scope indicates whether the resource is cluster- or namespace-scoped.
 	// Allowed values are `Cluster` and `Namespaced`.
 	Scope ResourceScope `json:"scope"`
+}
+
+// version inspects a ResourceMeta object and returns the correct APIVersion.
+func (r *ResourceMeta) Version() string {
+	if strings.Contains(r.APIVersion, "/") {
+		sp := strings.Split(r.APIVersion, "/")
+		return sp[len(sp)-1]
+	}
+	return r.APIVersion
+}
+
+// version inspects a ResourceMeta object and returns the correct APIVersion.
+func (r *ResourceMeta) Group() string {
+	if strings.Contains(r.APIVersion, "/") {
+		sp := strings.Split(r.APIVersion, "/")
+		return sp[0]
+	}
+	return ""
 }
 
 const (
