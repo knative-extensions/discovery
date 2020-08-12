@@ -187,7 +187,8 @@ type ResourceMeta struct {
 	Scope ResourceScope `json:"scope"`
 }
 
-// version inspects a ResourceMeta object and returns the correct APIVersion.
+// Version inspects a ResourceMeta object and returns the correct version
+// based on APIVersion.
 func (r *ResourceMeta) Version() string {
 	if strings.Contains(r.APIVersion, "/") {
 		sp := strings.Split(r.APIVersion, "/")
@@ -196,7 +197,8 @@ func (r *ResourceMeta) Version() string {
 	return r.APIVersion
 }
 
-// version inspects a ResourceMeta object and returns the correct APIVersion.
+// Group inspects a ResourceMeta object and returns the correct group
+// based on APIVersion.
 func (r *ResourceMeta) Group() string {
 	if strings.Contains(r.APIVersion, "/") {
 		sp := strings.Split(r.APIVersion, "/")

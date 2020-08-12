@@ -82,9 +82,9 @@ spec:
 		t.Fail()
 	}
 
-	if !cmp.Equal(got, want) {
+	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("From YAML (-want, +got) = %v",
-			cmp.Diff(want, got))
+			diff)
 	}
 }
 
@@ -135,9 +135,9 @@ func TestResourceRef_GroupVersion(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			got := tc.in.GroupVersion()
-			if !cmp.Equal(got, tc.want) {
+			if diff := cmp.Diff(tc.want, got); diff != "" {
 				t.Errorf("GroupVersion (-want, +got) = %v",
-					cmp.Diff(tc.want, got))
+					diff)
 			}
 		})
 	}
@@ -169,9 +169,9 @@ func TestResourceMeta_Group(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			got := tc.in.Group()
-			if !cmp.Equal(got, tc.want) {
+			if diff := cmp.Diff(tc.want, got); diff != "" {
 				t.Errorf("Group (-want, +got) = %v",
-					cmp.Diff(tc.want, got))
+					diff)
 			}
 		})
 	}
@@ -203,9 +203,9 @@ func TestResourceMeta_Version(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			got := tc.in.Version()
-			if !cmp.Equal(got, tc.want) {
+			if diff := cmp.Diff(tc.want, got); diff != "" {
 				t.Errorf("Version (-want, +got) = %v",
-					cmp.Diff(tc.want, got))
+					diff)
 			}
 		})
 	}
