@@ -22,6 +22,7 @@ import (
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 	"knative.dev/pkg/kmeta"
+	"strings"
 )
 
 // +genclient
@@ -163,7 +164,7 @@ type ResourceRef struct {
 
 // APIVersion puts "group" and "version" into a single "group/version" string
 // or returns APIVersion.
-func APIVersion(r ResourceRef) string {
+func (r *ResourceRef) GroupVersion() string {
 	if len(r.APIVersion) > 0 {
 		return r.APIVersion
 	}
@@ -186,6 +187,26 @@ type ResourceMeta struct {
 	Scope ResourceScope `json:"scope"`
 }
 
+// Version inspects a ResourceMeta object and returns the correct version
+// based on APIVersion.
+func (r *ResourceMeta) Version() string {
+	if strings.Contains(r.APIVersion, "/") {
+		sp := strings.Split(r.APIVersion, "/")
+		return sp[len(sp)-1]
+	}
+	return r.APIVersion
+}
+
+// Group inspects a ResourceMeta object and returns the correct group
+// based on APIVersion.
+func (r *ResourceMeta) Group() string {
+	if strings.Contains(r.APIVersion, "/") {
+		sp := strings.Split(r.APIVersion, "/")
+		return sp[0]
+	}
+	return ""
+}
+
 const (
 	// DuckTypeConditionReady is set when the revision is starting to materialize
 	// runtime resources, and becomes true when those resources are ready.
@@ -200,7 +221,7 @@ type ClusterDuckTypeStatus struct {
 	Ducks map[string][]ResourceMeta `json:"ducks,omitempty"`
 
 	// DuckCount is the count of unique duck types found post-hunt.
-	DuckCount int `json:"duckCount,omitempty"`
+	DuckCount int `json:"duckCount"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

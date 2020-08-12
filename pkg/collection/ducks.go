@@ -17,6 +17,7 @@ limitations under the License.
 package collection
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 
@@ -41,7 +42,7 @@ type DuckHunter interface {
 	// Refs are used to override the label and annotation based discovery
 	// mechanisms.
 	// TODO: if the ref is a CRD, load the CRD and pass that CRD to AddCRD.
-	AddRef(duckVersion string, ref v1alpha1.ResourceRef)
+	AddRef(duckVersion string, ref v1alpha1.ResourceRef) error
 
 	// Ducks returns the current mapped collection of ducks added to the hunter.
 	Ducks() map[string][]v1alpha1.ResourceMeta
@@ -54,23 +55,27 @@ type DuckFilters struct {
 	// DuckVersionFormat is expected to be in the form:
 	//   `<names.plural>.<group>`
 	// and will be used to assemble `<names.plural>.<group>/<duckVersion>`.
-	// This will group duck type versions based on the given annotation base.
+	// This will group duck type defaultVersions based on the given annotation base.
 	DuckVersionPrefix string
 }
 
 // NewDuckHunter
-// versions are used to default all the DuckType versions that apply to unfiltered CRDs.
-func NewDuckHunter(mapper ResourceMapper, versions []v1alpha1.DuckVersion, filters *DuckFilters) DuckHunter {
-	dh := &duckHunter{
-		mapper:   mapper,
-		filters:  filters,
-		versions: make([]string, 0),
-		ducks:    make(map[string][]v1alpha1.ResourceMeta, len(versions)),
+// defaultVersions are used to default all the DuckType defaultVersions that apply to unfiltered CRDs.
+func NewDuckHunter(mapper ResourceMapper, defaultVersions []v1alpha1.DuckVersion, filters *DuckFilters) DuckHunter {
+	if mapper == nil {
+		mapper = NewResourceMapper(nil)
 	}
 
-	for _, v := range versions {
+	dh := &duckHunter{
+		mapper:          mapper,
+		filters:         filters,
+		defaultVersions: make([]string, 0),
+		ducks:           make(map[string][]v1alpha1.ResourceMeta, len(defaultVersions)),
+	}
+
+	for _, v := range defaultVersions {
 		if _, found := dh.ducks[v.Name]; !found {
-			dh.versions = append(dh.versions, v.Name)
+			dh.defaultVersions = append(dh.defaultVersions, v.Name)
 			dh.ducks[v.Name] = make([]v1alpha1.ResourceMeta, 0)
 		}
 	}
@@ -85,9 +90,9 @@ type duckHunter struct {
 	mapper ResourceMapper
 
 	filters *DuckFilters
-	// versions are the versions to use for unfiltered CRDs being added to the ducks map.
-	versions []string
-	ducks    map[string][]v1alpha1.ResourceMeta
+	// defaultVersions are the defaultVersions to use for unfiltered CRDs being added to the ducks map.
+	defaultVersions []string
+	ducks           map[string][]v1alpha1.ResourceMeta
 }
 
 // AddCRDs implements DuckHunter.AddCRDs
@@ -106,8 +111,9 @@ func (dh *duckHunter) AddCRD(crd *apiextensionsv1.CustomResourceDefinition) {
 		dh.collectVersionsByFilter(crd)
 		for _, meta := range metas {
 			if !dh.addHandledWithFilters(crd, meta) {
-				// TODO: here is where the label filters would be tested for duck version annotation matching.
-				for _, v := range dh.versions {
+				// If not handled within the filter aware handler, then apply
+				// this resource to all the default duck versions.
+				for _, v := range dh.defaultVersions {
 					dh.ducks[v] = append(dh.ducks[v], meta)
 				}
 			}
@@ -133,11 +139,10 @@ func (dh *duckHunter) addHandledWithFilters(crd *apiextensionsv1.CustomResourceD
 				// instance should be skipped.
 				return true
 			}
-		} else {
-			return dh.insertHandledDuckByVersionFilter(crd, meta)
 		}
 	}
-	return false
+	// Getting here means there is no labels or no matching duck label.
+	return dh.insertHandledDuckByVersionFilter(crd, meta)
 }
 
 // collectVersionsByFilter this makes sure that there is a slice for each found version of the duck.
@@ -177,19 +182,37 @@ func (dh *duckHunter) insertHandledDuckByVersionFilter(crd *apiextensionsv1.Cust
 }
 
 // AddRef implements DuckHunter.AddRef
-func (dh *duckHunter) AddRef(duckVersion string, ref v1alpha1.ResourceRef) {
-	if _, found := dh.ducks[duckVersion]; !found {
-		dh.ducks[duckVersion] = make([]v1alpha1.ResourceMeta, 0)
+func (dh *duckHunter) AddRef(duckVersion string, ref v1alpha1.ResourceRef) error {
+	// Use ref.Kind or look up the kind based on ref.Resource.
+	kind := ref.Kind
+	if kind == "" {
+		var err error
+		kind, err = dh.mapper.KindFor(ref.GroupVersion(), ref.Resource)
+		if err != nil {
+			return err
+		}
 	}
-	// TODO: before this ref is added, we should validate the cluster understands this kind of resource at the version given.
 
-	// To enable this, look at https://github.com/kubernetes/kubernetes/pull/42873/files and discoveryclient.ServerPreferredResources()
-
-	dh.ducks[duckVersion] = append(dh.ducks[duckVersion], v1alpha1.ResourceMeta{
-		APIVersion: v1alpha1.APIVersion(ref),
-		Kind:       ref.Kind + ref.Resource, // TODO: FIXME this is a shortcoming of the api, we do not know Kind always. Might need to make a mapping of resource to Kind and keep it as a singleton lookup.
+	rm := v1alpha1.ResourceMeta{
+		APIVersion: ref.GroupVersion(),
+		Kind:       kind,
 		Scope:      ref.Scope,
-	})
+	}
+
+	// Validate that the resource exists in this cluster.
+	if !dh.mapper.KindExists(rm.APIVersion, rm.Kind) {
+		return fmt.Errorf("resource \"%s %s\" not known to the cluster", rm.Kind, rm.APIVersion)
+	}
+
+	// Save the resource at the given duck type version, making sure there is
+	// a place to store it.
+	if _, found := dh.ducks[duckVersion]; !found {
+		dh.ducks[duckVersion] = []v1alpha1.ResourceMeta{rm}
+	} else {
+		dh.ducks[duckVersion] = append(dh.ducks[duckVersion], rm)
+	}
+
+	return nil
 }
 
 // Ducks implements DuckHunter.Ducks

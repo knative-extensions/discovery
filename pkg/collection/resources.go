@@ -38,6 +38,9 @@ type ResourceMapper interface {
 	// ResourceFor returns the Kind for the given kind in the given
 	// GroupVersion.
 	ResourceFor(groupVersion, kind string) (string, error)
+
+	// DeepCopy returns a copy of the ResourceMapper.
+	DeepCopy() ResourceMapper
 }
 
 // NewResourceMapper processes a list of APIResourceLists and creates a
@@ -119,4 +122,22 @@ func (rm *resourceMapper) ResourceFor(groupVersion, kind string) (string, error)
 	}
 	return resource, nil
 
+}
+
+// DeepCopy implements ResourceMapper.DeepCopy
+func (rm *resourceMapper) DeepCopy() ResourceMapper {
+	mappings := make(map[string]mapping, len(rm.mappings))
+	for mk, mv := range rm.mappings {
+		mappings[mk] = mapping{
+			r2k: make(map[string]string, len(mv.r2k)),
+			k2r: make(map[string]string, len(mv.k2r)),
+		}
+		for k, v := range mv.r2k {
+			mappings[mk].r2k[k] = v
+		}
+		for k, v := range mv.k2r {
+			mappings[mk].k2r[k] = v
+		}
+	}
+	return &resourceMapper{mappings: mappings}
 }

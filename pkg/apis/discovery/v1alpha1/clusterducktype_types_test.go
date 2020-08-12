@@ -82,13 +82,13 @@ spec:
 		t.Fail()
 	}
 
-	if !cmp.Equal(got, want) {
+	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("From YAML (-want, +got) = %v",
-			cmp.Diff(want, got))
+			diff)
 	}
 }
 
-func TestAPIVersion(t *testing.T) {
+func TestResourceRef_GroupVersion(t *testing.T) {
 	tests := map[string]struct {
 		in   ResourceRef
 		want string
@@ -114,7 +114,7 @@ func TestAPIVersion(t *testing.T) {
 			in: ResourceRef{
 				Group: "this.group",
 			},
-			want: "this.group/",
+			want: "this.group/", // version is required normally on these objects.
 		},
 		"only apiVersion": {
 			in: ResourceRef{
@@ -134,10 +134,78 @@ func TestAPIVersion(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			got := APIVersion(tc.in)
-			if !cmp.Equal(got, tc.want) {
-				t.Errorf("APIVersion (-want, +got) = %v",
-					cmp.Diff(tc.want, got))
+			got := tc.in.GroupVersion()
+			if diff := cmp.Diff(tc.want, got); diff != "" {
+				t.Errorf("GroupVersion (-want, +got) = %v",
+					diff)
+			}
+		})
+	}
+}
+
+func TestResourceMeta_Group(t *testing.T) {
+	tests := map[string]struct {
+		in   ResourceMeta
+		want string
+	}{
+		"empty": {
+			in:   ResourceMeta{},
+			want: "",
+		},
+		"version and group set": {
+			in: ResourceMeta{
+				APIVersion: "this.group/v1",
+			},
+			want: "this.group",
+		},
+		"only version": {
+			in: ResourceMeta{
+				APIVersion: "v1",
+			},
+			want: "",
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			got := tc.in.Group()
+			if diff := cmp.Diff(tc.want, got); diff != "" {
+				t.Errorf("Group (-want, +got) = %v",
+					diff)
+			}
+		})
+	}
+}
+
+func TestResourceMeta_Version(t *testing.T) {
+	tests := map[string]struct {
+		in   ResourceMeta
+		want string
+	}{
+		"empty": {
+			in:   ResourceMeta{},
+			want: "",
+		},
+		"version and group set": {
+			in: ResourceMeta{
+				APIVersion: "this.group/v1",
+			},
+			want: "v1",
+		},
+		"only version": {
+			in: ResourceMeta{
+				APIVersion: "v1",
+			},
+			want: "v1",
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			got := tc.in.Version()
+			if diff := cmp.Diff(tc.want, got); diff != "" {
+				t.Errorf("Version (-want, +got) = %v",
+					diff)
 			}
 		})
 	}
