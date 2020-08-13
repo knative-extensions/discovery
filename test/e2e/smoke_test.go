@@ -30,7 +30,6 @@ func SmokeTestImpl(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create rig, %s", err)
 	}
-
 	t.Logf("Created a new testing rig at namespace %s.", rig.Namespace())
 
 	// Uninstall deferred.
