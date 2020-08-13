@@ -16,7 +16,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: config-logging
-  namespace: knative-eventing
+  namespace: knative--discovery
   labels:
     discovery.knative.dev/release: devel
 
