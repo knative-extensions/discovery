@@ -61,7 +61,7 @@ jobs:
         # Build and Publish our containers to the docker daemon (including test assets)
         export GO111MODULE=on
         export GOFLAGS=-mod=vendor
-        ko resolve -PRf config/ -f test/config > build.yaml
+        ko resolve -Pf config/ -f test/config > build.yaml
 
         # Load our docker images into the kind cluster!
         for x in $(docker images  --format='{{.Repository}}:{{.Tag}}' | grep ko.local); do
