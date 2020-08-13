@@ -33,4 +33,7 @@ import (
 
 	// Licenseclassifier
 	_ "github.com/google/licenseclassifier"
+
+	// For chaos testing the leaderelection stuff.
+	_ "knative.dev/pkg/leaderelection/chaosduck"
 )
