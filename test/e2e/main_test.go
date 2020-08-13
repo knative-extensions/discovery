@@ -25,8 +25,6 @@ import (
 
 // TestSmoke makes sure a ClusterDuckType goes ready.
 func TestSmoke(t *testing.T) {
-	t.Skipf("rigging not working on prow yet, coming soon.")
-
 	cancel := logstream.Start(t)
 	defer cancel()
 
