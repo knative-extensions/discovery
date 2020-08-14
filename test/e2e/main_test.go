@@ -19,8 +19,11 @@ limitations under the License.
 package example
 
 import (
-	"knative.dev/pkg/test/logstream"
 	"testing"
+
+	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
+
+	"knative.dev/pkg/test/logstream"
 )
 
 // TestSmoke makes sure a ClusterDuckType goes ready.
