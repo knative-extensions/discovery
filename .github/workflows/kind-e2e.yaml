@@ -32,16 +32,21 @@ jobs:
         fetch-depth: 1
         path: ./src/knative.dev/discovery
 
-    - name: Setup KinD Cluster with Knative Discovery.
+    - name: Install KinD
+        working-directory: ./src/knative.dev/discovery
+        env:
+          KIND_VERSION: v0.8.1
+        run: |
+          set -x
+
+          curl -Lo ./kind https://github.com/kubernetes-sigs/kind/releases/download/${KIND_VERSION}/kind-$(uname)-amd64
+          chmod +x ./kind
+          sudo mv kind /usr/local/bin
+
+    - name: Create KinD Cluster
       working-directory: ./src/knative.dev/discovery
-      env:
-        KIND_VERSION: v0.8.1
       run: |
         set -x
-
-        curl -Lo ./kind https://github.com/kubernetes-sigs/kind/releases/download/${KIND_VERSION}/kind-$(uname)-amd64
-        chmod +x ./kind
-        sudo mv kind /usr/local/bin
 
         # KinD configuration.
         cat > kind.yaml <<EOF
@@ -54,6 +59,11 @@ jobs:
 
         # Create a cluster!
         kind create cluster --config kind.yaml
+
+    - name: Install Knative Discovery
+      working-directory: ./src/knative.dev/discovery
+      run: |
+        set -x
 
         # Build and Publish our test images to the docker daemon.
         # ./test/upload-test-images.sh # <-- Skip for now.
@@ -71,6 +81,10 @@ jobs:
         # Deploy the controllers we published to the cluster.
         kubectl apply -f build.yaml
 
+    - name: Wait for Ready
+      working-directory: ./src/knative.dev/discovery
+      run: |
+        set -x
 
         # Probably don't need this anymore, but keep until we
         # have something that waits for pods to becomes ready.
@@ -79,8 +93,14 @@ jobs:
         # For debugging.
         kubectl get pods --all-namespaces
 
+    - name: Run e2e Tests
+      working-directory: ./src/knative.dev/discovery
+      run: |
+        set -x
+
         # For logstream to work.
         export SYSTEM_NAMESPACE=knative-discovery
 
         # Run the tests tagged as e2e on the KinD cluster.
         go test -v -race -count=1 -timeout=3m -tags=e2e ./test/e2e/...
+
