@@ -17,7 +17,7 @@ Install the Discovery Controllers:
 Run the end to end tests:
 
 ```shell
-./test/kind/e2e-tests.sh
+./test/kind/run-tests.sh
 ```
 
 Cleanup:

@@ -1,5 +1,3 @@
-// +build e2e
-
 /*
 Copyright 2020 The Knative Authors
 
@@ -16,20 +14,5 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package example
-
-import (
-	"testing"
-
-	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
-
-	"knative.dev/pkg/test/logstream"
-)
-
-// TestSmoke makes sure a ClusterDuckType goes ready.
-func TestSmoke(t *testing.T) {
-	cancel := logstream.Start(t)
-	defer cancel()
-
-	SmokeTestImpl(t)
-}
+// Package kflag contains a variety of non-standard command-line flag types
+package kflag

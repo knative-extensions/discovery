@@ -1,7 +1,5 @@
-// +build e2e
-
 /*
-Copyright 2020 The Knative Authors
+Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,20 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package example
-
-import (
-	"testing"
-
-	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
-
-	"knative.dev/pkg/test/logstream"
-)
-
-// TestSmoke makes sure a ClusterDuckType goes ready.
-func TestSmoke(t *testing.T) {
-	cancel := logstream.Start(t)
-	defer cancel()
-
-	SmokeTestImpl(t)
-}
+// package jsonpath is a template engine using jsonpath syntax,
+// which can be seen at http://goessner.net/articles/JsonPath/.
+// In addition, it has {range} {end} function to iterate list and slice.
+package jsonpath // import "k8s.io/client-go/util/jsonpath"

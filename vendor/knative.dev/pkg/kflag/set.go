@@ -1,5 +1,3 @@
-// +build e2e
-
 /*
 Copyright 2020 The Knative Authors
 
@@ -16,20 +14,29 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package example
+package kflag
 
 import (
-	"testing"
+	"flag"
+	"fmt"
 
-	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
-
-	"knative.dev/pkg/test/logstream"
+	"k8s.io/apimachinery/pkg/util/sets"
 )
 
-// TestSmoke makes sure a ClusterDuckType goes ready.
-func TestSmoke(t *testing.T) {
-	cancel := logstream.Start(t)
-	defer cancel()
+type StringSet struct {
+	Value sets.String
+}
 
-	SmokeTestImpl(t)
+var _ flag.Value = (*StringSet)(nil)
+
+func (i *StringSet) String() string {
+	return fmt.Sprintf("%v", i.Value)
+}
+
+func (i *StringSet) Set(value string) error {
+	if i.Value == nil {
+		i.Value = make(sets.String, 1)
+	}
+	i.Value.Insert(value)
+	return nil
 }
