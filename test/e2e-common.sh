@@ -189,10 +189,10 @@ function test_setup() {
   # Clean up kail so it doesn't interfere with job shutting down
   add_trap "kill $kail_pid || true" EXIT
 
-  install_test_resources || return 1
+  # install_test_resources || return 1
 
-  echo ">> Publish test images"
-  "$(dirname "$0")/upload-test-images.sh" e2e || fail_test "Error uploading test images"
+  # echo ">> Publish test images"
+  # "$(dirname "$0")/upload-test-images.sh" e2e || fail_test "Error uploading test images"
 }
 
 function dump_extra_cluster_state() {
