@@ -85,7 +85,6 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, dt *v1alpha1.ClusterDuck
 
 	dt.Status.Ducks = hunter.Ducks()
 	dt.Status.DuckCount = DuckCount(dt.Status.Ducks)
-
 	dt.Status.MarkReady()
 	return nil
 }
