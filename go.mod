@@ -3,6 +3,8 @@ module knative.dev/discovery
 go 1.14
 
 require (
+	github.com/cucumber/godog v0.10.0
+	github.com/cucumber/messages-go/v10 v10.0.3
 	github.com/google/go-cmp v0.5.1
 	github.com/google/licenseclassifier v0.0.0-20200708223521-3d09a0ea2f39
 	github.com/n3wscott/rigging v0.0.1
@@ -14,8 +16,8 @@ require (
 	k8s.io/client-go v11.0.1-0.20190805182717-6502b5e7b1b5+incompatible
 	k8s.io/code-generator v0.18.6
 	k8s.io/kube-openapi v0.0.0-20200410145947-bcb3869e6f29
-	knative.dev/pkg v0.0.0-20200813155605-c9f9284521f1
-	knative.dev/test-infra v0.0.0-20200813220306-af5517f4f576
+	knative.dev/pkg v0.0.0-20200818021113-c451e3c37f5f
+	knative.dev/test-infra v0.0.0-20200817225313-c0ea00ce480c
 )
 
 replace (
