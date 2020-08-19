@@ -19,10 +19,11 @@ package clusterducktype
 import (
 	"context"
 	"fmt"
-	"go.uber.org/zap"
-	"knative.dev/pkg/logging"
 	"strings"
 	"sync"
+
+	"go.uber.org/zap"
+	"knative.dev/pkg/logging"
 
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	apiextensionslisters "k8s.io/apiextensions-apiserver/pkg/client/listers/apiextensions/v1"

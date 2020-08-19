@@ -20,6 +20,10 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"os"
+	"strings"
+	"testing"
+
 	"github.com/cucumber/godog"
 	"github.com/cucumber/godog/colors"
 	"github.com/cucumber/messages-go/v10"
@@ -36,9 +40,6 @@ import (
 	"knative.dev/pkg/configmap"
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/logging"
-	"os"
-	"strings"
-	"testing"
 
 	pkgtest "knative.dev/pkg/reconciler/testing"
 )

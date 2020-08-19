@@ -19,6 +19,9 @@ package v1alpha1
 import (
 	"context"
 	"fmt"
+	"log"
+	"reflect"
+
 	kubev1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	fakeapiextensionsclientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/fake"
 	kubev1lister "k8s.io/apiextensions-apiserver/pkg/client/listers/apiextensions/v1"
@@ -31,8 +34,6 @@ import (
 	fakesampleclientset "knative.dev/discovery/pkg/client/clientset/versioned/fake"
 	discoverylister "knative.dev/discovery/pkg/client/listers/discovery/v1alpha1"
 	"knative.dev/pkg/reconciler/testing"
-	"log"
-	"reflect"
 )
 
 func AddConverters(scheme *runtime.Scheme) error {

@@ -19,9 +19,10 @@ package v1alpha1
 import (
 	"context"
 	"encoding/json"
+	"testing"
+
 	"k8s.io/apimachinery/pkg/types"
 	"knative.dev/pkg/reconciler"
-	"testing"
 
 	"knative.dev/discovery/pkg/apis/discovery/v1alpha1"
 	fakessampleclient "knative.dev/discovery/pkg/client/injection/client/fake"
