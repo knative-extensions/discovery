@@ -1,0 +1,20 @@
+apiVersion: discovery.knative.dev/v1alpha1
+kind: ClusterDuckType
+metadata:
+  name: zhangchas.duck.knative.dev
+  generation: {{ .generation }}
+spec:
+  selectors:
+    - labelSelector: "duck.knative.dev/smoked=true"
+
+  names:
+    name: "Zhangchas"
+    plural: "zhangchas"
+    singular: "zhangcha"
+
+  versions:
+    - name: "v1"
+  group: duck.knative.dev
+
+status:
+  observedGeneration: 0
