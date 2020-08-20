@@ -17,12 +17,18 @@ limitations under the License.
 package clusterducktype
 
 import (
+	"bufio"
 	"context"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"os"
+	"path"
 	"strings"
 	"testing"
+
+	"github.com/n3wscott/rigging/pkg/installer"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	"github.com/cucumber/godog"
 	"github.com/cucumber/godog/colors"
@@ -57,7 +63,7 @@ func TestMain(m *testing.M) {
 		opt.Paths = flag.Args()
 	} else {
 		opt.Paths = []string{
-			"./features/",
+			"./testdata/features/",
 		}
 	}
 
@@ -119,10 +125,12 @@ func ClusterDuckTypeFeatureContext(t *testing.T, s *godog.ScenarioContext) {
 		}}
 
 	s.Step(`^the following objects:$`, rt.theFollowingObjects)
+	s.Step(`^the following objects \(from file\):$`, rt.theFollowingObjectFiles)
 	s.Step(`^a ClusterDuckType reconciler$`, rt.aClusterDuckTypeReconciler)
 	s.Step(`^reconciling "([^"]*)"$`, rt.reconcilingKey)
 	s.Step(`^expect nothing$`, rt.expectNothing)
 	s.Step(`^expect status updates:$`, rt.expectStatusUpdates)
+	s.Step(`^expect status updates \(from file\):$`, rt.expectStatusUpdateFiles)
 	s.Step(`^expect Kubernetes Events:$`, rt.expectKubernetesEvents)
 
 	s.AfterScenario(func(pickle *messages.Pickle, err error) {
@@ -158,21 +166,79 @@ type ReconcilerTest struct {
 	factory pkgtest.Factory
 }
 
+func (rt *ReconcilerTest) theFollowingObjectFiles(y *messages.PickleStepArgument_PickleTable) error {
+	keys := make([]string, 0)
+	for row, v := range y.Rows {
+		var file string
+		config := make(map[string]interface{}, 0)
+
+		for i, c := range v.Cells {
+			if row == 0 {
+				if i == 0 {
+					continue
+				}
+				keys = append(keys, c.Value)
+				continue
+			}
+
+			switch i {
+			case 0:
+				file = "testdata/" + c.Value
+			default:
+				config[keys[i-1]] = c.Value
+			}
+		}
+
+		// Leverage the installer to parse the template files.
+		// TODO: move this code around to let it be reusable
+		// in a more clear way.
+		files := installer.ParseTemplates(file, config)
+		if file != "" {
+			list, err := ioutil.ReadDir(files)
+			if err != nil {
+				return err
+			}
+
+			for _, f := range list {
+				name := path.Join(files, f.Name())
+				if !f.IsDir() {
+					ff, err := os.Open(name)
+					if err != nil {
+						return err
+					}
+					objs, err := ParseYAML(bufio.NewReader(ff))
+					if err != nil {
+						return err
+					}
+
+					rt.addObjects(objs)
+				}
+			}
+		}
+	}
+	return nil
+}
+
 func (rt *ReconcilerTest) theFollowingObjects(y *messages.PickleStepArgument_PickleDocString) error {
 	objs, err := ParseYAML(strings.NewReader(y.Content))
 	if err != nil {
 		return err
 	}
+	rt.addObjects(objs)
 
-	rt.row.Objects = make([]runtime.Object, 0, len(objs))
+	return nil
+}
+
+func (rt *ReconcilerTest) addObjects(objs []unstructured.Unstructured) {
+	if rt.row.Objects == nil {
+		rt.row.Objects = make([]runtime.Object, 0, len(objs))
+	}
 
 	for _, obj := range objs {
 		rt.row.Objects = append(rt.row.Objects, obj.DeepCopyObject())
 	}
 
 	rt.row.Objects = ToKnownObjects(rt.row.Objects)
-
-	return nil
 }
 
 func (rt *ReconcilerTest) aClusterDuckTypeReconciler() error {
@@ -209,20 +275,79 @@ func (rt *ReconcilerTest) expectStatusUpdates(y *messages.PickleStepArgument_Pic
 		return err
 	}
 
+	rt.addWantStatusUpdates(objs)
+	return nil
+}
+
+func (rt *ReconcilerTest) expectStatusUpdateFiles(y *messages.PickleStepArgument_PickleTable) error {
+	keys := make([]string, 0)
+	for row, v := range y.Rows {
+		var file string
+		config := make(map[string]interface{}, 0)
+
+		for i, c := range v.Cells {
+			if row == 0 {
+				if i == 0 {
+					continue
+				}
+				keys = append(keys, c.Value)
+				continue
+			}
+
+			switch i {
+			case 0:
+				file = "testdata/" + c.Value
+			default:
+				config[keys[i-1]] = c.Value
+			}
+		}
+
+		// Leverage the installer to parse the template files.
+		// TODO: move this code around to let it be reusable
+		// in a more clear way.
+		files := installer.ParseTemplates(file, config)
+		if file != "" {
+			list, err := ioutil.ReadDir(files)
+			if err != nil {
+				return err
+			}
+
+			for _, f := range list {
+				name := path.Join(files, f.Name())
+				if !f.IsDir() {
+					ff, err := os.Open(name)
+					if err != nil {
+						return err
+					}
+					o, err := ParseYAML(bufio.NewReader(ff))
+					if err != nil {
+						return err
+					}
+
+					rt.addWantStatusUpdates(o)
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (rt *ReconcilerTest) addWantStatusUpdates(objs []unstructured.Unstructured) {
+	if rt.row.WantStatusUpdates == nil {
+		rt.row.WantStatusUpdates = make([]clientgotesting.UpdateActionImpl, 0)
+	}
+
 	updates := make([]runtime.Object, 0, len(objs))
 	for _, obj := range objs {
 		updates = append(updates, obj.DeepCopyObject())
 	}
 	updates = ToKnownObjects(updates)
-
-	rt.row.WantStatusUpdates = make([]clientgotesting.UpdateActionImpl, 0)
 	for _, u := range updates {
 		updateAction := clientgotesting.UpdateActionImpl{
 			Object: u,
 		}
 		rt.row.WantStatusUpdates = append(rt.row.WantStatusUpdates, updateAction)
 	}
-	return nil
 }
 
 func (rt *ReconcilerTest) expectKubernetesEvents(attributes *messages.PickleStepArgument_PickleTable) error {
