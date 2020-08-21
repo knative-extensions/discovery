@@ -22,11 +22,12 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"os"
 	"path"
 	"strings"
 	"testing"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/n3wscott/rigging/pkg/installer"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
