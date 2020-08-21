@@ -72,7 +72,11 @@ metadata:
     zoo.knative.dev/bill: "true"
     zoo.knative.dev/furry: "true"
     zoo.knative.dev/swims: "true"
-  # TODO: add mappings for duck version filters.
+  annotations:
+    furries.zoo.knative.dev/v1alpha1: v1alpha2,v1beta1
+    furries.zoo.knative.dev/v1beta1: v1
+    bills.zoo.knative.dev/v2: v1
+    swimmers.zoo.knative.dev/v3: v1
   name: platypi.australia
 spec:
   group: australia
@@ -84,7 +88,7 @@ spec:
   scope: Namespaced
   versions:
     - name: v1alpha1
-      served: true
+      served: false
       storage: false
     - name: v1alpha2
       served: true
@@ -111,6 +115,8 @@ kind: CustomResourceDefinition
 metadata:
   labels:
     zoo.knative.dev/swims: "true"
+  annotations:
+    swimmers.zoo.knative.dev/v2: v2
   name: gilamonsters.north.america
 spec:
   group: north.america

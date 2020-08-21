@@ -239,6 +239,31 @@ func Test_DuckHunter_AddCRD_filtered(t *testing.T) {
 				}},
 			},
 		},
+		"multi-match filter": {
+			dh: NewDuckHunter(nil, []v1alpha1.DuckVersion{{Name: "v1"}, {Name: "v2"}}, &DuckFilters{
+				DuckLabel:         "teach.me.how/ducky",
+				DuckVersionPrefix: "duckies.teach.me.how",
+			}),
+			crd: makeCRDAnnotated("teach.me.how", "Ducky", map[string]bool{"red": true, "blue": true, "green": true},
+				map[string]string{"teach.me.how/ducky": "true"},
+				map[string]string{"duckies.teach.me.how/v1": "red,blue", "duckies.teach.me.how/v2": "green"}),
+			want: map[string][]v1alpha1.ResourceMeta{
+				"v1": {{
+					APIVersion: "teach.me.how/blue",
+					Kind:       "Ducky",
+					Scope:      "Namespaced",
+				}, {
+					APIVersion: "teach.me.how/red",
+					Kind:       "Ducky",
+					Scope:      "Namespaced",
+				}},
+				"v2": {{
+					APIVersion: "teach.me.how/green",
+					Kind:       "Ducky",
+					Scope:      "Namespaced",
+				}},
+			},
+		},
 		"match second label": {
 			dh: NewDuckHunter(nil, nil, &DuckFilters{
 				DuckLabel:         "teach.me.how/ducky",

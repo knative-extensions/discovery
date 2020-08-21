@@ -21,9 +21,9 @@ status:
   conditions:
     - type: Ready
       status: "True"
+  duckCount: 1
   ducks:
     v1:
       - apiVersion: central.america/v1alpha1
         kind: Monkey
         scope: Namespaced
-  duckCount: 1

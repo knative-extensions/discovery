@@ -166,15 +166,18 @@ func (dh *duckHunter) insertHandledDuckByVersionFilter(crd *apiextensionsv1.Cust
 	if dh.filters == nil || dh.filters.DuckVersionPrefix == "" {
 		return false
 	}
-	for k, v := range crd.Annotations {
+	for k, versions := range crd.Annotations {
 		if strings.HasPrefix(k, dh.filters.DuckVersionPrefix+"/") {
 			// If we see any duck version prefix, then assume it is handled.
 			// It could be not matching this meta version.
 			handled = true
-			// If the annotation says to use this meta version for the duck version, map it.
-			if v == version(meta) {
-				duckVersion := strings.TrimPrefix(k, dh.filters.DuckVersionPrefix+"/")
-				dh.ducks[duckVersion] = append(dh.ducks[duckVersion], meta)
+			// If the annotation key contains the meta version for the duck version, map it.
+			for _, v := range strings.Split(versions, ",") {
+				v = strings.TrimSpace(v)
+				if v == version(meta) {
+					duckVersion := strings.TrimPrefix(k, dh.filters.DuckVersionPrefix+"/")
+					dh.ducks[duckVersion] = append(dh.ducks[duckVersion], meta)
+				}
 			}
 		}
 	}

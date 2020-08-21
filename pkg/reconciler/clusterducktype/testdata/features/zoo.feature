@@ -1,6 +1,6 @@
 Feature: Reconcile ClusterDuckType in a Zoo
 
-    Scenario: Reconciling ClusterDuckType ears.zoo.knative.dev
+    Scenario Outline: Reconciling ClusterDuckType <key>
 
         Given the following objects (from file):
             | file                     |
@@ -9,8 +9,15 @@ Feature: Reconcile ClusterDuckType in a Zoo
 
         And a ClusterDuckType reconciler
 
-        When reconciling "ears.zoo.knative.dev"
+        When reconciling "<key>"
 
         Then expect status updates (from file):
-            | file                      |
-            | config/zoo/updated-ears.yaml |
+            | file      |
+            | <updated> |
+
+        Examples:
+            | key                        | updated                            |
+            | ears.zoo.knative.dev       | config/zoo/updated-ears.yaml       |
+            | furries.zoo.knative.dev    | config/zoo/updated-furries.yaml    |
+            | bills.zoo.knative.dev      | config/zoo/updated-bills.yaml      |
+            | swimmers.zoo.knative.dev   | config/zoo/updated-swimmers.yaml   |

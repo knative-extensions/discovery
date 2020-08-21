@@ -1,0 +1,43 @@
+apiVersion: discovery.knative.dev/v1alpha1
+kind: ClusterDuckType
+metadata:
+  name: furries.zoo.knative.dev
+  generation: 0
+spec:
+  selectors:
+    - labelSelector: "zoo.knative.dev/furry=true"
+
+  names:
+    name: "Furry"
+    plural: "furries"
+    singular: "furry"
+
+  versions:
+    - name: "v1alpha1"
+    - name: "v1beta1"
+  group: zoo.knative.dev
+
+status:
+  observedGeneration: 0
+  conditions:
+    - type: Ready
+      status: "True"
+  duckCount: 2
+  ducks:
+    v1alpha1:
+      - apiVersion: australia/v1alpha2
+        kind: Platypus
+        scope: Namespaced
+      - apiVersion: australia/v1beta1
+        kind: Platypus
+        scope: Namespaced
+      - apiVersion: central.america/v1alpha1
+        kind: Monkey
+        scope: Namespaced
+    v1beta1:
+      - apiVersion: australia/v1
+        kind: Platypus
+        scope: Namespaced
+      - apiVersion: central.america/v1alpha1
+        kind: Monkey
+        scope: Namespaced
