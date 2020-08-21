@@ -17,12 +17,13 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"strings"
+
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 	"knative.dev/pkg/kmeta"
-	"strings"
 )
 
 // +genclient
@@ -120,6 +121,9 @@ type CustomResourceDefinitionSelector struct {
 	// ducktype. The annotation is expected to be in the form:
 	//   `<names.plural>.<group>/<versions[x].name>=[CRD.Version]`
 	// and results in `x = CRD.Version`.
+	// The duck type version annotation can have several CRD versions that map:
+	//   `<names.plural>.<group>/<versions[x].name>=[CRD.V1],[CRD.V2],[CRD.V3]`
+	// this tells the interrupter to match x to all of V1, V2 and V3 versions.
 	// If the version mapping annotation is missing, it is assumed this applies
 	// as the match.
 	// Must be a valid Kubernetes Label Selector.

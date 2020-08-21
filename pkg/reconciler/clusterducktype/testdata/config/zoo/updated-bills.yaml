@@ -1,0 +1,35 @@
+apiVersion: discovery.knative.dev/v1alpha1
+kind: ClusterDuckType
+metadata:
+  name: bills.zoo.knative.dev
+  generation: 0
+spec:
+  selectors:
+    - labelSelector: "zoo.knative.dev/bill=true"
+
+  names:
+    name: "Bill"
+    plural: "bills"
+    singular: "bill"
+
+  versions:
+    - name: "v2"
+  group: zoo.knative.dev
+
+status:
+  observedGeneration: 0
+  conditions:
+    - type: Ready
+      status: "True"
+  duckCount: 2
+  ducks:
+    v2:
+      - apiVersion: australia/v1
+        kind: Platypus
+        scope: Namespaced
+      - apiVersion: north.america/v1alpha2
+        kind: Duck
+        scope: Namespaced
+      - apiVersion: north.america/v1beta1
+        kind: Duck
+        scope: Namespaced

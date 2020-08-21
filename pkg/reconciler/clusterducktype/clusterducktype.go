@@ -57,7 +57,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, dt *v1alpha1.ClusterDuck
 	r.rmx.Unlock()
 
 	// Set up this instance of a duck hunter.
-	hunter := collection.NewDuckHunter(rm, nil, &collection.DuckFilters{
+	hunter := collection.NewDuckHunter(rm, dt.Spec.Versions, &collection.DuckFilters{
 		DuckLabel:         fmt.Sprintf("%s/%s", dt.Spec.Group, dt.Spec.Names.Singular),
 		DuckVersionPrefix: fmt.Sprintf("%s.%s", dt.Spec.Names.Plural, dt.Spec.Group),
 	})

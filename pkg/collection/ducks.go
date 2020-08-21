@@ -166,15 +166,18 @@ func (dh *duckHunter) insertHandledDuckByVersionFilter(crd *apiextensionsv1.Cust
 	if dh.filters == nil || dh.filters.DuckVersionPrefix == "" {
 		return false
 	}
-	for k, v := range crd.Annotations {
+	for k, versions := range crd.Annotations {
 		if strings.HasPrefix(k, dh.filters.DuckVersionPrefix+"/") {
 			// If we see any duck version prefix, then assume it is handled.
 			// It could be not matching this meta version.
 			handled = true
-			// If the annotation says to use this meta version for the duck version, map it.
-			if v == version(meta) {
-				duckVersion := strings.TrimPrefix(k, dh.filters.DuckVersionPrefix+"/")
-				dh.ducks[duckVersion] = append(dh.ducks[duckVersion], meta)
+			// If the annotation key contains the meta version for the duck version, map it.
+			for _, v := range strings.Split(versions, ",") {
+				v = strings.TrimSpace(v)
+				if v == version(meta) {
+					duckVersion := strings.TrimPrefix(k, dh.filters.DuckVersionPrefix+"/")
+					dh.ducks[duckVersion] = append(dh.ducks[duckVersion], meta)
+				}
 			}
 		}
 	}
@@ -215,12 +218,33 @@ func (dh *duckHunter) AddRef(duckVersion string, ref v1alpha1.ResourceRef) error
 	return nil
 }
 
+// duckCopy makes a deep copy of the ducks map
+func duckCopy(d map[string][]v1alpha1.ResourceMeta) map[string][]v1alpha1.ResourceMeta {
+	ducks := make(map[string][]v1alpha1.ResourceMeta, len(d))
+	for k, v := range d {
+		vc := make([]v1alpha1.ResourceMeta, len(v))
+		for i, vv := range v {
+			vc[i] = vv
+		}
+		ducks[k] = vc
+	}
+	return ducks
+}
+
 // Ducks implements DuckHunter.Ducks
 func (dh *duckHunter) Ducks() map[string][]v1alpha1.ResourceMeta {
-	for v := range dh.ducks {
-		sort.Sort(ByResourceMeta(dh.ducks[v]))
+	ducks := duckCopy(dh.ducks)
+	for k := range ducks {
+		if len(ducks[k]) == 0 {
+			delete(ducks, k)
+		} else {
+			sort.Sort(ByResourceMeta(ducks[k]))
+		}
 	}
-	return dh.ducks
+	if len(ducks) == 0 {
+		return nil
+	}
+	return ducks
 }
 
 // crdToResourceMeta takes in a CRD and converts it to a set of ResourceMeta.
@@ -231,6 +255,9 @@ func crdToResourceMeta(crd *apiextensionsv1.CustomResourceDefinition) []v1alpha1
 			continue
 		}
 
+		// TODO: this will have issues for unaccepted CRDs
+		// We need to look at the combo of crd.spec and crd.status
+		// for this metadata.
 		metas = append(metas, v1alpha1.ResourceMeta{
 			APIVersion: apiVersion(crd.Spec.Group, v.Name),
 			Kind:       crd.Spec.Names.Kind,

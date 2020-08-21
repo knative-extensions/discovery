@@ -1,0 +1,41 @@
+apiVersion: discovery.knative.dev/v1alpha1
+kind: ClusterDuckType
+metadata:
+  name: swimmers.zoo.knative.dev
+  generation: 0
+spec:
+  selectors:
+    - labelSelector: "zoo.knative.dev/swims=true"
+
+  names:
+    name: "Swimmer"
+    plural: "swimmers"
+    singular: "swimmer"
+
+  versions:
+    - name: "v1"
+
+  group: zoo.knative.dev
+
+status:
+  observedGeneration: 0
+  conditions:
+    - type: Ready
+      status: "True"
+  duckCount: 3
+  ducks:
+    v1:
+      - apiVersion: north.america/v1alpha2
+        kind: Duck
+        scope: Namespaced
+      - apiVersion: north.america/v1beta1
+        kind: Duck
+        scope: Namespaced
+    v2:
+      - apiVersion: north.america/v2
+        kind: GilaMonster
+        scope: Cluster
+    v3:
+      - apiVersion: australia/v1
+        kind: Platypus
+        scope: Namespaced

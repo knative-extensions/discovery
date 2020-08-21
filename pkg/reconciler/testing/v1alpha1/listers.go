@@ -126,7 +126,6 @@ func (l *Listers) GetAPIExtentionsObjects() []runtime.Object {
 }
 
 func (l *Listers) GetCustomResourceDefinitionLister() kubev1lister.CustomResourceDefinitionLister {
-
 	return kubev1lister.NewCustomResourceDefinitionLister(l.IndexerFor(&kubev1.CustomResourceDefinition{}))
 }
 

@@ -1,0 +1,91 @@
+apiVersion: discovery.knative.dev/v1alpha1
+kind: ClusterDuckType
+metadata:
+  name: ears.zoo.knative.dev
+  generation: 0
+spec:
+  selectors:
+    - labelSelector: "zoo.knative.dev/ears=true"
+
+  names:
+    name: "Ears"
+    plural: "ears"
+    singular: "ear"
+
+  versions:
+    - name: "v1"
+  group: zoo.knative.dev
+
+status:
+  observedGeneration: 0
+
+---
+
+apiVersion: discovery.knative.dev/v1alpha1
+kind: ClusterDuckType
+metadata:
+  name: furries.zoo.knative.dev
+  generation: 0
+spec:
+  selectors:
+    - labelSelector: "zoo.knative.dev/furry=true"
+
+  names:
+    name: "Furry"
+    plural: "furries"
+    singular: "furry"
+
+  versions:
+    - name: "v1alpha1"
+    - name: "v1beta1"
+  group: zoo.knative.dev
+
+status:
+  observedGeneration: 0
+
+---
+
+apiVersion: discovery.knative.dev/v1alpha1
+kind: ClusterDuckType
+metadata:
+  name: bills.zoo.knative.dev
+  generation: 0
+spec:
+  selectors:
+    - labelSelector: "zoo.knative.dev/bill=true"
+
+  names:
+    name: "Bill"
+    plural: "bills"
+    singular: "bill"
+
+  versions:
+    - name: "v2"
+  group: zoo.knative.dev
+
+status:
+  observedGeneration: 0
+
+---
+
+apiVersion: discovery.knative.dev/v1alpha1
+kind: ClusterDuckType
+metadata:
+  name: swimmers.zoo.knative.dev
+  generation: 0
+spec:
+  selectors:
+    - labelSelector: "zoo.knative.dev/swims=true"
+
+  names:
+    name: "Swimmer"
+    plural: "swimmers"
+    singular: "swimmer"
+
+  versions:
+    - name: "v1"
+
+  group: zoo.knative.dev
+
+status:
+  observedGeneration: 0

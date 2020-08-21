@@ -17,9 +17,11 @@ limitations under the License.
 package collection
 
 import (
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"reflect"
+	"sort"
 	"testing"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -239,6 +241,31 @@ func Test_DuckHunter_AddCRD_filtered(t *testing.T) {
 				}},
 			},
 		},
+		"multi-match filter": {
+			dh: NewDuckHunter(nil, []v1alpha1.DuckVersion{{Name: "v1"}, {Name: "v2"}}, &DuckFilters{
+				DuckLabel:         "teach.me.how/ducky",
+				DuckVersionPrefix: "duckies.teach.me.how",
+			}),
+			crd: makeCRDAnnotated("teach.me.how", "Ducky", map[string]bool{"red": true, "blue": true, "green": true},
+				map[string]string{"teach.me.how/ducky": "true"},
+				map[string]string{"duckies.teach.me.how/v1": "red,blue", "duckies.teach.me.how/v2": "green"}),
+			want: map[string][]v1alpha1.ResourceMeta{
+				"v1": {{
+					APIVersion: "teach.me.how/blue",
+					Kind:       "Ducky",
+					Scope:      "Namespaced",
+				}, {
+					APIVersion: "teach.me.how/red",
+					Kind:       "Ducky",
+					Scope:      "Namespaced",
+				}},
+				"v2": {{
+					APIVersion: "teach.me.how/green",
+					Kind:       "Ducky",
+					Scope:      "Namespaced",
+				}},
+			},
+		},
 		"match second label": {
 			dh: NewDuckHunter(nil, nil, &DuckFilters{
 				DuckLabel:         "teach.me.how/ducky",
@@ -261,9 +288,7 @@ func Test_DuckHunter_AddCRD_filtered(t *testing.T) {
 			}),
 			crd: makeCRDAnnotated("teach.me.how", "Ducky", map[string]bool{"v2": true},
 				map[string]string{"teach.me.how/ducky": "false"}, map[string]string{"duckies.teach.me.how/v1": "v2"}),
-			want: map[string][]v1alpha1.ResourceMeta{
-				"v1": {},
-			},
+			want: nil,
 		},
 		"no duck label": {
 			dh: NewDuckHunter(nil, nil, &DuckFilters{
@@ -335,9 +360,7 @@ func Test_DuckHunter_AddCRD_filtered(t *testing.T) {
 			}),
 			crd: makeCRDAnnotated("teach.me.how", "Ducky", map[string]bool{"v1": true, "v2": true},
 				map[string]string{"teach.me.how/ducky": "true"}, map[string]string{"duckies.teach.me.how/v1": "v3"}),
-			want: map[string][]v1alpha1.ResourceMeta{
-				"v1": {},
-			},
+			want: nil,
 		},
 	}
 	for name, tc := range tests {
@@ -525,6 +548,10 @@ func Test_crdToResourceMeta(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			got := crdToResourceMeta(tc.crd)
+
+			sort.Sort(ByResourceMeta(got))
+			sort.Sort(ByResourceMeta(tc.want))
+
 			if !reflect.DeepEqual(got, tc.want) {
 				t.Errorf("Ducks() = %v, want %v", got, tc.want)
 			}

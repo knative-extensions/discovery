@@ -28,6 +28,7 @@ import (
 	"testing"
 
 	"github.com/n3wscott/rigging/pkg/installer"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	"github.com/cucumber/godog"
@@ -133,6 +134,74 @@ func ClusterDuckTypeFeatureContext(t *testing.T, s *godog.ScenarioContext) {
 	s.Step(`^expect status updates \(from file\):$`, rt.expectStatusUpdateFiles)
 	s.Step(`^expect Kubernetes Events:$`, rt.expectKubernetesEvents)
 
+	// hardcode this for now... we can get this from CRDs in the system
+	rt.apiGroups = []*metav1.APIResourceList{
+		{
+			GroupVersion: "central.america/v2",
+			APIResources: []metav1.APIResource{{
+				Name:       "monkeys",
+				Namespaced: true,
+				Kind:       "Monkey",
+			}},
+		}, {
+			GroupVersion: "north.america/v1alpha1",
+			APIResources: []metav1.APIResource{{
+				Name:       "ducks",
+				Namespaced: true,
+				Kind:       "Ducks",
+			}},
+		}, {
+			GroupVersion: "north.america/v1alpha2",
+			APIResources: []metav1.APIResource{{
+				Name:       "ducks",
+				Namespaced: true,
+				Kind:       "Ducks",
+			}},
+		}, {
+			GroupVersion: "north.america/v1beta1",
+			APIResources: []metav1.APIResource{{
+				Name:       "ducks",
+				Namespaced: true,
+				Kind:       "Ducks",
+			}},
+		}, {
+			GroupVersion: "north.america/v2",
+			APIResources: []metav1.APIResource{{
+				Name:       "gilamonsters",
+				Namespaced: false,
+				Kind:       "GilaMonster",
+			}},
+		}, {
+			GroupVersion: "australia/v1alpha1",
+			APIResources: []metav1.APIResource{{
+				Name:       "platypi",
+				Namespaced: true,
+				Kind:       "Platypus",
+			}},
+		}, {
+			GroupVersion: "australia/v1alpha2",
+			APIResources: []metav1.APIResource{{
+				Name:       "platypi",
+				Namespaced: true,
+				Kind:       "Platypus",
+			}},
+		}, {
+			GroupVersion: "australia/v1beta1",
+			APIResources: []metav1.APIResource{{
+				Name:       "platypi",
+				Namespaced: true,
+				Kind:       "Platypus",
+			}},
+		}, {
+			GroupVersion: "australia/v1",
+			APIResources: []metav1.APIResource{{
+				Name:       "platypi",
+				Namespaced: true,
+				Kind:       "Platypus",
+			}},
+		},
+	}
+
 	s.AfterScenario(func(pickle *messages.Pickle, err error) {
 		originObjects := make([]runtime.Object, 0, len(rt.row.Objects))
 		for _, obj := range rt.row.Objects {
@@ -163,6 +232,8 @@ type ReconcilerTest struct {
 	t   *testing.T
 	row pkgtest.TableRow
 
+	apiGroups []*metav1.APIResourceList
+
 	factory pkgtest.Factory
 }
 
@@ -192,13 +263,16 @@ func (rt *ReconcilerTest) theFollowingObjectFiles(y *messages.PickleStepArgument
 		// Leverage the installer to parse the template files.
 		// TODO: move this code around to let it be reusable
 		// in a more clear way.
-		files := installer.ParseTemplates(file, config)
 		if file != "" {
+			files := installer.ParseTemplates(file, config)
 			list, err := ioutil.ReadDir(files)
 			if err != nil {
 				return err
 			}
-
+			// len zero would be an invalid or missing file.
+			if len(list) == 0 {
+				return fmt.Errorf("expected to read a yaml file from %q but found none", file)
+			}
 			for _, f := range list {
 				name := path.Join(files, f.Name())
 				if !f.IsDir() {
@@ -247,7 +321,7 @@ func (rt *ReconcilerTest) aClusterDuckTypeReconciler() error {
 		r := &Reconciler{
 			client:         fakekubeclient.Get(ctx),
 			crdLister:      listers.GetCustomResourceDefinitionLister(),
-			resourceMapper: collection.NewResourceMapper(nil), // TODO: let this be settable.
+			resourceMapper: collection.NewResourceMapper(rt.apiGroups),
 		}
 
 		return clusterducktype.NewReconciler(ctx, logging.FromContext(ctx),

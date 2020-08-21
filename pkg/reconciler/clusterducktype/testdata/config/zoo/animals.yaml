@@ -1,0 +1,140 @@
+
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    zoo.knative.dev/ears: "true"
+    zoo.knative.dev/furry: "true"
+  name: monkeys.central.america
+spec:
+  group: central.america
+  names:
+    kind: Monkey
+    listKind: MonkeyList
+    plural: monkeys
+    singular: monkey
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+status:
+  acceptedNames:
+    kind: Monkey
+    listKind: MonkeyList
+    plural: monkeys
+    singular: monkey
+  storedVersions:
+    - v1alpha1
+
+---
+
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    zoo.knative.dev/swims: "true"
+    zoo.knative.dev/bill: "true"
+  name: ducks.north.america
+spec:
+  group: north.america
+  names:
+    kind: Duck
+    listKind: DuckList
+    plural: ducks
+    singular: duck
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: false
+      storage: false
+    - name: v1alpha2
+      served: true
+      storage: true
+    - name: v1beta1
+      served: true
+      storage: false
+status:
+  acceptedNames:
+    kind: Duck
+    listKind: DuckList
+    plural: ducks
+    singular: duck
+  storedVersions:
+    - v1alpha2
+
+---
+
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    zoo.knative.dev/bill: "true"
+    zoo.knative.dev/furry: "true"
+    zoo.knative.dev/swims: "true"
+  annotations:
+    furries.zoo.knative.dev/v1alpha1: v1alpha2,v1beta1
+    furries.zoo.knative.dev/v1beta1: v1
+    bills.zoo.knative.dev/v2: v1
+    swimmers.zoo.knative.dev/v3: v1
+  name: platypi.australia
+spec:
+  group: australia
+  names:
+    kind: Platypus
+    listKind: PlatypusList
+    plural: platypi
+    singular: platypus
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: false
+      storage: false
+    - name: v1alpha2
+      served: true
+      storage: false
+    - name: v1beta1
+      served: true
+      storage: false
+    - name: v1
+      served: true
+      storage: true
+status:
+  acceptedNames:
+    kind: Platypus
+    listKind: PlatypusList
+    plural: platypi
+    singular: platypus
+  storedVersions:
+    - v1
+
+---
+
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    zoo.knative.dev/swims: "true"
+  annotations:
+    swimmers.zoo.knative.dev/v2: v2
+  name: gilamonsters.north.america
+spec:
+  group: north.america
+  names:
+    kind: GilaMonster
+    listKind: GilaMonsterList
+    plural: gilamonsters
+    singular: gilamonster
+  scope: Cluster
+  versions:
+    - name: v2
+      served: true
+      storage: true
+status:
+  acceptedNames:
+    kind: GilaMonster
+    listKind: GilaMonsterList
+    plural: gilamonsters
+    singular: gilamonster
+  storedVersions:
+    - v2
