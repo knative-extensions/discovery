@@ -62,7 +62,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, dt *v1alpha1.ClusterDuck
 		DuckVersionPrefix: fmt.Sprintf("%s.%s", dt.Spec.Names.Plural, dt.Spec.Group),
 	})
 
-	/// By query
+	// By query
 
 	for _, st := range dt.Spec.Selectors {
 		crds, err := r.getCRDsWith(st.LabelSelector)
@@ -73,13 +73,13 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, dt *v1alpha1.ClusterDuck
 		hunter.AddCRDs(crds)
 	}
 
-	/// By ref
+	// By ref
 
 	for _, dv := range dt.Spec.Versions {
 		for _, ref := range dv.Refs {
 			// TODO we should query and test that the Ref is installed and works on this cluster.
 			if err := hunter.AddRef(dv.Name, ref); err != nil {
-				logging.FromContext(ctx).Warnw("unable to add resource ref: %s", zap.Error(err))
+				logging.FromContext(ctx).Warnw("unable to add resource ref", zap.Error(err))
 			}
 		}
 	}
