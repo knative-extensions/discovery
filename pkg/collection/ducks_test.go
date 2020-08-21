@@ -18,6 +18,7 @@ package collection
 
 import (
 	"reflect"
+	"sort"
 	"testing"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -547,6 +548,10 @@ func Test_crdToResourceMeta(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			got := crdToResourceMeta(tc.crd)
+
+			sort.Sort(ByResourceMeta(got))
+			sort.Sort(ByResourceMeta(tc.want))
+
 			if !reflect.DeepEqual(got, tc.want) {
 				t.Errorf("Ducks() = %v, want %v", got, tc.want)
 			}
