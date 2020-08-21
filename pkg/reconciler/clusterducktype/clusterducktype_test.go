@@ -27,9 +27,8 @@ import (
 	"strings"
 	"testing"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	"github.com/n3wscott/rigging/pkg/installer"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	"github.com/cucumber/godog"
@@ -274,7 +273,6 @@ func (rt *ReconcilerTest) theFollowingObjectFiles(y *messages.PickleStepArgument
 			if len(list) == 0 {
 				return fmt.Errorf("expected to read a yaml file from %q but found none", file)
 			}
-
 			for _, f := range list {
 				name := path.Join(files, f.Name())
 				if !f.IsDir() {
