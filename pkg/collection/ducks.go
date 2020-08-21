@@ -215,12 +215,33 @@ func (dh *duckHunter) AddRef(duckVersion string, ref v1alpha1.ResourceRef) error
 	return nil
 }
 
+// duckCopy makes a deep copy of the ducks map
+func duckCopy(d map[string][]v1alpha1.ResourceMeta) map[string][]v1alpha1.ResourceMeta {
+	ducks := make(map[string][]v1alpha1.ResourceMeta, len(d))
+	for k, v := range d {
+		vc := make([]v1alpha1.ResourceMeta, len(v))
+		for i, vv := range v {
+			vc[i] = vv
+		}
+		ducks[k] = vc
+	}
+	return ducks
+}
+
 // Ducks implements DuckHunter.Ducks
 func (dh *duckHunter) Ducks() map[string][]v1alpha1.ResourceMeta {
-	for v := range dh.ducks {
-		sort.Sort(ByResourceMeta(dh.ducks[v]))
+	ducks := duckCopy(dh.ducks)
+	for k := range ducks {
+		if len(ducks[k]) == 0 {
+			delete(ducks, k)
+		} else {
+			sort.Sort(ByResourceMeta(ducks[k]))
+		}
 	}
-	return dh.ducks
+	if len(ducks) == 0 {
+		return nil
+	}
+	return ducks
 }
 
 // crdToResourceMeta takes in a CRD and converts it to a set of ResourceMeta.
@@ -231,6 +252,9 @@ func crdToResourceMeta(crd *apiextensionsv1.CustomResourceDefinition) []v1alpha1
 			continue
 		}
 
+		// TODO: this will have issues for unaccepted CRDs
+		// We need to look at the combo of crd.spec and crd.status
+		// for this metadata.
 		metas = append(metas, v1alpha1.ResourceMeta{
 			APIVersion: apiVersion(crd.Spec.Group, v.Name),
 			Kind:       crd.Spec.Names.Kind,

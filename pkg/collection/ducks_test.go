@@ -261,9 +261,7 @@ func Test_DuckHunter_AddCRD_filtered(t *testing.T) {
 			}),
 			crd: makeCRDAnnotated("teach.me.how", "Ducky", map[string]bool{"v2": true},
 				map[string]string{"teach.me.how/ducky": "false"}, map[string]string{"duckies.teach.me.how/v1": "v2"}),
-			want: map[string][]v1alpha1.ResourceMeta{
-				"v1": {},
-			},
+			want: nil,
 		},
 		"no duck label": {
 			dh: NewDuckHunter(nil, nil, &DuckFilters{
@@ -335,9 +333,7 @@ func Test_DuckHunter_AddCRD_filtered(t *testing.T) {
 			}),
 			crd: makeCRDAnnotated("teach.me.how", "Ducky", map[string]bool{"v1": true, "v2": true},
 				map[string]string{"teach.me.how/ducky": "true"}, map[string]string{"duckies.teach.me.how/v1": "v3"}),
-			want: map[string][]v1alpha1.ResourceMeta{
-				"v1": {},
-			},
+			want: nil,
 		},
 	}
 	for name, tc := range tests {

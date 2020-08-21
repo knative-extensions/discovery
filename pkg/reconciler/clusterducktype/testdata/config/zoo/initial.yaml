@@ -1,0 +1,20 @@
+apiVersion: discovery.knative.dev/v1alpha1
+kind: ClusterDuckType
+metadata:
+  name: ears.zoo.knative.dev
+  generation: 0
+spec:
+  selectors:
+    - labelSelector: "zoo.knative.dev/ears=true"
+
+  names:
+    name: "Ears"
+    plural: "ears"
+    singular: "ear"
+
+  versions:
+    - name: "v1"
+  group: zoo.knative.dev
+
+status:
+  observedGeneration: 0
