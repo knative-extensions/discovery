@@ -1,7 +1,6 @@
 # Knative Discovery API
 
-This is Work in Progress. It is based on the
-[Discovery API](https://docs.google.com/document/d/1CVMI0IpGqZH7j64-KQ6_8hJVUkeYEM0pdXslJ10a69E/edit)
+This is Work in Progress. It is based on the [Discovery API](./docs/proposal.md)
 design doc.
 
 ## Install
