@@ -1,14 +1,16 @@
 # Discovery API
 
-| State          | Author(s)     | Last Update               |
-| -------------- | ------------- | ------------------------- |
-| In development | Scott Nichols | Last Updated: May 6, 2020 |
+| State          | Author(s)     | Last Update                |
+| -------------- | ------------- | -------------------------- |
+| In development | Scott Nichols | Last Updated: Aug 31, 2020 |
 
 | Reviewer   | Role    | Approval Date |
 | ---------- | ------- | ------------- |
 | Serving    |         |               |
 | Client     |         |               |
 | Nacho Cano | Sources | 05/27/2020    |
+
+## Proposal
 
 In Knative, we are finding a need for additional metadata about the state of the
 cluster and the resources that are installed there. The correct solution would
@@ -87,8 +89,8 @@ name a few.
 This API will be owned and managed by the Eventing Source WG, it is under the
 charter for sources in a cluster to be discoverable and easily installable.
 
-To get started we need a github.com/knative/discovery repo to be created and we
-can start over on API definition, starting with DuckType and Manual.
+To get started we need a github.com/knative-sandbox/discovery repo to be created
+and we can start over on API definition, starting with DuckType and Manual.
 
 ## Open Questions
 
