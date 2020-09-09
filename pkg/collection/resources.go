@@ -51,8 +51,8 @@ func NewResourceMapper(apiGroups []*metav1.APIResourceList) ResourceMapper {
 
 	for _, apiGroup := range apiGroups {
 		mappings[apiGroup.GroupVersion] = mapping{
-			r2k: make(map[string]string, 0),
-			k2r: make(map[string]string, 0),
+			r2k: make(map[string]string),
+			k2r: make(map[string]string),
 		}
 
 		for _, apiResource := range apiGroup.APIResources {

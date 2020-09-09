@@ -46,7 +46,7 @@ func (dts *ClusterDuckTypeSpec) Validate(ctx context.Context) (errs *apis.FieldE
 
 	errs = errs.Also(dts.Names.Validate(ctx).ViaField("names"))
 
-	seenVersionNames := make(map[string]string, 0)
+	seenVersionNames := make(map[string]string)
 	for i, v := range dts.Versions {
 		if _, found := seenVersionNames[v.Name]; found {
 			errs = errs.Also((&apis.FieldError{

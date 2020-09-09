@@ -223,9 +223,7 @@ func duckCopy(d map[string][]v1alpha1.ResourceMeta) map[string][]v1alpha1.Resour
 	ducks := make(map[string][]v1alpha1.ResourceMeta, len(d))
 	for k, v := range d {
 		vc := make([]v1alpha1.ResourceMeta, len(v))
-		for i, vv := range v {
-			vc[i] = vv
-		}
+		copy(vc, v)
 		ducks[k] = vc
 	}
 	return ducks

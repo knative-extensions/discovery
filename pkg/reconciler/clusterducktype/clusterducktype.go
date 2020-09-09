@@ -126,7 +126,7 @@ func (r *Reconciler) resyncResourceMapper(ctx context.Context) {
 // count off in the status of ClusterDuckType.
 func DuckCount(ducks map[string][]v1alpha1.ResourceMeta) int {
 	count := 0
-	kinds := make(map[string]bool, 0)
+	kinds := make(map[string]bool)
 	for _, metas := range ducks {
 		for _, meta := range metas {
 			// TODO: it would be nice if ResourceMeta had a version-free unique hash to do this.

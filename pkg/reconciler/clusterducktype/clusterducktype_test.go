@@ -55,8 +55,6 @@ var opt = godog.Options{
 	Output: colors.Colored(os.Stdout),
 }
 
-var testStatus int
-
 func TestMain(m *testing.M) {
 	flag.Parse()
 
@@ -241,7 +239,7 @@ func (rt *ReconcilerTest) theFollowingObjectFiles(y *messages.PickleStepArgument
 	keys := make([]string, 0)
 	for row, v := range y.Rows {
 		var file string
-		config := make(map[string]interface{}, 0)
+		config := make(map[string]interface{})
 
 		for i, c := range v.Cells {
 			if row == 0 {
@@ -357,7 +355,7 @@ func (rt *ReconcilerTest) expectStatusUpdateFiles(y *messages.PickleStepArgument
 	keys := make([]string, 0)
 	for row, v := range y.Rows {
 		var file string
-		config := make(map[string]interface{}, 0)
+		config := make(map[string]interface{})
 
 		for i, c := range v.Cells {
 			if row == 0 {
