@@ -57,7 +57,7 @@ jobs:
 
       - name: Test
         run: go test -race $COVER_OPTS ./...
-        
+
       - if: steps.codecov-enabled.outputs.files_exists == 'true'
         name: Codecov
         uses: codecov/codecov-action@v1
