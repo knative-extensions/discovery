@@ -17,9 +17,10 @@ limitations under the License.
 package example
 
 import (
-	"github.com/n3wscott/rigging"
 	"testing"
 	"time"
+
+	"github.com/n3wscott/rigging"
 )
 
 // SmokeTestImpl makes sure an DuckType goes ready.
