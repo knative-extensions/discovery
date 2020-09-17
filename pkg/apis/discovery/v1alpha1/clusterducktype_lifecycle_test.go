@@ -94,6 +94,6 @@ func TestDuckTypeMarkReady(t *testing.T) {
 
 	c := rs.GetCondition(DuckTypeConditionReady)
 	if c == nil || c.Status != corev1.ConditionTrue {
-		t.Error("expected Ready to be true, got %v\n", c)
+		t.Errorf("expected Ready to be true, got %v\n", c)
 	}
 }
