@@ -19,6 +19,8 @@ import (
 	"sort"
 	"testing"
 
+	corev1 "k8s.io/api/core/v1"
+
 	"github.com/google/go-cmp/cmp"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"knative.dev/pkg/apis"
@@ -45,6 +47,7 @@ func TestDuckTypeDuckTypes(t *testing.T) {
 		})
 	}
 }
+
 func TestDuckTypeGetConditionSet(t *testing.T) {
 	r := &ClusterDuckType{}
 
@@ -83,5 +86,15 @@ func TestDuckTypeInitializeConditions(t *testing.T) {
 
 	if diff := cmp.Diff(expected, types); diff != "" {
 		t.Error("Conditions(-want,+got):\n", diff)
+	}
+}
+
+func TestDuckTypeMarkReady(t *testing.T) {
+	rs := &ClusterDuckTypeStatus{}
+	rs.MarkReady()
+
+	c := rs.GetCondition(DuckTypeConditionReady)
+	if c == nil || c.Status != corev1.ConditionTrue {
+		t.Errorf("expected Ready to be true, got %v\n", c)
 	}
 }
