@@ -53,7 +53,6 @@ spec:
       version: v2
   selectors:
   - labelSelector: "example.com/thisduck=true"
-
 `
 
 	want := &ClusterDuckType{
