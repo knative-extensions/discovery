@@ -19,6 +19,8 @@ limitations under the License.
 package fake
 
 import (
+	"context"
+
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -38,7 +40,7 @@ var clusterducktypesResource = schema.GroupVersionResource{Group: "discovery.kna
 var clusterducktypesKind = schema.GroupVersionKind{Group: "discovery.knative.dev", Version: "v1alpha1", Kind: "ClusterDuckType"}
 
 // Get takes name of the clusterDuckType, and returns the corresponding clusterDuckType object, and an error if there is any.
-func (c *FakeClusterDuckTypes) Get(name string, options v1.GetOptions) (result *v1alpha1.ClusterDuckType, err error) {
+func (c *FakeClusterDuckTypes) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.ClusterDuckType, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewRootGetAction(clusterducktypesResource, name), &v1alpha1.ClusterDuckType{})
 	if obj == nil {
@@ -48,7 +50,7 @@ func (c *FakeClusterDuckTypes) Get(name string, options v1.GetOptions) (result *
 }
 
 // List takes label and field selectors, and returns the list of ClusterDuckTypes that match those selectors.
-func (c *FakeClusterDuckTypes) List(opts v1.ListOptions) (result *v1alpha1.ClusterDuckTypeList, err error) {
+func (c *FakeClusterDuckTypes) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.ClusterDuckTypeList, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewRootListAction(clusterducktypesResource, clusterducktypesKind, opts), &v1alpha1.ClusterDuckTypeList{})
 	if obj == nil {
@@ -69,13 +71,13 @@ func (c *FakeClusterDuckTypes) List(opts v1.ListOptions) (result *v1alpha1.Clust
 }
 
 // Watch returns a watch.Interface that watches the requested clusterDuckTypes.
-func (c *FakeClusterDuckTypes) Watch(opts v1.ListOptions) (watch.Interface, error) {
+func (c *FakeClusterDuckTypes) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
 		InvokesWatch(testing.NewRootWatchAction(clusterducktypesResource, opts))
 }
 
 // Create takes the representation of a clusterDuckType and creates it.  Returns the server's representation of the clusterDuckType, and an error, if there is any.
-func (c *FakeClusterDuckTypes) Create(clusterDuckType *v1alpha1.ClusterDuckType) (result *v1alpha1.ClusterDuckType, err error) {
+func (c *FakeClusterDuckTypes) Create(ctx context.Context, clusterDuckType *v1alpha1.ClusterDuckType, opts v1.CreateOptions) (result *v1alpha1.ClusterDuckType, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewRootCreateAction(clusterducktypesResource, clusterDuckType), &v1alpha1.ClusterDuckType{})
 	if obj == nil {
@@ -85,7 +87,7 @@ func (c *FakeClusterDuckTypes) Create(clusterDuckType *v1alpha1.ClusterDuckType)
 }
 
 // Update takes the representation of a clusterDuckType and updates it. Returns the server's representation of the clusterDuckType, and an error, if there is any.
-func (c *FakeClusterDuckTypes) Update(clusterDuckType *v1alpha1.ClusterDuckType) (result *v1alpha1.ClusterDuckType, err error) {
+func (c *FakeClusterDuckTypes) Update(ctx context.Context, clusterDuckType *v1alpha1.ClusterDuckType, opts v1.UpdateOptions) (result *v1alpha1.ClusterDuckType, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewRootUpdateAction(clusterducktypesResource, clusterDuckType), &v1alpha1.ClusterDuckType{})
 	if obj == nil {
@@ -96,7 +98,7 @@ func (c *FakeClusterDuckTypes) Update(clusterDuckType *v1alpha1.ClusterDuckType)
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeClusterDuckTypes) UpdateStatus(clusterDuckType *v1alpha1.ClusterDuckType) (*v1alpha1.ClusterDuckType, error) {
+func (c *FakeClusterDuckTypes) UpdateStatus(ctx context.Context, clusterDuckType *v1alpha1.ClusterDuckType, opts v1.UpdateOptions) (*v1alpha1.ClusterDuckType, error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewRootUpdateSubresourceAction(clusterducktypesResource, "status", clusterDuckType), &v1alpha1.ClusterDuckType{})
 	if obj == nil {
@@ -106,22 +108,22 @@ func (c *FakeClusterDuckTypes) UpdateStatus(clusterDuckType *v1alpha1.ClusterDuc
 }
 
 // Delete takes name of the clusterDuckType and deletes it. Returns an error if one occurs.
-func (c *FakeClusterDuckTypes) Delete(name string, options *v1.DeleteOptions) error {
+func (c *FakeClusterDuckTypes) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
 		Invokes(testing.NewRootDeleteAction(clusterducktypesResource, name), &v1alpha1.ClusterDuckType{})
 	return err
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *FakeClusterDuckTypes) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
-	action := testing.NewRootDeleteCollectionAction(clusterducktypesResource, listOptions)
+func (c *FakeClusterDuckTypes) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+	action := testing.NewRootDeleteCollectionAction(clusterducktypesResource, listOpts)
 
 	_, err := c.Fake.Invokes(action, &v1alpha1.ClusterDuckTypeList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched clusterDuckType.
-func (c *FakeClusterDuckTypes) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.ClusterDuckType, err error) {
+func (c *FakeClusterDuckTypes) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.ClusterDuckType, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewRootPatchSubresourceAction(clusterducktypesResource, name, pt, data, subresources...), &v1alpha1.ClusterDuckType{})
 	if obj == nil {
