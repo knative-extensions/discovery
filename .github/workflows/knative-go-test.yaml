@@ -18,18 +18,20 @@
 name: Test
 
 on:
+
   push:
-    branches: [ 'master', 'release-*' ]
+    branches: [ 'master' ]
+
   pull_request:
     branches: [ 'master', 'release-*' ]
 
 jobs:
 
   test:
-    name: Test
+    name: Unit Tests
     strategy:
       matrix:
-        go-version: [1.14.x]
+        go-version: [1.15.x]
         platform: [ubuntu-latest]
 
     runs-on: ${{ matrix.platform }}
@@ -61,4 +63,3 @@ jobs:
       - if: steps.codecov-enabled.outputs.files_exists == 'true'
         name: Codecov
         uses: codecov/codecov-action@v1
-
