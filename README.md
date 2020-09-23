@@ -16,7 +16,7 @@ TODO: instructions on installing nightly and a release.
 
 ## Development
 
-Install, 
+Install,
 
 ```shell script
 ko apply -f ./config
@@ -87,7 +87,9 @@ spec:
 
 ### Demo
 
-Using [`addressables.duck.knative.dev.yaml`](./config/knative/addressables.duck.knative.dev.yaml), we will apply it,
+Using
+[`addressables.duck.knative.dev.yaml`](./config/knative/addressables.duck.knative.dev.yaml),
+we will apply it,
 
 ```shell
 kubectl apply -f ./config/knative/addressables.duck.knative.dev.yaml
@@ -120,66 +122,65 @@ kind: CluserDuckType
 metadata:
   generation: 2
   name: addressables.duck.knative.dev
-spec:
-  ...
+spec: ...
 status:
   conditions:
-  - lastTransitionTime: "2020-08-11T22:21:57Z"
-    status: "True"
-    type: Ready
+    - lastTransitionTime: "2020-08-11T22:21:57Z"
+      status: "True"
+      type: Ready
   duckCount: 6
   ducks:
     v1:
-    - apiVersion: eventing.knative.dev/v1
-      kind: Broker
-      scope: Namespaced
-    - apiVersion: eventing.knative.dev/v1beta1
-      kind: Broker
-      scope: Namespaced
-    - apiVersion: flows.knative.dev/v1
-      kind: Parallel
-      scope: Namespaced
-    - apiVersion: flows.knative.dev/v1
-      kind: Sequence
-      scope: Namespaced
-    - apiVersion: flows.knative.dev/v1beta1
-      kind: Parallel
-      scope: Namespaced
-    - apiVersion: flows.knative.dev/v1beta1
-      kind: Sequence
-      scope: Namespaced
-    - apiVersion: messaging.knative.dev/v1
-      kind: Channel
-      scope: Namespaced
-    - apiVersion: messaging.knative.dev/v1beta1
-      kind: Channel
-      scope: Namespaced
-    - apiVersion: serving.knative.dev/v1
-      kind: Route
-      scope: Namespaced
-    - apiVersion: serving.knative.dev/v1
-      kind: Service
-      scope: Namespaced
-    - apiVersion: serving.knative.dev/v1alpha1
-      kind: Route
-      scope: Namespaced
-    - apiVersion: serving.knative.dev/v1alpha1
-      kind: Service
-      scope: Namespaced
-    - apiVersion: serving.knative.dev/v1beta1
-      kind: Route
-      scope: Namespaced
-    - apiVersion: serving.knative.dev/v1beta1
-      kind: Service
-      scope: Namespaced
+      - apiVersion: eventing.knative.dev/v1
+        kind: Broker
+        scope: Namespaced
+      - apiVersion: eventing.knative.dev/v1beta1
+        kind: Broker
+        scope: Namespaced
+      - apiVersion: flows.knative.dev/v1
+        kind: Parallel
+        scope: Namespaced
+      - apiVersion: flows.knative.dev/v1
+        kind: Sequence
+        scope: Namespaced
+      - apiVersion: flows.knative.dev/v1beta1
+        kind: Parallel
+        scope: Namespaced
+      - apiVersion: flows.knative.dev/v1beta1
+        kind: Sequence
+        scope: Namespaced
+      - apiVersion: messaging.knative.dev/v1
+        kind: Channel
+        scope: Namespaced
+      - apiVersion: messaging.knative.dev/v1beta1
+        kind: Channel
+        scope: Namespaced
+      - apiVersion: serving.knative.dev/v1
+        kind: Route
+        scope: Namespaced
+      - apiVersion: serving.knative.dev/v1
+        kind: Service
+        scope: Namespaced
+      - apiVersion: serving.knative.dev/v1alpha1
+        kind: Route
+        scope: Namespaced
+      - apiVersion: serving.knative.dev/v1alpha1
+        kind: Service
+        scope: Namespaced
+      - apiVersion: serving.knative.dev/v1beta1
+        kind: Route
+        scope: Namespaced
+      - apiVersion: serving.knative.dev/v1beta1
+        kind: Service
+        scope: Namespaced
   observedGeneration: 2
 ```
 
 ## Knative Duck Types
 
 If the `./config/knative` directory is applied (via
-`kubectl apply -f config/knative`), a quick view of the duck types used by Knative in this cluster
-becomes easier to find:
+`kubectl apply -f config/knative`), a quick view of the duck types used by
+Knative in this cluster becomes easier to find:
 
 ```shell
 kubectl get clusterducktypes
@@ -198,4 +199,4 @@ _Note_: there is also a short name: `cducks`
 
 ```shell
 kubectl get cducks
-``` 
+```
