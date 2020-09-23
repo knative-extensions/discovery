@@ -1,11 +1,18 @@
 # Knative Discovery API
 
+[![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white)](https://pkg.go.dev/knative.dev/discovery)
+[![Go Report Card](https://goreportcard.com/badge/knative.dev/discovery)](https://goreportcard.com/report/knative.dev/discovery)
+[![Releases](https://img.shields.io/github/release-pre/knative-sandbox/discovery.svg)](https://github.com/knative-sandbox/discovery/releases)
+[![LICENSE](https://img.shields.io/github/license/knative-sandbox/discovery.svg)](https://github.com/knative-sandbox/discovery/blob/master/LICENSE)
+[![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://knative.slack.com)
+[![TestGrid](https://img.shields.io/badge/testgrid-discovery-informational)](https://testgrid.knative.dev/discovery)
+
 This is Work in Progress. It is based on the [Discovery API](./docs/proposal.md)
 design doc.
 
 ## Install
 
-Nightly, 
+TODO: instructions on installing nightly and a release.
 
 ## Development
 
@@ -14,8 +21,6 @@ Install,
 ```shell script
 ko apply -f ./config
 ```
-
-
 
 ## ClusterDuckType:discovery.knative.dev/v1alpha1
 
