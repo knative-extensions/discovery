@@ -1,0 +1,65 @@
+# Copyright 2020 The Knative Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: discovery.knative.dev/v1alpha1
+kind: ClusterDuckType
+metadata:
+  name: channelables.duck.knative.dev
+  labels:
+    discovery.knative.dev/release: devel
+spec:
+  selectors:
+    - labelSelector: "duck.knative.dev/channelable=true"
+
+  names:
+    name: "Channelable"
+    plural: "channelables"
+    singular: "channelable"
+
+  versions:
+    - name: "v1"
+      additionalPrinterColumns:
+        - name: URL
+          type: string
+          jsonPath: .status.address.url
+
+
+      # schema: # TODO
+  # // ChannelableSpec contains Spec of the Channelable object
+  #type ChannelableSpec struct {
+  #	SubscribableSpec `json:",inline"`
+  # see https://github.com/knative/eventing/blob/a6b7494a5b8fbb2e9574dfbe54fbb9dad53ad121/pkg/apis/duck/v1/subscribable_types.go
+  #
+  #	// DeliverySpec contains options controlling the event delivery
+  #	// +optional
+  #	Delivery *DeliverySpec `json:"delivery,omitempty"`
+  # see https://github.com/knative/eventing/blob/a6b7494a5b8fbb2e9574dfbe54fbb9dad53ad121/pkg/apis/duck/v1/delivery_types.go
+  #}
+  #  // ChannelableStatus contains the Status of a Channelable object.
+  #  type ChannelableStatus struct {
+  #  // inherits duck/v1 Status, which currently provides:
+  #  // * ObservedGeneration - the 'Generation' of the Service that was last processed by the controller.
+  #  // * Conditions - the latest available observations of a resource's current state.
+  #  duckv1.Status `json:",inline"`
+  #  // AddressStatus is the part where the Channelable fulfills the Addressable contract.
+  #  duckv1.AddressStatus `json:",inline"`
+  #  // Subscribers is populated with the statuses of each of the Channelable's subscribers.
+  #  SubscribableStatus `json:",inline"`
+  #  // DeadLetterChannel is a KReference and is set by the channel when it supports native error handling via a channel
+  #  // Failed messages are delivered here.
+  #  // +optional
+  #  DeadLetterChannel *duckv1.KReference `json:"deadLetterChannel,omitempty"`
+  #}
+
+  group: duck.knative.dev
