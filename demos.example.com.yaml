@@ -12,27 +12,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# The following is an example ClusterDuckType.
 apiVersion: discovery.knative.dev/v1alpha1
 kind: ClusterDuckType
 metadata:
-  name: addressables.duck.knative.dev
-  labels:
-    discovery.knative.dev/release: devel
+  name: demos.example.com
 spec:
+  # selectors is a list of CRD label selectors to find CRDs that have been
+  # labeled as the given duck type.
   selectors:
-    - labelSelector: "duck.knative.dev/addressable=true"
+    - labelSelector: "example.com/demo=true"
 
+  # Names allows us to give a short name to the duck type.
   names:
-    name: "Addressable"
-    plural: "addressables"
-    singular: "addressable"
+    name: "Demo"
+    plural: "demos"
+    singular: "demo"
 
+  # Versions are to allow the definition of a single duck type with multiple
+  # versions, useful if the duck type API shape changes.
   versions:
     - name: "v1"
+      # refs allows for adding native types, or crds directly as the ducks via
+      # Group/Version/Kind/Resource
       refs:
-        - group: "duck.knative.dev"
+        - group: "demo.example.com"
           version: "v1"
-          kind: "Addressable"
+          kind: "Demo"
+      # additionalPrinterColumns is intended to understand what printer columns
+      # should be used for the custom objects.
       additionalPrinterColumns:
         - name: Ready
           type: string
@@ -40,12 +48,10 @@ spec:
         - name: Reason
           type: string
           jsonPath: ".status.conditions[?(@.type=='Ready')].reason"
-        - name: URL
+        - name: Demo
           type: string
-          jsonPath: .status.address.url
-        - name: Age
-          type: date
-          jsonPath: .metadata.creationTimestamp
+          jsonPath: .status.demo
+      # schema is the partial schema of the duck type.
       schema:
         openAPIV3Schema:
           properties:
@@ -55,7 +61,6 @@ spec:
                 address:
                   type: object
                   properties:
-                    url:
+                    demo:
                       type: string
-
-  group: duck.knative.dev
+  group: example.com

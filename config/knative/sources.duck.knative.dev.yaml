@@ -1,0 +1,59 @@
+# Copyright 2020 The Knative Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: discovery.knative.dev/v1alpha1
+kind: ClusterDuckType
+metadata:
+  name: sources.duck.knative.dev
+  labels:
+    discovery.knative.dev/release: devel
+spec:
+  selectors:
+    - labelSelector: "duck.knative.dev/source=true"
+
+  names:
+    name: "Source"
+    plural: "sources"
+    singular: "source"
+
+  versions:
+    - name: "v1"
+      additionalPrinterColumns:
+        - name: Sink
+          type: string
+          jsonPath: .status.sinkUri
+
+      # schema: # TODO
+#      // SourceStatus shows how we expect folks to embed Addressable in
+#      // their Status field.
+#      type SourceStatus struct {
+#      // inherits Status, which currently provides:
+#      // * ObservedGeneration - the 'Generation' of the Service that was last
+#      //   processed by the controller.
+#      // * Conditions - the latest available observations of a resource's current
+#      //   state.
+#      Status `json:",inline"`
+#
+#      // SinkURI is the current active sink URI that has been configured for the
+#      // Source.
+#      // +optional
+#      SinkURI *apis.URL `json:"sinkUri,omitempty"`
+#
+#      // CloudEventAttributes are the specific attributes that the Source uses
+#      // as part of its CloudEvents.
+#      // +optional
+#      CloudEventAttributes []CloudEventAttributes `json:"ceAttributes,omitempty"`
+#      }
+
+  group: duck.knative.dev

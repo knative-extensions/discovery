@@ -1,9 +1,22 @@
 # Knative Discovery API
 
+[![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white)](https://pkg.go.dev/knative.dev/discovery)
+[![Go Report Card](https://goreportcard.com/badge/knative.dev/discovery)](https://goreportcard.com/report/knative.dev/discovery)
+[![Releases](https://img.shields.io/github/release-pre/knative-sandbox/discovery.svg)](https://github.com/knative-sandbox/discovery/releases)
+[![LICENSE](https://img.shields.io/github/license/knative-sandbox/discovery.svg)](https://github.com/knative-sandbox/discovery/blob/master/LICENSE)
+[![TestGrid](https://img.shields.io/badge/testgrid-discovery-informational?logo=data:image/x-icon;base64,AAABAAEAICAAAAEACACoCAAAFgAAACgAAAAgAAAAQAAAAAEACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALAAAAFQAAACoAAw0AAAAAVQAGGgAAAABgAAAAgAAKJgAAAACqAA0zAAATTAAAGmYAAB1zAAAmmQAAM8wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgoKCgoKCAsQEBAQEBANDRAQEBAQEAsPEBAQEBAQAAAKCgoKCgoICxAQEBAQEA0NEBAQEBAQCw8QEBAQEBAAAAoKCgoKCggLEBAQEBAQDQ0QEBAQEBALDxAQEBAQEAAACgoKCgoKCAsQEBAQEBANDRAQEBAQEAsPEBAQEBAQAAAKCgoKCgoICxAQEBAQEA0NEBAQEBAQCw8QEBAQEBAAAAoKCgoKCggLEBAQEBAQDQ0QEBAQEBALDxAQEBAQEAAACAgICAgIBwkPDw8PDw8MDA8PDw8PDwkODw8PDw8PAAALCwsLCwsJBAsLCwsLCwYCAwMDAwMDAQkLCwsLCwsAABAQEBAQEA8LEBAQEBAQDQUKCgoKCgoDDxAQEBAQEAAAEBAQEBAQDwsQEBAQEBANBQoKCgoKCgMPEBAQEBAQAAAQEBAQEBAPCxAQEBAQEA0FCgoKCgoKAw8QEBAQEBAAABAQEBAQEA8LEBAQEBAQDQUKCgoKCgoDDxAQEBAQEAAAEBAQEBAQDwsQEBAQEBANBQoKCgoKCgMPEBAQEBAQAAAQEBAQEBAPCxAQEBAQEA0FCgoKCgoKAw8QEBAQEBAAAA0NDQ0NDQwGDQ0NDQ0NCwMFBQUFBQUCDA0NDQ0NDQAADQ0NDQ0NDAIFBQUFBQUDCw0NDQ0NDQYMDQ0NDQ0NAAAQEBAQEBAPAwoKCgoKCgUNEBAQEBAQCw8QEBAQEBAAABAQEBAQEA8DCgoKCgoKBQ0QEBAQEBALDxAQEBAQEAAAEBAQEBAQDwMKCgoKCgoFDRAQEBAQEAsPEBAQEBAQAAAQEBAQEBAPAwoKCgoKCgUNEBAQEBAQCw8QEBAQEBAAABAQEBAQEA8DCgoKCgoKBQ0QEBAQEBALDxAQEBAQEAAAEBAQEBAQDwMKCgoKCgoFDRAQEBAQEAsPEBAQEBAQAAALCwsLCwsJAQMDAwMDAwIGCwsLCwsLBAkLCwsLCwsAAA8PDw8PDw4JDw8PDw8PDAwPDw8PDw8JBwgICAgICAAAEBAQEBAQDwsQEBAQEBANDRAQEBAQEAsICgoKCgoKAAAQEBAQEBAPCxAQEBAQEA0NEBAQEBAQCwgKCgoKCgoAABAQEBAQEA8LEBAQEBAQDQ0QEBAQEBALCAoKCgoKCgAAEBAQEBAQDwsQEBAQEBANDRAQEBAQEAsICgoKCgoKAAAQEBAQEBAPCxAQEBAQEA0NEBAQEBAQCwgKCgoKCgoAABAQEBAQEA8LEBAQEBAQDQ0QEBAQEBALCAoKCgoKCgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA)](https://testgrid.knative.dev/discovery)
+[![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://knative.slack.com)
+
 This is Work in Progress. It is based on the [Discovery API](./docs/proposal.md)
 design doc.
 
 ## Install
+
+TODO: instructions on installing nightly and a release.
+
+## Development
+
+Install,
 
 ```shell script
 ko apply -f ./config
@@ -16,24 +29,24 @@ cluster admin, or tooling to better understand the duck types that are installed
 in the cluster. This information could be used to understand which Kinds could
 fulfill a role for another resource.
 
-### example.yaml
+### demos.example.com.yaml
 
 ```yaml
 apiVersion: discovery.knative.dev/v1alpha1
 kind: ClusterDuckType
 metadata:
-  name: addressables.duck.knative.dev
+  name: demos.example.com
 spec:
   # selectors is a list of CRD label selectors to find CRDs that have been
   # labeled as the given duck type.
   selectors:
-    - labelSelector: "duck.knative.dev/addressable=true"
+    - labelSelector: "example.com/demo=true"
 
   # Names allows us to give a short name to the duck type.
   names:
-    name: "Addressable"
-    plural: "addressables"
-    singular: "addressable"
+    name: "Demo"
+    plural: "demos"
+    singular: "demo"
 
   # Versions are to allow the definition of a single duck type with multiple
   # versions, useful if the duck type API shape changes.
@@ -42,26 +55,21 @@ spec:
       # refs allows for adding native types, or crds directly as the ducks via
       # Group/Version/Kind/Resource
       refs:
-        - version: v1
-          resource: services
-          kind: Service
-
+        - group: "demo.example.com"
+          version: "v1"
+          kind: "Demo"
       # additionalPrinterColumns is intended to understand what printer columns
       # should be used for the custom objects.
       additionalPrinterColumns:
         - name: Ready
           type: string
-          JSONPath: ".status.conditions[?(@.type=='Ready')].status"
+          jsonPath: ".status.conditions[?(@.type=='Ready')].status"
         - name: Reason
           type: string
-          JSONPath: ".status.conditions[?(@.type=='Ready')].reason"
-        - name: URL
+          jsonPath: ".status.conditions[?(@.type=='Ready')].reason"
+        - name: Demo
           type: string
-          JSONPath: .status.address.url
-        - name: Age
-          type: date
-          JSONPath: .metadata.creationTimestamp
-
+          jsonPath: .status.demo
       # schema is the partial schema of the duck type.
       schema:
         openAPIV3Schema:
@@ -72,96 +80,123 @@ spec:
                 address:
                   type: object
                   properties:
-                    url:
+                    demo:
                       type: string
+  group: example.com
+```
 
-  group: duck.knative.dev
+### Demo
+
+Using
+[`addressables.duck.knative.dev.yaml`](./config/knative/addressables.duck.knative.dev.yaml),
+we will apply it,
+
+```shell
+kubectl apply -f ./config/knative/addressables.duck.knative.dev.yaml
+```
+
+```text
+clusterducktype.discovery.knative.dev/addressables.duck.knative.dev created
 ```
 
 After applying this, you can fetch it:
 
 ```shell
-$  kubectl get ducktypes addressables.duck.knative.dev
-NAME                           SHORT NAME    DUCKS   READY   REASON
-addressables.duck.knative.dev   addressable   11      True
+kubectl get ducktypes addressables.duck.knative.dev
+```
+
+```text
+NAME                            SHORT NAME    DUCKS   READY   REASON
+addressables.duck.knative.dev   addressable   6       True
 ```
 
 And get the full DuckType `addressable.duck.knative.dev` resource:
 
-_(note this is pending finalization)_
-
 ```shell
-$ kubectl get clusterducktypes addressable.duck.knative.dev -oyaml
+kubectl get clusterducktypes addressable.duck.knative.dev -oyaml
+```
+
+```yaml
 apiVersion: discovery.knative.dev/v1alpha1
 kind: CluserDuckType
 metadata:
-  generation: 1
+  generation: 2
   name: addressables.duck.knative.dev
-spec:
-  ...
+spec: ...
 status:
   conditions:
-  - lastTransitionTime: "2020-01-16T22:13:24Z"
-    status: "True"
-    type: Ready
-  duckCount: 10
+    - lastTransitionTime: "2020-08-11T22:21:57Z"
+      status: "True"
+      type: Ready
+  duckCount: 6
   ducks:
-  - group: eventing.knative.dev
-    kind: Broker
-    resource: brokers
-    version: v1
-  - group: flows.knative.dev
-    kind: Parallel
-    resource: parallels
-    version: v1
-  - group: flows.knative.dev
-    kind: Sequence
-    resource: sequences
-    version: v1
-  - group: messaging.knative.dev
-    kind: Channel
-    resource: channels
-    version: v1
-  - group: messaging.knative.dev
-    kind: InMemoryChannel
-    resource: inmemorychannels
-    version: v1
-  - group: messaging.knative.dev
-    kind: Parallel
-    resource: parallels
-    version: v1
-  - group: messaging.knative.dev
-    kind: Sequence
-    resource: sequences
-    version: v1
-  - kind: Service
-    resource: services
-    version: v1
-  - group: serving.knative.dev
-    kind: Route
-    resource: routes
-    version: v1alpha1
-  - group: serving.knative.dev
-    kind: Service
-    resource: services
-    version: v1
-  observedGeneration: 1
+    v1:
+      - apiVersion: eventing.knative.dev/v1
+        kind: Broker
+        scope: Namespaced
+      - apiVersion: eventing.knative.dev/v1beta1
+        kind: Broker
+        scope: Namespaced
+      - apiVersion: flows.knative.dev/v1
+        kind: Parallel
+        scope: Namespaced
+      - apiVersion: flows.knative.dev/v1
+        kind: Sequence
+        scope: Namespaced
+      - apiVersion: flows.knative.dev/v1beta1
+        kind: Parallel
+        scope: Namespaced
+      - apiVersion: flows.knative.dev/v1beta1
+        kind: Sequence
+        scope: Namespaced
+      - apiVersion: messaging.knative.dev/v1
+        kind: Channel
+        scope: Namespaced
+      - apiVersion: messaging.knative.dev/v1beta1
+        kind: Channel
+        scope: Namespaced
+      - apiVersion: serving.knative.dev/v1
+        kind: Route
+        scope: Namespaced
+      - apiVersion: serving.knative.dev/v1
+        kind: Service
+        scope: Namespaced
+      - apiVersion: serving.knative.dev/v1alpha1
+        kind: Route
+        scope: Namespaced
+      - apiVersion: serving.knative.dev/v1alpha1
+        kind: Service
+        scope: Namespaced
+      - apiVersion: serving.knative.dev/v1beta1
+        kind: Route
+        scope: Namespaced
+      - apiVersion: serving.knative.dev/v1beta1
+        kind: Service
+        scope: Namespaced
+  observedGeneration: 2
 ```
 
 ## Knative Duck Types
 
 If the `./config/knative` directory is applied (via
-`kubectl apply -f config/knative`), a quick view of the duck types that are on
-the cluster becomes easier to get:
-
-_(note this is pending finalization)_
+`kubectl apply -f config/knative`), a quick view of the duck types used by
+Knative in this cluster becomes easier to find:
 
 ```shell
-$ kubectl get clusterducktypes
-NAME                                  DUCK NAME      DUCKS   READY   REASON
-addressables.duck.knative.dev         Addressable    10      True
-bindings.duck.knative.dev             Binding        2       True
-podspecables.duck.knative.dev         PodSpecable    7       True
-sources.duck.knative.dev              Source         7       True
-subscribables.messaging.knative.dev   Subscribable   2       True
+kubectl get clusterducktypes
+```
+
+```text
+NAME                            SHORT NAME    DUCKS   READY   REASON
+addressables.duck.knative.dev   Addressable   6       True
+bindings.duck.knative.dev       Binding       1       True
+channelables.duck.knative.dev   Channelable   0       True
+podspecables.duck.knative.dev   PodSpecable   7       True
+sources.duck.knative.dev        Source        4       True
+```
+
+_Note_: there is also a short name: `cducks`
+
+```shell
+kubectl get cducks
 ```

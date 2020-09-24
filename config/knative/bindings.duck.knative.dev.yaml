@@ -15,35 +15,33 @@
 apiVersion: discovery.knative.dev/v1alpha1
 kind: ClusterDuckType
 metadata:
-  name: podspecables.duck.knative.dev
+  name: bindings.duck.knative.dev
   labels:
     discovery.knative.dev/release: devel
 spec:
   selectors:
-    - labelSelector: "duck.knative.dev/podspecable=true"
+    - labelSelector: "duck.knative.dev/binding=true"
 
   names:
-    name: "PodSpecable"
-    plural: "podspecables"
-    singular: "podspecable"
+    name: "Binding"
+    plural: "bindings"
+    singular: "binding"
 
   versions:
-    - name: "v1"
-      refs:
-        - group: apps
-          version: v1
-          kind: Deployment
-        - group: apps
-          version: v1
-          kind: ReplicaSet
-        - group: apps
-          version: v1
-          kind: DaemonSet
-        - group: apps
-          version: v1
-          kind: StatefulSet
-        - group: batch
-          version: v1
-          kind: Job
-       #schema: # TODO
+    - name: "v1beta1"
+      additionalPrinterColumns:
+        - name: Subject Kind
+          type: string
+          jsonPath: .spec.subject.kind
+        - name: Subject Name
+          type: string
+          jsonPath: .spec.subject.name
+
+      # schema: # TODO
+    #// BindingSpec specifies the spec portion of the Binding partial-schema.
+    #  type BindingSpec struct {
+    #  // Subject references the resource(s) whose "runtime contract" should be
+    #  // augmented by Binding implementations.
+    #  Subject tracker.Reference `json:"subject"`
+    #}
   group: duck.knative.dev
