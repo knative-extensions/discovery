@@ -19,65 +19,66 @@ name: 'Releasability'
 
 on:
   schedule:
-  - cron: '0 1 * * *'
+  - cron: '0 1 * * *' # On the hour.
 
 jobs:
   releasability:
-  name: Releasability
-  env:
-
-#########################################
-#   Update this section each release.   #
-    RELEASE: v0.19
-    SLACK_CHANNEL: '@n3wscott'
-#                                      #
-#########################################
-
-    SLACK_ICON: http://github.com/knative.png?size=48
-    SLACK_USERNAME: github-actions
-    SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-    MSG_MINIMAL: 'true'
+    name: Releasability
+    env:
+  #########################################
+  #   Update this section each release.   #
+      RELEASE: v0.19
+      SLACK_CHANNEL: '@n3wscott'
+  #########################################
+      SLACK_ICON: http://github.com/knative.png?size=48
+      SLACK_USERNAME: github-actions
+      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+      MSG_MINIMAL: 'true'
+      SLACK_TITLE: Releasability for ${{ github.repository }} is UNKNOWN
   
-  strategy:
-    matrix:
-      go-version: [1.15.x]
-      platform: [ubuntu-latest]
+    runs-on: 'ubuntu-latest'
+  
+    steps:
 
-  runs-on: ${{ matrix.platform }}
+      - name: Set up Go 1.15.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.15.x
+        id: go
 
-  steps:
+      - name: Check out code
+        uses: actions/checkout@v2
 
-    - name: Set up Go ${{ matrix.go-version }}
-      uses: actions/setup-go@v2
-      with:
-        go-version: ${{ matrix.go-version }}
-      id: go
+      - name: Install Dependencies
+        run: |
+          GO111MODULE=on go get tableflip.dev/buoy@master
 
-    - name: Check out code
-      uses: actions/checkout@v2
+      - name: Check
+        run: |
+          buoy check go.mod --release $RELEASE --verbose
 
-    - name: Install Dependencies
-      run: |
-        GO111MODULE=on go get tableflip.dev/buoy@master
+      - name: Status GO
+        run: |
+          echo "::set-env name=SLACK_COLOR::'#098e00'"
+          echo "::set-env name=SLACK_TITLE::Releasability for ${{ github.repository }} @ ${RELEASE} is GO!"
 
-    - name: Check
-      run: |
-        buoy check go.mod --release $RELEASE --verbose
+      - name: Status NO-GO
+        if: ${{ failure() }}
+        run: |
+          echo "::set-env name=SLACK_COLOR::'#8E1600'"
+          echo "::set-env name=SLACK_TITLE::Releasability for ${{ github.repository }} @ ${RELEASE} is NO-GO!"
 
-    - name: Post success notice to Slack
-      uses: rtCamp/action-slack-notify@v2.1.0
-      env:
-        SLACK_COLOR: '#098e00'
-        SLACK_TITLE: Releasability for ${{ github.repository }} @ $RELEASE is GO!
-        SLACK_MESSAGE: |
-          For detailed logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      - name: Post notice to Slack
+        uses: rtCamp/action-slack-notify@v2.1.0
+        env:
+          SLACK_COLOR: '#098e00'
+          SLACK_TITLE: Releasability for ${{ github.repository }} @ $RELEASE is GO!
+          SLACK_MESSAGE: |
+            For detailed logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
-    - name: Post failure notice to Slack
-      uses: rtCamp/action-slack-notify@v2.1.0
-      if: ${{ failure() }}
-      env:
-        SLACK_CHANNEL: '@n3wscott'
-        SLACK_COLOR: '#8E1600'
-        SLACK_TITLE: Releasability for ${{ github.repository }} @ $RELEASE is NO-GO!
-        SLACK_MESSAGE: |
-          For detailed logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      - name: Post failure notice to Slack
+        uses: rtCamp/action-slack-notify@v2.1.0
+        if: ${{ always() }}
+        env:
+          SLACK_MESSAGE: |
+            For detailed logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
