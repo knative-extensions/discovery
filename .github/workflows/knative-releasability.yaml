@@ -70,14 +70,6 @@ jobs:
 
       - name: Post notice to Slack
         uses: rtCamp/action-slack-notify@v2.1.0
-        env:
-          SLACK_COLOR: '#098e00'
-          SLACK_TITLE: Releasability for ${{ github.repository }} @ $RELEASE is GO!
-          SLACK_MESSAGE: |
-            For detailed logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-      - name: Post failure notice to Slack
-        uses: rtCamp/action-slack-notify@v2.1.0
         if: ${{ always() }}
         env:
           SLACK_MESSAGE: |
