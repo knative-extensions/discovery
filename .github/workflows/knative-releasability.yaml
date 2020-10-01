@@ -24,6 +24,8 @@ on:
 jobs:
   releasability:
     name: Releasability
+    runs-on: 'ubuntu-latest'
+
     env:
   #########################################
   #   Update this section each release.   #
@@ -35,11 +37,8 @@ jobs:
       SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
       MSG_MINIMAL: 'true'
       SLACK_TITLE: Releasability for ${{ github.repository }} is UNKNOWN
-  
-    runs-on: 'ubuntu-latest'
-  
-    steps:
 
+    steps:
       - name: Set up Go 1.15.x
         uses: actions/setup-go@v2
         with:
