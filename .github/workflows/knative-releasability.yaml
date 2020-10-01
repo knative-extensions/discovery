@@ -19,7 +19,7 @@ name: 'Releasability'
 
 on:
   schedule:
-  - cron: '0 1 * * *' # On the hour.
+  - cron: '0 * * * *' # On the hour.
 
 jobs:
   releasability:
