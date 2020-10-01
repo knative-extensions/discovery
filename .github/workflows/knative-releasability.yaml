@@ -56,8 +56,9 @@ jobs:
       - name: Check
         run: |
           buoy check go.mod --release $RELEASE --verbose
-          
-          # Go!
+
+      - name: Status GO
+        run: |
           echo "::set-env name=SLACK_COLOR::'#098e00'"
           echo "::set-env name=SLACK_TITLE::Releasability for ${{ github.repository }} @ ${RELEASE} is GO!"
 
