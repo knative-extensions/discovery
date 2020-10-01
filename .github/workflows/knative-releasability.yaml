@@ -19,7 +19,7 @@ name: 'Releasability'
 
 on:
   schedule:
-  - cron: '0 * * * *' # On the hour.
+  - cron: '10 * * * *' # On the hour.
 
 jobs:
   releasability:
@@ -30,13 +30,8 @@ jobs:
   #########################################
   #   Update this section each release.   #
       RELEASE: v0.19
-      SLACK_CHANNEL: '@n3wscott'
+      SLACK_CHANNEL: 'mattmoor-slack-test'
   #########################################
-      SLACK_ICON: http://github.com/knative.png?size=48
-      SLACK_USERNAME: github-actions
-      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-      MSG_MINIMAL: 'true'
-      SLACK_TITLE: Releasability for ${{ github.repository }} is UNKNOWN
 
     steps:
       - name: Set up Go 1.15.x
@@ -71,5 +66,9 @@ jobs:
         uses: rtCamp/action-slack-notify@v2.1.0
         if: ${{ always() }}
         env:
+          SLACK_ICON: http://github.com/knative.png?size=48
+          SLACK_USERNAME: github-actions
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          MSG_MINIMAL: 'true'
           SLACK_MESSAGE: |
             For detailed logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
