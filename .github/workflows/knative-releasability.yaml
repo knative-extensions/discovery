@@ -49,7 +49,7 @@ jobs:
           path: ./src/knative.dev/${{ github.event.repository.name }}
 
       - name: Check
-        run: buoy check go.mod --release ${RELEASE} --verbose
+        run: buoy check go.mod --release ${RELEASE} --domain knative.dev --verbose
 
     - name: Upgrade
       run: ./hack/update-deps.sh --release ${RELEASE} --upgrade

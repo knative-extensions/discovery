@@ -43,7 +43,7 @@ readonly UPGRADE
 readonly VERSION
 
 if (( UPGRADE )); then
-  FLOATING_DEPS=( $(run_go_tool tableflip.dev/buoy buoy float ${ROOT_DIR}/go.mod --release ${VERSION}) )
+  FLOATING_DEPS=( $(run_go_tool tableflip.dev/buoy buoy float ${ROOT_DIR}/go.mod --release ${VERSION} --domain knative.dev) )
   echo "Upgrading deps to ${FLOATING_DEPS[@]}"
   go get -d ${FLOATING_DEPS[@]}
 fi
