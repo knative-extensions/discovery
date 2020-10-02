@@ -19,7 +19,7 @@ name: 'Releasability'
 
 on:
   schedule:
-  - cron: '10 * * * *' # On the hour.
+  - cron: '0 5 * * 1-5' # 5am, robot time, weekdays.
 
 jobs:
   releasability:
