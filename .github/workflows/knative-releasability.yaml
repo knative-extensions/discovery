@@ -19,7 +19,8 @@ name: 'Releasability'
 
 on:
   schedule:
-  - cron: '0 5 * * 1-5' # 5am, robot time, weekdays.
+  - cron: '0 * * * 1-5' # 5am, robot time, hourly on weekdays for testing.
+#  - cron: '0 5 * * 1-5' # 5am, robot time, weekdays.
 
 jobs:
   releasability:
@@ -45,10 +46,27 @@ jobs:
 
       - name: Check out code
         uses: actions/checkout@v2
+        with:
+          path: ./src/knative.dev/${{ github.event.repository.name }}
 
       - name: Check
         run: |
-          buoy check go.mod --release $RELEASE --verbose
+          buoy check go.mod --release ${RELEASE} --verbose
+
+    - name: Upgrade
+      shell: bash
+      run: |
+        [[ ! -f hack/update-codegen.sh ]] || ./hack/update-deps.sh --release ${RELEASE} --upgrade
+
+    - name: Verify
+      shell: bash
+      run: |
+        if [[ -z "$(git status --porcelain)" ]]; then
+            echo "${{ github.repository }} up to date."
+        else
+            echo "${{ github.repository }} is out of date."
+            exit 1
+        fi
 
       - name: Status GO
         if: ${{ success() }}
