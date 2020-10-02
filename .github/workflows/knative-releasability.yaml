@@ -56,7 +56,7 @@ jobs:
     - name: Upgrade
       shell: bash
       run: |
-        [[ ! -f hack/update-codegen.sh ]] || ./hack/update-deps.sh --release ${RELEASE} --releasability
+        [[ ! -f hack/update-codegen.sh ]] || ./hack/update-deps.sh --release ${RELEASE} --upgrade
 
     - name: Verify
       shell: bash

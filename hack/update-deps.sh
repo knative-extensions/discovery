@@ -30,12 +30,10 @@ export GOFLAGS=-mod=vendor
 
 UPGRADE=0
 VERSION="v0.19"
-RULESET="any"
 while [[ $# -ne 0 ]]; do
   parameter=$1
   case ${parameter} in
     --upgrade) UPGRADE=1 ;;
-    --releasability) UPGRADE=1; RULESET="branch" ;;
     --release) shift; VERSION="$1" ;;
     *) abort "unknown option ${parameter}" ;;
   esac
@@ -43,10 +41,9 @@ while [[ $# -ne 0 ]]; do
 done
 readonly UPGRADE
 readonly VERSION
-readonly RULESET
 
 if (( UPGRADE )); then
-  FLOATING_DEPS=( $(run_go_tool tableflip.dev/buoy buoy float ${ROOT_DIR}/go.mod --ruleset ${RULESET} --release ${VERSION}) )
+  FLOATING_DEPS=( $(run_go_tool tableflip.dev/buoy buoy float ${ROOT_DIR}/go.mod --release ${VERSION}) )
   echo "Upgrading deps to ${FLOATING_DEPS[@]}"
   go get -d ${FLOATING_DEPS[@]}
 fi
