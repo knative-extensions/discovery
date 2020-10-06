@@ -19,8 +19,7 @@ name: 'Releasability'
 
 on:
   schedule:
-  - cron: '0 * * * 1-5' # 5am, robot time, hourly on weekdays for testing.
-#  - cron: '0 5 * * 1-5' # 5am, robot time, weekdays.
+  - cron: '0 5 * * 1-5' # 5am, robot time, weekdays.
 
 jobs:
   releasability:
@@ -51,33 +50,33 @@ jobs:
       - name: Check
         run: buoy check go.mod --release ${RELEASE} --domain knative.dev --verbose
 
-    - name: Upgrade
-      run: ./hack/update-deps.sh --release ${RELEASE} --upgrade
+      - name: Upgrade
+        run: ./hack/update-deps.sh --release ${RELEASE} --upgrade
 
-    - name: Verify
-      run: |
-        if [[ -z "$(git status --porcelain)" ]]; then
-            echo "${{ github.repository }} up to date."
-        else
-            echo "${{ github.repository }} is out of date."
-            exit 1
-        fi
+      - name: Verify
+        run: |
+          if [[ -z "$(git status --porcelain)" ]]; then
+              echo "${{ github.repository }} up to date."
+              echo 'current=true' >> $GITHUB_ENV
+          else
+              echo "${{ github.repository }} is out of date."
+              echo 'current=false' >> $GITHUB_ENV
+          fi
 
       - name: Status GO
-        if: ${{ success() }}
+        if: env.current == 'true'
         run: |
           echo "::set-env name=SLACK_COLOR::'#098e00'"
           echo "::set-env name=SLACK_TITLE::Releasability for ${{ github.repository }} @ ${RELEASE} is GO!"
 
       - name: Status NO-GO
-        if: ${{ failure() }}
+        if: env.current == 'false'
         run: |
           echo "::set-env name=SLACK_COLOR::'#8E1600'"
           echo "::set-env name=SLACK_TITLE::Releasability for ${{ github.repository }} @ ${RELEASE} is NO-GO!"
 
       - name: Post notice to Slack
         uses: rtCamp/action-slack-notify@v2.1.0
-        if: ${{ always() }}
         env:
           SLACK_ICON: http://github.com/knative.png?size=48
           SLACK_USERNAME: github-actions
