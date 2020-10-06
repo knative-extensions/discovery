@@ -19,7 +19,9 @@ name: 'Releasability'
 
 on:
   schedule:
-  - cron: '0 5 * * 1-5' # 5am, robot time, weekdays.
+    - cron: '0 5 * * 1-5' # 5am, robot time, weekdays.
+
+  workflow_dispatch:    # Manual trigger.
 
 jobs:
   releasability:
@@ -66,14 +68,14 @@ jobs:
       - name: Status GO
         if: env.current == 'true'
         run: |
-          echo "::set-env name=SLACK_COLOR::'#098e00'"
-          echo "::set-env name=SLACK_TITLE::Releasability for ${{ github.repository }} @ ${RELEASE} is GO!"
+          echo 'SLACK_COLOR=#098e00' >> $GITHUB_ENV
+          echo 'SLACK_TITLE=Releasability for ${{ github.repository }} @ ${RELEASE} is GO!' >> $GITHUB_ENV
 
       - name: Status NO-GO
         if: env.current == 'false'
         run: |
-          echo "::set-env name=SLACK_COLOR::'#8E1600'"
-          echo "::set-env name=SLACK_TITLE::Releasability for ${{ github.repository }} @ ${RELEASE} is NO-GO!"
+          echo 'SLACK_COLOR=#8E1600' >> $GITHUB_ENV
+          echo 'SLACK_TITLE=Releasability for ${{ github.repository }} @ ${RELEASE} is NO-GO!' >> $GITHUB_ENV
 
       - name: Post notice to Slack
         uses: rtCamp/action-slack-notify@v2.1.0
