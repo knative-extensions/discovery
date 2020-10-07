@@ -28,29 +28,24 @@ cd ${ROOT_DIR}
 export GO111MODULE=on
 export GOFLAGS=-mod=vendor
 
-# This controls the release branch we track.
-VERSION="master"
-
-# The list of dependencies that we track at HEAD and periodically
-# float forward in this repository.
-FLOATING_DEPS=(
-  "knative.dev/pkg@${VERSION}"
-  "knative.dev/test-infra@${VERSION}"
-)
-
-GO_GET=0
+UPGRADE=0
+VERSION="v0.19"
 while [[ $# -ne 0 ]]; do
   parameter=$1
   case ${parameter} in
-    --upgrade) GO_GET=1 ;;
+    --upgrade) UPGRADE=1 ;;
+    --release) shift; VERSION="$1" ;;
     *) abort "unknown option ${parameter}" ;;
   esac
   shift
 done
-readonly GO_GET
+readonly UPGRADE
+readonly VERSION
 
-if (( GO_GET )); then
-    go get -d ${FLOATING_DEPS[@]}
+if (( UPGRADE )); then
+  FLOATING_DEPS=( $(run_go_tool tableflip.dev/buoy buoy float ${ROOT_DIR}/go.mod --release ${VERSION} --domain knative.dev) )
+  echo "Upgrading deps to ${FLOATING_DEPS[@]}"
+  go get -d ${FLOATING_DEPS[@]}
 fi
 
 # Prune modules.
