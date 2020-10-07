@@ -57,7 +57,7 @@ jobs:
           echo 'EOF' >> $GITHUB_ENV
 
           # We just captured the return code of the buoy call, test it to see
-          # if we should contiue validating. The next steps short circut if
+          # if we should contiue validating. The next steps short circuit if
           # we already know we are not ready for a release.
           if [[ "$CHECK" -eq "0"  ]]; then
             echo 'current=true' >> $GITHUB_ENV
