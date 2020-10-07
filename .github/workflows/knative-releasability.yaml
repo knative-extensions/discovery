@@ -51,10 +51,14 @@ jobs:
 
       - name: Check
         run: |
+          # The following pushes the sdtout of buoy into $CHECK_MESSAGE
           echo 'CHECK_MESSAGE<<EOF' >> $GITHUB_ENV
           (buoy check go.mod --release ${RELEASE} --domain knative.dev --verbose || CHECK=$?) >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
 
+          # We just captured the return code of the buoy call, test it to see
+          # if we should contiue validating. The next steps short circut if
+          # we already know we are not ready for a release.
           if [[ "$CHECK" -eq "0"  ]]; then
             echo 'current=true' >> $GITHUB_ENV
           else
@@ -64,18 +68,17 @@ jobs:
       - name: Upgrade
         if: env.current == 'true'
         run: |
-          if ./hack/update-deps.sh --release ${RELEASE} --upgrade; then
-            echo 'current=true' >> $GITHUB_ENV
-          else
+          # if update deps returns un-successful, then mark current to false.
+          if ! ./hack/update-deps.sh --release ${RELEASE} --upgrade; then
             echo 'current=false' >> $GITHUB_ENV
           fi
 
       - name: Verify
         if: env.current == 'true'
         run: |
+          # If we see no changes after the upgrade, then we are up to date.
           if [[ -z "$(git status --porcelain)" ]]; then
               echo "VERIFY_MESSAGE=${{ github.repository }} up to date." >> $GITHUB_ENV
-              echo 'current=true' >> $GITHUB_ENV
           else
               echo "VERIFY_MESSAGE=${{ github.repository }} is out of date." >> $GITHUB_ENV
               echo 'current=false' >> $GITHUB_ENV
