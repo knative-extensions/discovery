@@ -51,7 +51,7 @@ jobs:
 
       - name: Check
         run: |
-          # The following pushes the sdtout of buoy into $CHECK_MESSAGE
+          # The following pushes the stdout of buoy into $CHECK_MESSAGE
           echo 'CHECK_MESSAGE<<EOF' >> $GITHUB_ENV
           (buoy check go.mod --release ${RELEASE} --domain knative.dev --verbose || CHECK=$?) >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
