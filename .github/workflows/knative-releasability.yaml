@@ -50,18 +50,34 @@ jobs:
           path: ./src/knative.dev/${{ github.event.repository.name }}
 
       - name: Check
-        run: buoy check go.mod --release ${RELEASE} --domain knative.dev --verbose
+        run: |
+          echo 'CHECK_MESSAGE<<EOF' >> $GITHUB_ENV
+          (buoy check go.mod --release ${RELEASE} --domain knative.dev --verbose || CHECK=$1) >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
+
+          if [[ "$CHECK" -eq "0"  ]]; then
+            echo 'current=true' >> $GITHUB_ENV
+          else
+            echo 'current=false' >> $GITHUB_ENV
+          fi
 
       - name: Upgrade
-        run: ./hack/update-deps.sh --release ${RELEASE} --upgrade
+        if: env.current == 'true'
+        run: |
+          if ./hack/update-deps.sh --release ${RELEASE} --upgrade; then
+            echo 'current=true' >> $GITHUB_ENV
+          else
+            echo 'current=false' >> $GITHUB_ENV
+          fi
 
       - name: Verify
+        if: env.current == 'true'
         run: |
           if [[ -z "$(git status --porcelain)" ]]; then
-              echo "${{ github.repository }} up to date."
+              echo "VERIFY_MESSAGE=${{ github.repository }} up to date." >> $GITHUB_ENV
               echo 'current=true' >> $GITHUB_ENV
           else
-              echo "${{ github.repository }} is out of date."
+              echo "VERIFY_MESSAGE=${{ github.repository }} is out of date." >> $GITHUB_ENV
               echo 'current=false' >> $GITHUB_ENV
           fi
 
@@ -85,4 +101,6 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           MSG_MINIMAL: 'true'
           SLACK_MESSAGE: |
+            ${CHECK_MESSAGE}
+            ${VERIFY_MESSAGE}
             For detailed logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
