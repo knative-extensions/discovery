@@ -52,7 +52,7 @@ jobs:
       - name: Check
         run: |
           echo 'CHECK_MESSAGE<<EOF' >> $GITHUB_ENV
-          (buoy check go.mod --release ${RELEASE} --domain knative.dev --verbose || CHECK=$1) >> $GITHUB_ENV
+          (buoy check go.mod --release ${RELEASE} --domain knative.dev --verbose || CHECK=$?) >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
 
           if [[ "$CHECK" -eq "0"  ]]; then
