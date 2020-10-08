@@ -46,8 +46,6 @@ jobs:
 
       - name: Check out code
         uses: actions/checkout@v2
-        with:
-          path: ./src/knative.dev/${{ github.event.repository.name }}
 
       - name: Check
         run: |
