@@ -104,6 +104,6 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           MSG_MINIMAL: 'true'
           SLACK_MESSAGE: |
-            ${CHECK_MESSAGE}
-            ${VERIFY_MESSAGE}
+            ${{ env.CHECK_MESSAGE }}
+            ${{ env.VERIFY_MESSAGE }}
             For detailed logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
