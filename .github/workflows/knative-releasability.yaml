@@ -50,8 +50,9 @@ jobs:
       - name: Check
         run: |
           # The following pushes the stdout of buoy into $CHECK_MESSAGE
+          CHECK=0
           echo 'CHECK_MESSAGE<<EOF' >> $GITHUB_ENV
-          (buoy check go.mod --release ${RELEASE} --domain knative.dev --verbose || CHECK=$?) >> $GITHUB_ENV
+          buoy check go.mod --release ${RELEASE} --domain knative.dev --verbose >> $GITHUB_ENV || CHECK=$?
           echo 'EOF' >> $GITHUB_ENV
 
           # We just captured the return code of the buoy call, test it to see
@@ -68,6 +69,7 @@ jobs:
         run: |
           # if update deps returns un-successful, then mark current to false.
           if ! ./hack/update-deps.sh --release ${RELEASE} --upgrade; then
+            echo "VERIFY_MESSAGE=Unable to update deps for ${{ github.repository }}." >> $GITHUB_ENV
             echo 'current=false' >> $GITHUB_ENV
           fi
 
@@ -86,13 +88,13 @@ jobs:
         if: env.current == 'true'
         run: |
           echo 'SLACK_COLOR=#098e00' >> $GITHUB_ENV
-          echo 'SLACK_TITLE=Releasability for ${{ github.repository }} @ ${RELEASE} is GO!' >> $GITHUB_ENV
+          echo 'SLACK_TITLE=Releasability for ${{ github.repository }} @ ${{ env.RELEASE }} is GO!' >> $GITHUB_ENV
 
       - name: Status NO-GO
         if: env.current == 'false'
         run: |
           echo 'SLACK_COLOR=#8E1600' >> $GITHUB_ENV
-          echo 'SLACK_TITLE=Releasability for ${{ github.repository }} @ ${RELEASE} is NO-GO!' >> $GITHUB_ENV
+          echo 'SLACK_TITLE=Releasability for ${{ github.repository }} @ ${{ env.RELEASE }} is NO-GO!' >> $GITHUB_ENV
 
       - name: Post notice to Slack
         uses: rtCamp/action-slack-notify@v2.1.0
