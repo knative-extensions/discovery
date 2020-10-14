@@ -175,13 +175,14 @@ github.com/matttproud/golang_protobuf_extensions/pbutil
 github.com/modern-go/concurrent
 # github.com/modern-go/reflect2 v1.0.1
 github.com/modern-go/reflect2
-# github.com/n3wscott/rigging v0.1.0
+# github.com/n3wscott/rigging v0.3.0
 ## explicit
 github.com/n3wscott/rigging
 github.com/n3wscott/rigging/pkg/images
 github.com/n3wscott/rigging/pkg/installer
 github.com/n3wscott/rigging/pkg/lifecycle
 github.com/n3wscott/rigging/pkg/manifest
+github.com/n3wscott/rigging/pkg/namers
 # github.com/openzipkin/zipkin-go v0.2.2
 github.com/openzipkin/zipkin-go/model
 # github.com/pkg/errors v0.9.1
@@ -833,7 +834,7 @@ k8s.io/utils/buffer
 k8s.io/utils/integer
 k8s.io/utils/pointer
 k8s.io/utils/trace
-# knative.dev/pkg v0.0.0-20201013114130-602db5ee124d
+# knative.dev/pkg v0.0.0-20201014184531-9e655c6b02f6
 ## explicit
 knative.dev/pkg/apis
 knative.dev/pkg/apis/duck
@@ -905,7 +906,7 @@ knative.dev/pkg/webhook/configmaps
 knative.dev/pkg/webhook/resourcesemantics
 knative.dev/pkg/webhook/resourcesemantics/defaulting
 knative.dev/pkg/webhook/resourcesemantics/validation
-# knative.dev/test-infra v0.0.0-20201013100530-45e0761df397
+# knative.dev/test-infra v0.0.0-20201014021030-ae3984a33f82
 ## explicit
 knative.dev/test-infra/scripts
 # sigs.k8s.io/structured-merge-diff/v3 v3.0.1-0.20200706213357-43c19bbb7fba
