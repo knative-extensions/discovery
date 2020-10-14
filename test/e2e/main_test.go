@@ -26,6 +26,22 @@ import (
 	"knative.dev/pkg/test/logstream"
 )
 
+var (
+	test_context context.Context
+)
+
+func Context() context.Context {
+	return test_context
+}
+
+func TestMain(m *testing.M) {
+	ctx, startInformers := injection.EnableInjectionOrDie(nil, nil) //nolint
+	lifecycle.InjectClients(ctx)
+	test_context = ctx
+	startInformers()
+	os.Exit(m.Run())
+}
+
 // TestSmoke makes sure a ClusterDuckType goes ready.
 func TestSmoke(t *testing.T) {
 	cancel := logstream.Start(t)
