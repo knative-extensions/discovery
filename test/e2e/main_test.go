@@ -34,10 +34,6 @@ var (
 	test_context context.Context
 )
 
-func Context() context.Context {
-	return test_context
-}
-
 func TestMain(m *testing.M) {
 	ctx, startInformers := injection.EnableInjectionOrDie(nil, nil) //nolint
 	lifecycle.InjectClients(ctx)
