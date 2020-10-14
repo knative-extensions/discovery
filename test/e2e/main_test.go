@@ -19,10 +19,14 @@ limitations under the License.
 package example
 
 import (
+	"context"
+	"os"
 	"testing"
 
+	"github.com/n3wscott/rigging/pkg/lifecycle"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 
+	"knative.dev/pkg/injection"
 	"knative.dev/pkg/test/logstream"
 )
 
