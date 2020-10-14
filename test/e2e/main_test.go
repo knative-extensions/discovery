@@ -19,17 +19,30 @@ limitations under the License.
 package example
 
 import (
+	"context"
+	"os"
 	"testing"
 
+	"github.com/n3wscott/rigging/pkg/lifecycle"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 
-	"knative.dev/pkg/test/logstream"
+	"knative.dev/pkg/injection"
 )
+
+var (
+	test_context context.Context
+)
+
+func TestMain(m *testing.M) {
+	ctx, startInformers := injection.EnableInjectionOrDie(nil, nil) //nolint
+	lifecycle.InjectClients(ctx)
+	test_context = ctx
+	startInformers()
+	os.Exit(m.Run())
+}
 
 // TestSmoke makes sure a ClusterDuckType goes ready.
 func TestSmoke(t *testing.T) {
-	cancel := logstream.Start(t)
-	defer cancel()
-
+	// TOOD: add logstream back.
 	SmokeTestImpl(t)
 }

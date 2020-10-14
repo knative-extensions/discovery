@@ -1,5 +1,5 @@
 /*
-Copyright 2019 The Knative Authors
+Copyright 2020 The Rigging Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package helpers
+package namers
 
 import (
 	"math/rand"
@@ -29,7 +29,6 @@ const (
 	letterBytes    = "abcdefghijklmnopqrstuvwxyz"
 	randSuffixLen  = 8
 	sep            = '-'
-	sepS           = "-"
 	testNamePrefix = "Test"
 )
 
@@ -41,17 +40,17 @@ func init() {
 	rand.Seed(seed)
 }
 
-type named interface {
+type Namer interface {
 	Name() string
 }
 
 // ObjectPrefixForTest returns the name prefix for this test's random names.
-func ObjectPrefixForTest(t named) string {
+func ObjectPrefixForTest(t Namer) string {
 	return MakeK8sNamePrefix(strings.TrimPrefix(t.Name(), testNamePrefix))
 }
 
 // ObjectNameForTest generates a random object name based on the test name.
-func ObjectNameForTest(t named) string {
+func ObjectNameForTest(t Namer) string {
 	return kmeta.ChildName(ObjectPrefixForTest(t), string(sep)+RandomString())
 }
 
@@ -61,53 +60,30 @@ func ObjectNameForTest(t named) string {
 // This method will use "-" as the separator between the prefix and
 // the random suffix.
 func AppendRandomString(prefix string) string {
-	return prefix + sepS + RandomString()
+	return strings.Join([]string{prefix, RandomString()}, string(sep))
 }
 
 // RandomString will generate a random string.
 func RandomString() string {
 	suffix := make([]byte, randSuffixLen)
+
 	for i := range suffix {
 		suffix[i] = letterBytes[rand.Intn(len(letterBytes))]
 	}
 	return string(suffix)
 }
 
-// For the same prefix more specific should come first.
-// Note: we expect GRPC vs gRPC.
-var knownNames = []string{"GRPC", "H2C", "HTTPS", "HTTP2", "HTTP", "REST", "TLS", "WS"}
-
 // MakeK8sNamePrefix converts each chunk of non-alphanumeric character into a single dash
 // and also convert camelcase tokens into dash-delimited lowercase tokens.
-// The function will try to catch some well known abbreviations, so that we don't separate them.
 func MakeK8sNamePrefix(s string) string {
 	var sb strings.Builder
-	sb.Grow(len(s)) // At least as many chars will be in the output.
 	newToken := false
-outer:
-	for i := 0; i < len(s); i++ {
-		c := rune(s[i])
+	for _, c := range s {
 		if !(unicode.IsLetter(c) || unicode.IsNumber(c)) {
 			newToken = true
 			continue
 		}
-		isUpper := unicode.IsUpper(c)
-		// We could've done it only for uppercase letters,
-		if isUpper {
-			for _, n := range knownNames {
-				if strings.HasPrefix(s[i:], n) {
-					sub := s[i : i+len(n)]
-					if sb.Len() > 0 {
-						sb.WriteRune(sep)
-					}
-					sb.WriteString(strings.ToLower(sub))
-					i += len(n) - 1
-					continue outer
-				}
-			}
-		}
-		// Just a random uppercase word.
-		if sb.Len() > 0 && (newToken || isUpper) {
+		if sb.Len() > 0 && (newToken || unicode.IsUpper(c)) {
 			sb.WriteRune(sep)
 		}
 		sb.WriteRune(unicode.ToLower(c))
