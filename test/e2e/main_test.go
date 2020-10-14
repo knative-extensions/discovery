@@ -27,7 +27,6 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 
 	"knative.dev/pkg/injection"
-	"knative.dev/pkg/test/logstream"
 )
 
 var (
@@ -44,8 +43,6 @@ func TestMain(m *testing.M) {
 
 // TestSmoke makes sure a ClusterDuckType goes ready.
 func TestSmoke(t *testing.T) {
-	cancel := logstream.Start(t)
-	defer cancel()
-
+	// TOOD: add logstream back.
 	SmokeTestImpl(t)
 }
