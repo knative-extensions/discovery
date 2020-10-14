@@ -183,8 +183,6 @@ github.com/n3wscott/rigging/pkg/installer
 github.com/n3wscott/rigging/pkg/lifecycle
 github.com/n3wscott/rigging/pkg/manifest
 github.com/n3wscott/rigging/pkg/namers
-# github.com/openzipkin/zipkin-go v0.2.2
-github.com/openzipkin/zipkin-go/model
 # github.com/pkg/errors v0.9.1
 github.com/pkg/errors
 # github.com/pmezard/go-difflib v1.0.0
@@ -229,7 +227,6 @@ go.opencensus.io/metric/metricproducer
 go.opencensus.io/plugin/ocgrpc
 go.opencensus.io/plugin/ochttp
 go.opencensus.io/plugin/ochttp/propagation/b3
-go.opencensus.io/plugin/ochttp/propagation/tracecontext
 go.opencensus.io/resource
 go.opencensus.io/resource/resourcekeys
 go.opencensus.io/stats
@@ -885,18 +882,7 @@ knative.dev/pkg/reconciler/testing
 knative.dev/pkg/signals
 knative.dev/pkg/system
 knative.dev/pkg/system/testing
-knative.dev/pkg/test
-knative.dev/pkg/test/helpers
-knative.dev/pkg/test/ingress
-knative.dev/pkg/test/logging
-knative.dev/pkg/test/logstream
 knative.dev/pkg/test/logstream/v2
-knative.dev/pkg/test/monitoring
-knative.dev/pkg/test/spoof
-knative.dev/pkg/test/zipkin
-knative.dev/pkg/tracing/config
-knative.dev/pkg/tracing/propagation
-knative.dev/pkg/tracing/propagation/tracecontextb3
 knative.dev/pkg/tracker
 knative.dev/pkg/version
 knative.dev/pkg/webhook
