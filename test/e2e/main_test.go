@@ -43,6 +43,6 @@ func TestMain(m *testing.M) {
 
 // TestSmoke makes sure a ClusterDuckType goes ready.
 func TestSmoke(t *testing.T) {
-	// TOOD: add logstream back.
+	// TODO: add logstream back.
 	SmokeTestImpl(t)
 }
