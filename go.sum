@@ -1845,8 +1845,8 @@ knative.dev/pkg v0.0.0-20200528142800-1c6815d7e4c9/go.mod h1:QgNZTxnwpB/oSpNcfnL
 knative.dev/pkg v0.0.0-20200711004937-22502028e31a/go.mod h1:AqAJV6rYi8IGikDjJ/9ZQd9qKdkXVlesVnVjwx62YB8=
 knative.dev/pkg v0.0.0-20201014184531-9e655c6b02f6 h1:yUP8KB8nf/FmovzKfGNei+ivXeTM8vwscSZCjC4LbBY=
 knative.dev/pkg v0.0.0-20201014184531-9e655c6b02f6/go.mod h1:Vt8wg4OLNbZiW+ibtfysciKMgHkXfkxa8pAGXzHg8HI=
-knative.dev/pkg v0.0.0-20201019114258-95e9532f0457 h1:FYTkblGgEnRffT22HvPQa2G+Q/T9MDxumHtzKVDvVqE=
-knative.dev/pkg v0.0.0-20201019114258-95e9532f0457/go.mod h1:Gd7eJYKYPveffVad0/wImHpQSYn+Pt9q09HGJyL/b54=
+knative.dev/pkg v0.0.0-20201020033659-eafc8c6f72a7 h1:N7orFEGyhf/G877NsVrhRB+J1hzdUOIMLvBXT3/81FM=
+knative.dev/pkg v0.0.0-20201020033659-eafc8c6f72a7/go.mod h1:Gd7eJYKYPveffVad0/wImHpQSYn+Pt9q09HGJyL/b54=
 knative.dev/test-infra v0.0.0-20200407185800-1b88cb3b45a5/go.mod h1:xcdUkMJrLlBswIZqL5zCuBFOC22WIPMQoVX1L35i0vQ=
 knative.dev/test-infra v0.0.0-20200505052144-5ea2f705bb55/go.mod h1:WqF1Azka+FxPZ20keR2zCNtiQA1MP9ZB4BH4HuI+SIU=
 knative.dev/test-infra v0.0.0-20200513011557-d03429a76034/go.mod h1:aMif0KXL4g19YCYwsy4Ocjjz5xgPlseYV+B95Oo4JGE=
@@ -1858,6 +1858,8 @@ knative.dev/test-infra v0.0.0-20201014021030-ae3984a33f82 h1:/HZKnJdqoGjknSM50+S
 knative.dev/test-infra v0.0.0-20201014021030-ae3984a33f82/go.mod h1:lm0U0k6ARXr8Po0LcSTCfETg63LOF3ajUxcoqy5JSH0=
 knative.dev/test-infra v0.0.0-20201015231956-d236fb0ea9ff h1:I8tkQx28wNs6v/ymlGv6oKQFASCFHTgJtgo7dvv5XII=
 knative.dev/test-infra v0.0.0-20201015231956-d236fb0ea9ff/go.mod h1:lm0U0k6ARXr8Po0LcSTCfETg63LOF3ajUxcoqy5JSH0=
+knative.dev/test-infra v0.0.0-20201020062259-cd8625126729 h1:4epaoAKCa9R7ckZwBRNDRwvkZDmLl1LwwwSRyhx8idI=
+knative.dev/test-infra v0.0.0-20201020062259-cd8625126729/go.mod h1:lm0U0k6ARXr8Po0LcSTCfETg63LOF3ajUxcoqy5JSH0=
 mvdan.cc/interfacer v0.0.0-20180901003855-c20040233aed/go.mod h1:Xkxe497xwlCKkIaQYRfC7CSLworTXY9RMqwhhCm+8Nc=
 mvdan.cc/lint v0.0.0-20170908181259-adc824a0674b/go.mod h1:2odslEg/xrtNQqCYg2/jCoyKnw3vv5biOc3JnIcYfL4=
 mvdan.cc/unparam v0.0.0-20190720180237-d51796306d8f/go.mod h1:4G1h5nDURzA3bwVMZIVpwbkw+04kSxk3rAtzlimaUJw=
