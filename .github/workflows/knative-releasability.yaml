@@ -19,18 +19,14 @@ name: 'Releasability'
 
 on:
   schedule:
-    - cron: '0 5 * * 1-5' # 5am, robot time, weekdays.
+    - cron: '0 1 * * 1-5' # 6am Pacific, weekdays.
 
   workflow_dispatch:      # Manual trigger.
     inputs:
-      release:
-        description: 'Release (vX.Y)?'
-        required: true
-        default: 'v0.18'
+      releaseFamily:
+        description: 'Release? (vX.Y)'
       slackChannel:
-        description: 'Slack Channel?'
-        required: true
-        default: 'release-18'
+        description: 'Slack Channel? (release-#)'
 
 jobs:
   releasability:
@@ -38,10 +34,23 @@ jobs:
     runs-on: 'ubuntu-latest'
 
     env:
-      RELEASE: "${{ github.event.inputs.release }}"
-      SLACK_CHANNEL: "${{ github.event.inputs.channel }}"
+      #########################################
+      #   Update this section each release.   #
+      RELEASE: 'v0.18'
+      SLACK_CHANNEL: 'release-18'
+      #########################################
 
     steps:
+      - name: Defaults
+        run: |
+          # If manual trigger sent releaseFamily and slackChannel, then override them
+          if [[ "${{ github.event.inputs.releaseFamily }}" != "" ]]; then
+            echo "RELEASE=${{ github.event.inputs.releaseFamily }}." >> $GITHUB_ENV
+          fi
+          if [[ "${{ github.event.inputs.slackChannel }}" != "" ]]; then
+            echo "SLACK_CHANNEL=${{ github.event.inputs.slackChannel }}." >> $GITHUB_ENV
+          fi
+
       - name: Set up Go 1.15.x
         uses: actions/setup-go@v2
         with:
@@ -115,7 +124,7 @@ jobs:
           echo 'SLACK_COLOR=#8E1600' >> $GITHUB_ENV
           echo 'SLACK_TITLE=Releasability for ${{ github.repository }} @ ${{ env.RELEASE }} is NO-GO!' >> $GITHUB_ENV
 
-      - name: Post notice to Slack
+      - name: Post status to Slack
         if: steps.exists.outputs.release-branch == 'false'
         uses: rtCamp/action-slack-notify@v2.1.0
         env:
