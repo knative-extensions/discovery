@@ -110,7 +110,7 @@ jobs:
           echo 'SLACK_TITLE=Releasability for ${{ github.repository }} @ ${{ env.RELEASE }} is GO!' >> $GITHUB_ENV
 
       - name: Status NO-GO
-        if: ${steps.exists.outputs.release-branch == 'false' && env.current == 'false' }}
+        if: steps.exists.outputs.release-branch == 'false' && env.current == 'false'
         run: |
           echo 'SLACK_COLOR=#8E1600' >> $GITHUB_ENV
           echo 'SLACK_TITLE=Releasability for ${{ github.repository }} @ ${{ env.RELEASE }} is NO-GO!' >> $GITHUB_ENV
