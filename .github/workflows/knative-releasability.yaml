@@ -21,7 +21,16 @@ on:
   schedule:
     - cron: '0 5 * * 1-5' # 5am, robot time, weekdays.
 
-  workflow_dispatch:    # Manual trigger.
+  workflow_dispatch:      # Manual trigger.
+    inputs:
+      release:
+        description: 'Release (vX.Y)?'
+        required: true
+        default: 'v0.18'
+      slackChannel:
+        description: 'Slack Channel?'
+        required: true
+        default: 'release-18'
 
 jobs:
   releasability:
@@ -29,11 +38,8 @@ jobs:
     runs-on: 'ubuntu-latest'
 
     env:
-  #########################################
-  #   Update this section each release.   #
-      RELEASE: v0.18
-      SLACK_CHANNEL: 'release-18'
-  #########################################
+      RELEASE: "${{ github.event.inputs.release }}"
+      SLACK_CHANNEL: "${{ github.event.inputs.channel }}"
 
     steps:
       - name: Set up Go 1.15.x
