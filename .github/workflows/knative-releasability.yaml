@@ -50,14 +50,14 @@ jobs:
       - name: Exists
         id: exists
         run: |
-        EXISTS=0
-        buoy exists go.mod --release ${RELEASE} --verbose || EXISTS=$?
-        if [[ EXISTS == 0 ]]; then
-          EXISTS='true'
-        else
-          EXISTS='false'
-        fi
-        echo ::set-output name=branch::${EXISTS}
+          EXISTS=0
+          buoy exists go.mod --release ${RELEASE} --verbose || EXISTS=$?
+          if [[ EXISTS == 0 ]]; then
+            EXISTS='true'
+          else
+            EXISTS='false'
+          fi
+          echo ::set-output name=branch::${EXISTS}
 
       - name: Check
         if: steps.exists.outputs.branch != 'true'
