@@ -57,10 +57,10 @@ jobs:
           else
             EXISTS='false'
           fi
-          echo ::set-output name=branch::${EXISTS}
+          echo ::set-output name=release-branch::${EXISTS}
 
       - name: Check
-        if: steps.exists.outputs.branch != 'true'
+        if: !steps.exists.outputs.release-branch
         run: |
           # The following pushes the stdout of buoy into $CHECK_MESSAGE
           CHECK=0
@@ -78,7 +78,7 @@ jobs:
           fi
 
       - name: Upgrade
-        if: steps.exists.outputs.branch != 'true' && env.current == 'true'
+        if: !steps.exists.outputs.release-branch && env.current == 'true'
         run: |
           # if update deps returns un-successful, then mark current to false.
           if ! ./hack/update-deps.sh --release ${RELEASE} --upgrade; then
@@ -87,7 +87,7 @@ jobs:
           fi
 
       - name: Verify
-        if: steps.exists.outputs.branch != 'true' && env.current == 'true'
+        if: !steps.exists.outputs.release-branch && env.current == 'true'
         run: |
           # If we see no changes after the upgrade, then we are up to date.
           if [[ -z "$(git status --porcelain)" ]]; then
@@ -98,19 +98,19 @@ jobs:
           fi
 
       - name: Status GO
-        if: steps.exists.outputs.branch != 'true' && env.current == 'true'
+        if: !steps.exists.outputs.release-branch && env.current == 'true'
         run: |
           echo 'SLACK_COLOR=#098e00' >> $GITHUB_ENV
           echo 'SLACK_TITLE=Releasability for ${{ github.repository }} @ ${{ env.RELEASE }} is GO!' >> $GITHUB_ENV
 
       - name: Status NO-GO
-        if: steps.exists.outputs.branch != 'true' && env.current == 'false'
+        if: !steps.exists.outputs.release-branch && env.current == 'false'
         run: |
           echo 'SLACK_COLOR=#8E1600' >> $GITHUB_ENV
           echo 'SLACK_TITLE=Releasability for ${{ github.repository }} @ ${{ env.RELEASE }} is NO-GO!' >> $GITHUB_ENV
 
       - name: Post notice to Slack
-        if: steps.exists.outputs.branch != 'true'
+        if: !steps.exists.outputs.release-branch
         uses: rtCamp/action-slack-notify@v2.1.0
         env:
           SLACK_ICON: http://github.com/knative.png?size=48
