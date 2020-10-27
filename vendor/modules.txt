@@ -506,7 +506,6 @@ k8s.io/apiextensions-apiserver/pkg/client/listers/apiextensions/v1
 k8s.io/apiextensions-apiserver/pkg/client/listers/apiextensions/v1beta1
 # k8s.io/apimachinery v0.18.8 => k8s.io/apimachinery v0.18.8
 ## explicit
-k8s.io/apimachinery/pkg/api/apitesting/fuzzer
 k8s.io/apimachinery/pkg/api/equality
 k8s.io/apimachinery/pkg/api/errors
 k8s.io/apimachinery/pkg/api/meta
@@ -831,13 +830,12 @@ k8s.io/utils/buffer
 k8s.io/utils/integer
 k8s.io/utils/pointer
 k8s.io/utils/trace
-# knative.dev/pkg v0.0.0-20201026232541-37583c54bfc3
+# knative.dev/pkg v0.0.0-20201027160133-4ce8016d707c
 ## explicit
 knative.dev/pkg/apis
 knative.dev/pkg/apis/duck
 knative.dev/pkg/apis/duck/ducktypes
 knative.dev/pkg/apis/duck/v1
-knative.dev/pkg/apis/testing/fuzzer
 knative.dev/pkg/changeset
 knative.dev/pkg/client/injection/apiextensions/client
 knative.dev/pkg/client/injection/apiextensions/client/fake
