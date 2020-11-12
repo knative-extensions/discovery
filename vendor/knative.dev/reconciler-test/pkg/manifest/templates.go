@@ -1,5 +1,5 @@
 /*
-Copyright 2019 The Rigging Authors
+Copyright 2020 The Knative Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,9 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package installer
+package manifest
 
 import (
+	"bytes"
 	"io/ioutil"
 	"log"
 	"os"
@@ -25,7 +26,10 @@ import (
 	"text/template"
 )
 
-func ParseTemplates(path string, config map[string]interface{}) string {
+// ParseTemplates walks through all the template yaml file in the given directory
+// and produces instantiated yaml file in a temporary directory.
+// Return the name of the temporary directory
+func ParseTemplates(path string, images map[string]string, data map[string]interface{}) (string, error) {
 	dir, err := ioutil.TempDir("", "processed_yaml")
 	if err != nil {
 		panic(err)
@@ -44,18 +48,42 @@ func ParseTemplates(path string, config map[string]interface{}) string {
 			if err != nil {
 				log.Fatal(err)
 			}
-			err = t.Execute(tmpfile, config)
+			err = t.Execute(tmpfile, data)
 			if err != nil {
 				log.Print("execute: ", err)
 				return err
 			}
 			_ = tmpfile.Close()
+
+			// Set image.
+			read, err := ioutil.ReadFile(tmpfile.Name())
+			newContents := string(read)
+			for key, image := range images {
+				newContents = strings.Replace(newContents, key, image, -1)
+			}
+
+			err = ioutil.WriteFile(tmpfile.Name(), []byte(newContents), 0)
+			if err != nil {
+				log.Print("write file: ", err)
+				return err
+			}
 		}
 		return nil
 	})
 	log.Print("new files in ", dir)
 	if err != nil {
+		return "", err
+	}
+	return dir, nil
+}
+
+// ExecuteTemplate instantiates the given template with data
+func ExecuteTemplate(tpl string, data map[string]interface{}) (string, error) {
+	t, err := template.New("").Parse(tpl)
+	if err != nil {
 		panic(err)
 	}
-	return dir
+	buffer := &bytes.Buffer{}
+	err = t.Execute(buffer, data)
+	return buffer.String(), err
 }

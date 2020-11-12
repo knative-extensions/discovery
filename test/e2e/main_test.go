@@ -16,33 +16,40 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package example
+package e2e
 
 import (
-	"context"
+	"flag"
 	"os"
 	"testing"
 
-	"github.com/n3wscott/rigging/pkg/lifecycle"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 
 	"knative.dev/pkg/injection"
+	"knative.dev/reconciler-test/pkg/environment"
 )
 
-var (
-	test_context context.Context
-)
+var global environment.GlobalEnvironment
+
+func init() {
+	environment.InitFlags(flag.CommandLine)
+}
 
 func TestMain(m *testing.M) {
+	flag.Parse()
+
 	ctx, startInformers := injection.EnableInjectionOrDie(nil, nil) //nolint
-	lifecycle.InjectClients(ctx)
-	test_context = ctx
 	startInformers()
+
+	global = environment.NewGlobalEnvironment(ctx)
+
 	os.Exit(m.Run())
 }
 
 // TestSmoke makes sure a ClusterDuckType goes ready.
 func TestSmoke(t *testing.T) {
-	// TODO: add logstream back.
-	SmokeTestImpl(t)
+	t.Parallel()
+	ctx, env := global.Environment()
+	env.Test(ctx, t, ClusterDuckTypeSmoke())
+	env.Finish()
 }

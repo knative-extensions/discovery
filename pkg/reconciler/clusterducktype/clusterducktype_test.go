@@ -27,7 +27,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/n3wscott/rigging/pkg/installer"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
@@ -47,6 +46,7 @@ import (
 	"knative.dev/pkg/configmap"
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/logging"
+	"knative.dev/reconciler-test/pkg/manifest"
 
 	pkgtest "knative.dev/pkg/reconciler/testing"
 )
@@ -258,11 +258,15 @@ func (rt *ReconcilerTest) theFollowingObjectFiles(y *messages.PickleStepArgument
 			}
 		}
 
-		// Leverage the installer to parse the template files.
+		// Leverage ParseTemplates to parse the template files.
 		// TODO: move this code around to let it be reusable
 		// in a more clear way.
 		if file != "" {
-			files := installer.ParseTemplates(file, config)
+			files, err := manifest.ParseTemplates(file, nil, config)
+			if err != nil {
+				return err
+			}
+
 			list, err := ioutil.ReadDir(files)
 			if err != nil {
 				return err
@@ -374,10 +378,13 @@ func (rt *ReconcilerTest) expectStatusUpdateFiles(y *messages.PickleStepArgument
 			}
 		}
 
-		// Leverage the installer to parse the template files.
+		// Leverage ParseTemplates to parse the template files.
 		// TODO: move this code around to let it be reusable
 		// in a more clear way.
-		files := installer.ParseTemplates(file, config)
+		files, err := manifest.ParseTemplates(file, nil, config)
+		if err != nil {
+			return err
+		}
 		if file != "" {
 			list, err := ioutil.ReadDir(files)
 			if err != nil {

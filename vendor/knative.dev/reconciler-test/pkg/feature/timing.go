@@ -14,21 +14,28 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package logstream
+package feature
 
-type (
-	// Canceler is the type of a function returned when a logstream is
-	// started to be deferred so that the logstream can be stopped when
-	// the test is complete.
-	Canceler func()
+type Timing uint8
 
-	// Callback is invoked after pod logs are transformed
-	Callback func(string, ...interface{})
-
-	// Source allows you to create streams for a given resource name
-	Source interface {
-		// Start a log stream for the given resource name and invoke
-		// the callback with the processed log
-		StartStream(name string, l Callback) (Canceler, error)
-	}
+const (
+	Setup Timing = iota
+	Requirement
+	Assert
+	Teardown
 )
+
+func (t Timing) String() string {
+	return timingMapping[t]
+}
+
+func Timings() []Timing {
+	return []Timing{Setup, Requirement, Assert, Teardown}
+}
+
+var timingMapping = map[Timing]string{
+	Setup:       "Setup",
+	Requirement: "Requirement",
+	Assert:      "Assert",
+	Teardown:    "Teardown",
+}

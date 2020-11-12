@@ -1,5 +1,5 @@
 /*
-Copyright 2019 The Rigging Authors
+Copyright 2020 The Knative Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,13 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package installer
+package environment
 
 import (
 	"fmt"
-	"github.com/n3wscott/rigging/pkg/images"
 	"strings"
 	"sync"
+
+	"knative.dev/reconciler-test/pkg/images"
 )
 
 var packages = []string(nil)
@@ -29,6 +30,9 @@ var packaged sync.Once
 
 // RegisterPackage registers an interest in producing an image based on the
 // provide package.
+// Can be called multiple times with the same package.
+// A package will be used to produce the image and used
+// like `image: ko://<package>` inside test yaml.
 func RegisterPackage(pack ...string) {
 	for _, p := range pack {
 		exists := false
@@ -44,6 +48,17 @@ func RegisterPackage(pack ...string) {
 	}
 }
 
+// WithImages will bypass ProduceImages() and use the provided image set
+// instead. Should be called before ProduceImages(), if used, likely in an
+// init() method. An images value should be a container registry image. The
+// images map is presented to the templates on the field `images`, and used
+// like `image: <key>` inside test yaml.
+func WithImages(images map[string]string) {
+	packaged.Do(func() {
+		packageToImageConfig = images
+	})
+}
+
 // ProduceImages returns back the packages that have been added.
 // Will produce images once, can be called many times.
 func ProduceImages() (map[string]string, error) {
@@ -56,8 +71,7 @@ func ProduceImages() (map[string]string, error) {
 				propErr = err
 				return
 			}
-			i := strings.Split(pack, "/")
-			packageToImageConfig[i[len(i)-1]] = strings.TrimSpace(image)
+			packageToImageConfig["ko://"+pack] = strings.TrimSpace(image)
 		}
 	})
 	return packageToImageConfig, propErr
