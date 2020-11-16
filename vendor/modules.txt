@@ -244,6 +244,7 @@ go.uber.org/automaxprocs/internal/cgroups
 go.uber.org/automaxprocs/internal/runtime
 go.uber.org/automaxprocs/maxprocs
 # go.uber.org/multierr v1.6.0
+## explicit
 go.uber.org/multierr
 # go.uber.org/zap v1.16.0
 ## explicit
@@ -834,10 +835,10 @@ k8s.io/utils/buffer
 k8s.io/utils/integer
 k8s.io/utils/pointer
 k8s.io/utils/trace
-# knative.dev/hack v0.0.0-20201103151104-3d5abc3a0075
+# knative.dev/hack v0.0.0-20201112185459-01a34c573bd8
 ## explicit
 knative.dev/hack
-# knative.dev/pkg v0.0.0-20201103155803-bdd7fe1f177c
+# knative.dev/pkg v0.0.0-20201113182900-615f17a0eb05
 ## explicit
 knative.dev/pkg/apis
 knative.dev/pkg/apis/duck
