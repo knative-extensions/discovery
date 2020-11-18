@@ -14,38 +14,40 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package example
+package e2e
 
 import (
+	"context"
 	"testing"
 	"time"
 
-	"github.com/n3wscott/rigging"
+	"knative.dev/discovery/test/e2e/config/smoke"
+	"knative.dev/reconciler-test/pkg/environment"
+	"knative.dev/reconciler-test/pkg/feature"
+	"knative.dev/reconciler-test/pkg/k8s"
 )
 
-// SmokeTestImpl makes sure an DuckType goes ready.
-func SmokeTestImpl(t *testing.T) {
-	opts := []rigging.Option{}
+const (
+	interval = 1 * time.Second
+	timeout  = 45 * time.Second
+)
 
-	rig, err := rigging.NewInstall(opts, []string{"smoke"}, map[string]string{})
-	if err != nil {
-		t.Fatalf("failed to create rig, %s", err)
-	}
-	t.Logf("Created a new testing rig at namespace %s.", rig.Namespace())
+func ClusterDuckTypeSmoke() *feature.Feature {
+	f := new(feature.Feature)
 
-	// Uninstall deferred.
-	defer func() {
-		if err := rig.Uninstall(); err != nil {
-			t.Errorf("failed to uninstall, %s", err)
-		}
-	}()
+	f.Setup("install a simple ClusterDuckType", smoke.Install())
 
-	refs := rig.Objects()
-	for _, r := range refs {
-		_, err := rig.WaitForReadyOrDone(r, 45*time.Second)
-		if err != nil {
+	f.Alpha("for a single ClusterDuckType").
+		Must("goes ready", AllGoReady)
+
+	return f
+}
+
+func AllGoReady(ctx context.Context, t *testing.T) {
+	env := environment.FromContext(ctx)
+	for _, ref := range env.References() {
+		if err := k8s.WaitForReadyOrDone(ctx, ref, interval, timeout); err != nil {
 			t.Fatalf("failed to wait for ready or done, %s", err)
 		}
-		// Pass!
 	}
 }

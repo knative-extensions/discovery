@@ -1,5 +1,5 @@
 /*
-Copyright 2019 The Rigging Authors
+Copyright 2020 The Knative Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,14 +17,22 @@ limitations under the License.
 package images
 
 import (
-	"fmt"
+	"os/exec"
+	"strings"
 )
 
-// Use ko to publish the image.
-func KoPublish(path string) (string, error) {
-	out, err := runCmd(fmt.Sprintf("ko publish %s", path))
-	if err != nil {
-		return "", err
-	}
-	return out, nil
+// Helper functions to run shell commands.
+
+func cmd(cmdLine string) *exec.Cmd {
+	cmdSplit := strings.Split(cmdLine, " ")
+	cmd := cmdSplit[0]
+	args := cmdSplit[1:]
+	return exec.Command(cmd, args...)
+}
+
+func runCmd(cmdLine string) (string, error) {
+	cmd := cmd(cmdLine)
+
+	cmdOut, err := cmd.Output()
+	return string(cmdOut), err
 }

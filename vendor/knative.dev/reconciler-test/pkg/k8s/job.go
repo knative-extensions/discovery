@@ -1,5 +1,5 @@
 /*
-Copyright 2019 The Rigging Authors
+Copyright 2020 The Knative Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,19 +14,77 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package lifecycle
+package k8s
 
 import (
 	"context"
 	"fmt"
+	"log"
+	"time"
 
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 	"knative.dev/pkg/logging"
 )
+
+// WaitUntilJobDone waits until a job has finished.
+func WaitUntilJobDone(client kubernetes.Interface, namespace, name string, interval, timeout time.Duration) error {
+	err := wait.PollImmediate(interval, timeout, func() (bool, error) {
+		job, err := client.BatchV1().Jobs(namespace).Get(context.Background(), name, metav1.GetOptions{})
+		if err != nil {
+			if apierrors.IsNotFound(err) {
+				log.Println(namespace, name, "not found", err)
+				// keep polling
+				return false, nil
+			}
+			return false, err
+		}
+		return IsJobComplete(job), nil
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// WaitForJobTerminationMessage waits for a job to end and then collects the termination message.
+func WaitForJobTerminationMessage(client kubernetes.Interface, namespace, name string, interval, timeout time.Duration) (string, error) {
+	// poll until the pod is terminated.
+	err := wait.PollImmediate(interval, timeout, func() (bool, error) {
+		pod, err := GetJobPodByJobName(context.Background(), client, namespace, name)
+		if err != nil {
+			if apierrors.IsNotFound(err) {
+				log.Println(namespace, name, "not found", err)
+				// keep polling
+				return false, nil
+			}
+			return false, err
+		}
+		if pod != nil {
+			for _, cs := range pod.Status.ContainerStatuses {
+				if cs.State.Terminated != nil {
+					return true, nil
+				}
+			}
+		}
+		return false, nil
+	})
+
+	if err != nil {
+		return "", err
+	}
+	pod, err := GetJobPodByJobName(context.Background(), client, namespace, name)
+	if err != nil {
+		return "", err
+	}
+	return GetFirstTerminationMessage(pod), nil
+}
 
 func IsJobComplete(job *batchv1.Job) bool {
 	for _, c := range job.Status.Conditions {

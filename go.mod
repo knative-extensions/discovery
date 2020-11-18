@@ -7,7 +7,6 @@ require (
 	github.com/cucumber/messages-go/v10 v10.0.3
 	github.com/google/go-cmp v0.5.2
 	github.com/google/licenseclassifier v0.0.0-20200708223521-3d09a0ea2f39
-	github.com/n3wscott/rigging v0.3.0
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.16.0
 	gopkg.in/yaml.v2 v2.3.0
@@ -19,6 +18,7 @@ require (
 	k8s.io/kube-openapi v0.0.0-20200410145947-bcb3869e6f29
 	knative.dev/hack v0.0.0-20201112185459-01a34c573bd8
 	knative.dev/pkg v0.0.0-20201113182900-615f17a0eb05
+	knative.dev/reconciler-test v0.0.0-20201113174300-2b45d4c2e686
 )
 
 replace (

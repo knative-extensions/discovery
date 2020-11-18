@@ -1,5 +1,5 @@
 /*
-Copyright 2019 The Rigging Authors
+Copyright 2020 The Knative Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,25 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package images
+package smoke
 
 import (
-	"os/exec"
-	"strings"
+	"context"
+	"testing"
+
+	"knative.dev/reconciler-test/pkg/environment"
+	"knative.dev/reconciler-test/pkg/feature"
+	"knative.dev/reconciler-test/pkg/manifest"
 )
 
-// Helper functions to run shell commands.
-
-func cmd(cmdLine string) *exec.Cmd {
-	cmdSplit := strings.Split(cmdLine, " ")
-	cmd := cmdSplit[0]
-	args := cmdSplit[1:]
-	return exec.Command(cmd, args...)
+func init() {
+	environment.RegisterPackage(manifest.ImagesLocalYaml()...)
 }
 
-func runCmd(cmdLine string) (string, error) {
-	cmd := cmd(cmdLine)
-
-	cmdOut, err := cmd.Output()
-	return string(cmdOut), err
+func Install() feature.StepFn {
+	return func(ctx context.Context, t *testing.T) {
+		if _, err := manifest.InstallLocalYaml(ctx, nil); err != nil {
+			t.Fatal(err)
+		}
+	}
 }

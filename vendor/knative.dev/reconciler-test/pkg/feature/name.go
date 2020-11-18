@@ -1,5 +1,5 @@
 /*
-Copyright 2020 The Rigging Authors
+Copyright 2020 The Knative Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package namers
+package feature
 
 import (
 	"math/rand"
@@ -44,12 +44,12 @@ type Namer interface {
 	Name() string
 }
 
-// ObjectPrefixForTest returns the name prefix for this test's random names.
+// ObjectPrefixForTest returns the Name prefix for this test's random names.
 func ObjectPrefixForTest(t Namer) string {
 	return MakeK8sNamePrefix(strings.TrimPrefix(t.Name(), testNamePrefix))
 }
 
-// ObjectNameForTest generates a random object name based on the test name.
+// ObjectNameForTest generates a random object Name based on the test Name.
 func ObjectNameForTest(t Namer) string {
 	return kmeta.ChildName(ObjectPrefixForTest(t), string(sep)+RandomString())
 }
@@ -71,6 +71,11 @@ func RandomString() string {
 		suffix[i] = letterBytes[rand.Intn(len(letterBytes))]
 	}
 	return string(suffix)
+}
+
+// MakeRandomK8sName
+func MakeRandomK8sName(prefix string) string {
+	return MakeK8sNamePrefix(AppendRandomString(prefix))
 }
 
 // MakeK8sNamePrefix converts each chunk of non-alphanumeric character into a single dash
@@ -96,7 +101,7 @@ func MakeK8sNamePrefix(s string) string {
 // eg. test/e2e.TestMain will return TestMain.
 func GetBaseFuncName(fullFuncName string) string {
 	name := fullFuncName
-	// Possibly there is no parent package, so only remove it from the name if '/' exists
+	// Possibly there is no parent package, so only remove it from the Name if '/' exists
 	if strings.ContainsRune(name, '/') {
 		name = name[strings.LastIndex(name, "/")+1:]
 	}
