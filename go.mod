@@ -33,3 +33,6 @@ replace (
 	k8s.io/client-go => k8s.io/client-go v0.18.8
 	k8s.io/code-generator => k8s.io/code-generator v0.18.8
 )
+
+// DO NOT SUBMIT
+replace knative.dev/hack => ../../knative/hack
