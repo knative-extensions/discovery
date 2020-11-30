@@ -19,11 +19,17 @@ set -o nounset
 set -o pipefail
 
 source $(dirname $0)/../vendor/knative.dev/hack/library.sh
-export GOPATH=$(go_mod_path)
+export GOPATH=$(go_mod_gopath_hack)
+
+echo "=== Update Codegen for $MODULE_NAME"
+
+echo "GOPATH=$GOPATH"
 
 CODEGEN_PKG=${CODEGEN_PKG:-$(cd ${REPO_ROOT_DIR}; ls -d -1 ./vendor/k8s.io/code-generator 2>/dev/null || echo ../code-generator)}
 
 KNATIVE_CODEGEN_PKG=${KNATIVE_CODEGEN_PKG:-$(cd ${REPO_ROOT_DIR}; ls -d -1 ./vendor/knative.dev/pkg 2>/dev/null || echo ../pkg)}
+
+echo "--- Kubernetes Codegen"
 
 # generate the code with:
 # --output-base    because this script should also be able to run inside the vendor dir of
@@ -35,12 +41,16 @@ ${CODEGEN_PKG}/generate-groups.sh "deepcopy,client,informer,lister" \
   "discovery:v1alpha1" \
   --go-header-file ${REPO_ROOT_DIR}/hack/boilerplate/boilerplate.go.txt
 
+echo "--- Knative Codegen"
+
 # Knative Injection
 chmod +x ${KNATIVE_CODEGEN_PKG}/hack/generate-knative.sh
 ${KNATIVE_CODEGEN_PKG}/hack/generate-knative.sh "injection" \
   knative.dev/discovery/pkg/client knative.dev/discovery/pkg/apis \
   "discovery:v1alpha1" \
   --go-header-file ${REPO_ROOT_DIR}/hack/boilerplate/boilerplate.go.txt
+
+echo "--- Update deps post-codegen"
 
 # Make sure our dependencies are up-to-date
 ${REPO_ROOT_DIR}/hack/update-deps.sh
