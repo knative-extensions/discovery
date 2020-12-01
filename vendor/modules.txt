@@ -835,13 +835,17 @@ k8s.io/utils/integer
 k8s.io/utils/pointer
 k8s.io/utils/trace
 <<<<<<< HEAD
+<<<<<<< HEAD
 # knative.dev/hack v0.0.0-20201125230335-c46a6498e9ed
 =======
 # knative.dev/hack v0.0.0-20201120192952-353db687ec5b => ../../knative/hack
 >>>>>>> update to use new entry point
+=======
+# knative.dev/hack v0.0.0-20201201234937-fddbf732e450
+>>>>>>> update deps
 ## explicit
 knative.dev/hack
-# knative.dev/pkg v0.0.0-20201124023135-49e55c9eb816
+# knative.dev/pkg v0.0.0-20201130192436-e5346d90e980
 ## explicit
 knative.dev/pkg/apis
 knative.dev/pkg/apis/duck
@@ -910,7 +914,7 @@ knative.dev/pkg/webhook/configmaps
 knative.dev/pkg/webhook/resourcesemantics
 knative.dev/pkg/webhook/resourcesemantics/defaulting
 knative.dev/pkg/webhook/resourcesemantics/validation
-# knative.dev/reconciler-test v0.0.0-20201123224957-57547e427baf
+# knative.dev/reconciler-test v0.0.0-20201124190335-83a44efcdfef
 ## explicit
 knative.dev/reconciler-test/pkg/environment
 knative.dev/reconciler-test/pkg/feature
@@ -927,4 +931,3 @@ sigs.k8s.io/yaml
 # k8s.io/apimachinery => k8s.io/apimachinery v0.18.8
 # k8s.io/client-go => k8s.io/client-go v0.18.8
 # k8s.io/code-generator => k8s.io/code-generator v0.18.8
-# knative.dev/hack => ../../knative/hack

@@ -23,10 +23,14 @@ if [[ -f "$kn_hack_library" ]]; then
 else
   echo "this file is intended to be imported from a golang project that vendors knative.dev/hack"
 <<<<<<< HEAD
+<<<<<<< HEAD
   exit
 =======
   exit 1
 >>>>>>> update to use new entry point
+=======
+  exit
+>>>>>>> update deps
 fi
 
 export GOPATH=$(go_mod_gopath_hack)
