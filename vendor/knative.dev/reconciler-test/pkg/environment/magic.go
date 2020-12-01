@@ -133,8 +133,6 @@ func (mr *MagicEnvironment) Prerequisite(ctx context.Context, t *testing.T, f *f
 func (mr *MagicEnvironment) Test(ctx context.Context, t *testing.T, f *feature.Feature) {
 	t.Helper() // Helper marks the calling function as a test helper function.
 
-	steps := feature.CollapseSteps(f.Steps)
-
 	for _, timing := range feature.Timings() {
 		// do it the slow way first.
 		wg := &sync.WaitGroup{}
@@ -144,7 +142,7 @@ func (mr *MagicEnvironment) Test(ctx context.Context, t *testing.T, f *feature.F
 			t.Helper()      // Helper marks the calling function as a test helper function.
 			defer wg.Done() // Outer wait.
 
-			for _, s := range steps {
+			for _, s := range f.Steps {
 				// Skip if step phase is not running.
 				if s.T != timing {
 					continue

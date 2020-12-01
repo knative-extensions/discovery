@@ -18,16 +18,11 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-source $(dirname $0)/../vendor/knative.dev/hack/library.sh
-export GOPATH=$(go_mod_gopath_hack)
+source $(dirname $0)/../vendor/knative.dev/hack/codegen-library.sh
 
 echo "=== Update Codegen for $MODULE_NAME"
 
 echo "GOPATH=$GOPATH"
-
-CODEGEN_PKG=${CODEGEN_PKG:-$(cd ${REPO_ROOT_DIR}; ls -d -1 ./vendor/k8s.io/code-generator 2>/dev/null || echo ../code-generator)}
-
-KNATIVE_CODEGEN_PKG=${KNATIVE_CODEGEN_PKG:-$(cd ${REPO_ROOT_DIR}; ls -d -1 ./vendor/knative.dev/pkg 2>/dev/null || echo ../pkg)}
 
 echo "--- Kubernetes Codegen"
 
@@ -35,7 +30,6 @@ echo "--- Kubernetes Codegen"
 # --output-base    because this script should also be able to run inside the vendor dir of
 #                  k8s.io/kubernetes. The output-base is needed for the generators to output into the vendor dir
 #                  instead of the $GOPATH directly. For normal projects this can be dropped.
-chmod +x ${CODEGEN_PKG}/generate-groups.sh
 ${CODEGEN_PKG}/generate-groups.sh "deepcopy,client,informer,lister" \
   knative.dev/discovery/pkg/client knative.dev/discovery/pkg/apis \
   "discovery:v1alpha1" \
@@ -44,7 +38,6 @@ ${CODEGEN_PKG}/generate-groups.sh "deepcopy,client,informer,lister" \
 echo "--- Knative Codegen"
 
 # Knative Injection
-chmod +x ${KNATIVE_CODEGEN_PKG}/hack/generate-knative.sh
 ${KNATIVE_CODEGEN_PKG}/hack/generate-knative.sh "injection" \
   knative.dev/discovery/pkg/client knative.dev/discovery/pkg/apis \
   "discovery:v1alpha1" \

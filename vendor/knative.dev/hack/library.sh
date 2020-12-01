@@ -98,37 +98,6 @@ function function_exists() {
   [[ "$(type -t $1)" == "function" ]]
 }
 
-# GitHub Actions aware output grouping.
-function group() {
-  # End the group is there is already a group.
-  if [ -z ${__GROUP_TRACKER+x} ]; then
-    export __GROUP_TRACKER="grouping"
-    trap end_group EXIT
-  else
-    end_group
-  fi
-  # Start a new group.
-  start_group "$@"
-}
-
-# GitHub Actions aware output grouping.
-function start_group() {
-  if [[ -n ${GITHUB_WORKFLOW:-} ]]; then
-    echo "::group::$@"
-    trap end_group EXIT
-  else
-    echo "--- $@"
-  fi
-}
-
-# GitHub Actions aware end of output grouping.
-function end_group() {
-  if [[ -n ${GITHUB_WORKFLOW:-} ]]; then
-    echo "::endgroup::"
-  fi
-}
-
-
 # Waits until the given object doesn't exist.
 # Parameters: $1 - the kind of the object.
 #             $2 - object's name.
@@ -559,7 +528,7 @@ function go_update_deps() {
   done
 
   if [[ $UPGRADE == 1 ]]; then
-    group "Upgrading to ${VERSION}"
+    echo "--- Upgrading to ${VERSION}"
     # From shell parameter expansion:
     # ${parameter:+word}
     # If parameter is null or unset, nothing is substituted, otherwise the expansion of word is substituted.
@@ -579,7 +548,7 @@ function go_update_deps() {
     fi
   fi
 
-  group "Go mod tidy and vendor"
+  echo "--- Go mod tidy and vendor"
 
   # Prune modules.
   local orig_pipefail_opt=$(shopt -p -o pipefail)
@@ -588,7 +557,7 @@ function go_update_deps() {
   go mod vendor 2>&1 |  grep -v "ignoring symlink" || true
   eval "$orig_pipefail_opt"
 
-  group "Removing unwanted vendor files"
+  echo "--- Removing unwanted vendor files"
 
   # Remove unwanted vendor files
   find vendor/ \( -name "OWNERS" \
@@ -599,10 +568,10 @@ function go_update_deps() {
 
   export GOFLAGS=-mod=vendor
 
-  group "Updating licenses"
+  echo "--- Updating licenses"
   update_licenses third_party/VENDOR-LICENSE "./..."
 
-  group "Removing broken symlinks"
+  echo "--- Removing broken symlinks"
   remove_broken_symlinks ./vendor
 }
 
