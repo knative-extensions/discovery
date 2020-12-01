@@ -24,7 +24,7 @@ echo "=== Update Codegen for $MODULE_NAME"
 
 echo "GOPATH=$GOPATH"
 
-echo "--- Kubernetes Codegen"
+group "Kubernetes Codegen"
 
 # generate the code with:
 # --output-base    because this script should also be able to run inside the vendor dir of
@@ -35,7 +35,7 @@ ${CODEGEN_PKG}/generate-groups.sh "deepcopy,client,informer,lister" \
   "discovery:v1alpha1" \
   --go-header-file ${REPO_ROOT_DIR}/hack/boilerplate/boilerplate.go.txt
 
-echo "--- Knative Codegen"
+group "Knative Codegen"
 
 # Knative Injection
 ${KNATIVE_CODEGEN_PKG}/hack/generate-knative.sh "injection" \
@@ -43,7 +43,7 @@ ${KNATIVE_CODEGEN_PKG}/hack/generate-knative.sh "injection" \
   "discovery:v1alpha1" \
   --go-header-file ${REPO_ROOT_DIR}/hack/boilerplate/boilerplate.go.txt
 
-echo "--- Update deps post-codegen"
+group "Update deps post-codegen"
 
 # Make sure our dependencies are up-to-date
 ${REPO_ROOT_DIR}/hack/update-deps.sh
