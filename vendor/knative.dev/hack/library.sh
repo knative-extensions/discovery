@@ -606,8 +606,6 @@ function go_update_deps() {
   remove_broken_symlinks ./vendor
 }
 
-<<<<<<< HEAD
-=======
 # Return the go module name of the current module.
 # Intended to be used like:
 #   export MODULE_NAME=$(go_mod_module_name)
@@ -627,7 +625,6 @@ function go_mod_gopath_hack() {
   echo "${TMP_DIR}"
 }
 
->>>>>>> update deps
 # Run kntest tool, error out and ask users to install it if it's not currently installed.
 # Parameters: $1..$n - parameters passed to the tool.
 function run_kntest() {

@@ -834,18 +834,10 @@ k8s.io/utils/buffer
 k8s.io/utils/integer
 k8s.io/utils/pointer
 k8s.io/utils/trace
-<<<<<<< HEAD
-<<<<<<< HEAD
-# knative.dev/hack v0.0.0-20201125230335-c46a6498e9ed
-=======
-# knative.dev/hack v0.0.0-20201120192952-353db687ec5b => ../../knative/hack
->>>>>>> update to use new entry point
-=======
 # knative.dev/hack v0.0.0-20201201234937-fddbf732e450
->>>>>>> update deps
 ## explicit
 knative.dev/hack
-# knative.dev/pkg v0.0.0-20201130192436-e5346d90e980
+# knative.dev/pkg v0.0.0-20201202014037-81712ed625fd
 ## explicit
 knative.dev/pkg/apis
 knative.dev/pkg/apis/duck
