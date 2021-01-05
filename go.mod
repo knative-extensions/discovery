@@ -6,7 +6,7 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cucumber/godog v0.10.0
 	github.com/cucumber/messages-go/v10 v10.0.3
-	github.com/google/go-cmp v0.5.2
+	github.com/google/go-cmp v0.5.4
 	github.com/google/licenseclassifier v0.0.0-20200708223521-3d09a0ea2f39
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/prometheus/procfs v0.0.11 // indirect
@@ -20,8 +20,8 @@ require (
 	k8s.io/client-go v11.0.1-0.20190805182717-6502b5e7b1b5+incompatible
 	k8s.io/code-generator v0.18.12
 	k8s.io/kube-openapi v0.0.0-20200410145947-bcb3869e6f29
-	knative.dev/hack v0.0.0-20201201234937-fddbf732e450
-	knative.dev/pkg v0.0.0-20201202014037-81712ed625fd
+	knative.dev/hack v0.0.0-20201214230143-4ed1ecb8db24
+	knative.dev/pkg v0.0.0-20201231084629-fb3dc711206a
 	knative.dev/reconciler-test v0.0.0-20201124190335-83a44efcdfef
 )
 
