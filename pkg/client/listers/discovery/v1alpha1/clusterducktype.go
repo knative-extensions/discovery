@@ -26,10 +26,13 @@ import (
 )
 
 // ClusterDuckTypeLister helps list ClusterDuckTypes.
+// All objects returned here must be treated as read-only.
 type ClusterDuckTypeLister interface {
 	// List lists all ClusterDuckTypes in the indexer.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1alpha1.ClusterDuckType, err error)
 	// Get retrieves the ClusterDuckType from the index for a given name.
+	// Objects returned here must be treated as read-only.
 	Get(name string) (*v1alpha1.ClusterDuckType, error)
 	ClusterDuckTypeListerExpansion
 }
