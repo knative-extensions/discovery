@@ -25,8 +25,10 @@ import (
 	"go.uber.org/zap"
 	"knative.dev/pkg/logging"
 
+	rbacv1 "k8s.io/api/rbac/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	apiextensionslisters "k8s.io/apiextensions-apiserver/pkg/client/listers/apiextensions/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes"
 	"knative.dev/discovery/pkg/collection"
@@ -56,11 +58,16 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, dt *v1alpha1.ClusterDuck
 	rm := r.resourceMapper.DeepCopy()
 	r.rmx.Unlock()
 
+	clusterRole, err := r.getAggregatingClusterRole(ctx, dt)
+	if err != nil {
+		return err
+	}
 	// Set up this instance of a duck hunter.
 	hunter := collection.NewDuckHunter(rm, dt.Spec.Versions, &collection.DuckFilters{
 		DuckLabel:         fmt.Sprintf("%s/%s", dt.Spec.Group, dt.Spec.Names.Singular),
 		DuckVersionPrefix: fmt.Sprintf("%s.%s", dt.Spec.Names.Plural, dt.Spec.Group),
-	})
+	}, clusterRole,
+	)
 
 	// By query
 
@@ -84,10 +91,51 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, dt *v1alpha1.ClusterDuck
 		}
 	}
 
-	dt.Status.Ducks = hunter.Ducks()
+	ducks := hunter.Ducks()
+
+	if clusterRole != nil {
+		dt.Status.ClusterRoleAggregationRule = *clusterRole.AggregationRule
+	}
+	dt.Status.Ducks = ducks
 	dt.Status.DuckCount = DuckCount(dt.Status.Ducks)
 	dt.Status.MarkReady()
 	return nil
+}
+
+// getAggregatingClusterRole fetches the ClusterRole specified by Spec.Role.RoleRef
+//   if not set, it will default to using the first LabelSelector in Spec.Selectors to
+//   match any ClusterRole with a matching AggregationRule
+func (r *Reconciler) getAggregatingClusterRole(ctx context.Context, dt *v1alpha1.ClusterDuckType) (*rbacv1.ClusterRole, error) {
+	if dt.Spec.Role != nil && dt.Spec.Role.RoleRef != nil {
+		return r.client.RbacV1().ClusterRoles().Get(ctx, dt.Spec.Role.RoleRef.Name, metav1.GetOptions{})
+
+	} else if len(dt.Spec.Selectors) > 0 {
+		clusterRoles, err := r.client.RbacV1().ClusterRoles().List(ctx, metav1.ListOptions{})
+		if err != nil {
+			return nil, err
+		}
+		return getClusterRoleWithAggregationLabel(ctx, dt.Spec.Selectors[0].LabelSelector, clusterRoles.Items)
+	} else {
+		return nil, nil
+	}
+}
+
+// getClusterRoleWithAggregationLabel fetches a ClusterRole with a AggregationRule that matches the labelSelector
+func getClusterRoleWithAggregationLabel(ctx context.Context, labelSelector string, clusterRoles []rbacv1.ClusterRole) (*rbacv1.ClusterRole, error) {
+	label := strings.Split(labelSelector, "=")[0]
+	if label == "" {
+		return nil, nil
+	}
+	for _, cr := range clusterRoles {
+		if cr.AggregationRule != nil {
+			for _, selectors := range cr.AggregationRule.ClusterRoleSelectors {
+				if _, ok := selectors.MatchLabels[label]; ok {
+					return &cr, nil
+				}
+			}
+		}
+	}
+	return nil, nil
 }
 
 // getCRDsWith returns CRDs labeled as given.

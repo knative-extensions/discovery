@@ -21,6 +21,8 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"gopkg.in/yaml.v2"
 
+	rbacv1 "k8s.io/api/rbac/v1"
+
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 )
 
@@ -53,6 +55,11 @@ spec:
       version: v2
   selectors:
   - labelSelector: "example.com/thisduck=true"
+  role:
+    roleref:
+      kind: someKind
+      name: someName
+      apigroup: someAPIGroup
 `
 
 	want := &ClusterDuckType{
@@ -74,6 +81,13 @@ spec:
 			Selectors: []CustomResourceDefinitionSelector{{
 				LabelSelector: "example.com/thisduck=true",
 			}},
+			Role: &Role{
+				RoleRef: &rbacv1.RoleRef{
+					Kind:     "someKind",
+					Name:     "someName",
+					APIGroup: "someAPIGroup",
+				},
+			},
 		}}
 
 	got := &ClusterDuckType{}
