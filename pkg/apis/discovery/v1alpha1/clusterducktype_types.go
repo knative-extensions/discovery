@@ -56,6 +56,7 @@ var (
 )
 
 // ClusterDuckTypeSpec holds the desired state of the ClusterDuckType (from the client).
+// +k8s:openapi-gen=true
 type ClusterDuckTypeSpec struct {
 	// Group is the API group of the defined duck type.
 	// Must match the name of the ClusterDuckType (in the form `<names.plural>.<group>`).
