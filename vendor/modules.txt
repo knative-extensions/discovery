@@ -852,6 +852,7 @@ knative.dev/pkg/client/injection/apiextensions/informers/apiextensions/v1/custom
 knative.dev/pkg/client/injection/apiextensions/informers/apiextensions/v1/customresourcedefinition/fake
 knative.dev/pkg/client/injection/apiextensions/informers/factory
 knative.dev/pkg/client/injection/apiextensions/informers/factory/fake
+knative.dev/pkg/client/injection/ducks/duck/v1/addressable
 knative.dev/pkg/client/injection/kube/client
 knative.dev/pkg/client/injection/kube/client/fake
 knative.dev/pkg/client/injection/kube/informers/admissionregistration/v1/mutatingwebhookconfiguration
