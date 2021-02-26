@@ -102,10 +102,10 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, dt *discoveryv1alpha1.Cl
 			r.controllers[key] = rc
 			r.lock.Unlock()
 
-			logging.FromContext(ctx).Infof("starting auto domain mapping reconciler for gvk %q", rc.gvk.String())
+			logging.FromContext(ctx).Infof("starting addressable reconciler for gvk %q", rc.gvk.String())
 			go func(c *controller.Impl) {
 				if err := c.Run(2, atctx.Done()); err != nil {
-					logging.FromContext(ctx).Errorf("unable to start auto domain mapping reconciler for gvk %q", rc.gvk.String())
+					logging.FromContext(ctx).Errorf("unable to start addressable reconciler for gvk %q", rc.gvk.String())
 				}
 			}(rc.controller)
 		}

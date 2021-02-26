@@ -18,6 +18,7 @@ package clusterducktype
 
 import (
 	"context"
+	"knative.dev/discovery/pkg/metareconciler/sample"
 	"sync"
 
 	"knative.dev/pkg/configmap"
@@ -41,7 +42,7 @@ func NewSampleController(
 	r := &Reconciler{
 		forDuck:     "addressables.duck.knative.dev",
 		duckVersion: "v1",
-		ctorDuck:    nil,
+		ctorDuck:    sample.NewController,
 		ogctx:       ctx,
 		ogcmw:       cmw,
 		lock:        sync.Mutex{},

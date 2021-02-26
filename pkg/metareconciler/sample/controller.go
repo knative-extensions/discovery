@@ -18,6 +18,7 @@ package sample
 
 import (
 	"context"
+
 	"go.uber.org/zap"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -37,7 +38,7 @@ const (
 
 // NewController returns a function that initializes the controller and
 // Registers event handlers to enqueue events
-func NewController(_ context.Context, gvk schema.GroupVersionKind) injection.ControllerConstructor {
+func NewController(gvk schema.GroupVersionKind) injection.ControllerConstructor {
 	return func(ctx context.Context,
 		cmw configmap.Watcher,
 	) *controller.Impl {
@@ -48,7 +49,7 @@ func NewController(_ context.Context, gvk schema.GroupVersionKind) injection.Con
 		gvr, _ := meta.UnsafeGuessKindToResource(gvk)
 		addressableInformer, addressableLister, err := addressableduckInformer.Get(ctx, gvr)
 		if err != nil {
-			logger.Errorw("Error getting source informer", zap.String("GVR", gvr.String()), zap.Error(err))
+			logger.Errorw("Error getting addressable informer", zap.String("GVR", gvr.String()), zap.Error(err))
 			return nil
 		}
 
