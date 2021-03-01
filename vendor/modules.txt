@@ -839,7 +839,7 @@ k8s.io/utils/trace
 # knative.dev/hack v0.0.0-20210203173706-8368e1f6eacf
 ## explicit
 knative.dev/hack
-# knative.dev/pkg v0.0.0-20210216013737-584933f8280b
+# knative.dev/pkg v0.0.0-20210226182947-9039dc189ced
 ## explicit
 knative.dev/pkg/apis
 knative.dev/pkg/apis/duck
@@ -909,7 +909,7 @@ knative.dev/pkg/webhook/configmaps
 knative.dev/pkg/webhook/resourcesemantics
 knative.dev/pkg/webhook/resourcesemantics/defaulting
 knative.dev/pkg/webhook/resourcesemantics/validation
-# knative.dev/reconciler-test v0.0.0-20210216030508-77f50054d024
+# knative.dev/reconciler-test v0.0.0-20210301085148-2e2f88160c53
 ## explicit
 knative.dev/reconciler-test/pkg/environment
 knative.dev/reconciler-test/pkg/feature
