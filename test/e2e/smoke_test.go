@@ -18,7 +18,6 @@ package e2e
 
 import (
 	"context"
-	"testing"
 	"time"
 
 	"knative.dev/discovery/test/e2e/config/smoke"
@@ -43,7 +42,7 @@ func ClusterDuckTypeSmoke() *feature.Feature {
 	return f
 }
 
-func AllGoReady(ctx context.Context, t *testing.T) {
+func AllGoReady(ctx context.Context, t feature.T) {
 	env := environment.FromContext(ctx)
 	for _, ref := range env.References() {
 		if err := k8s.WaitForReadyOrDone(ctx, ref, interval, timeout); err != nil {
