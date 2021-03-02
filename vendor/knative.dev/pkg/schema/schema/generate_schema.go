@@ -19,7 +19,6 @@ package schema
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"math"
 	"reflect"
 	"strings"
@@ -228,7 +227,6 @@ func generateStructSchema(t reflect.Type, skipTopLevelCommon bool, history ...re
 func visited(t reflect.Type, history []reflect.Type) bool {
 	for _, h := range history {
 		// Look for a t in history.
-		log.Printf("%s %+v\n", t.String(), t)
 		if t.String() == h.String() {
 			return true
 		}

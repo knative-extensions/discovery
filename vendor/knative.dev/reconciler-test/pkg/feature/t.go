@@ -1,5 +1,5 @@
 /*
-Copyright 2020 The Knative Authors
+Copyright 2021 The Knative Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,28 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package images
+package feature
 
-import (
-	"os"
-	"os/exec"
-	"strings"
-)
+// T is an interface similar to testing.T passed to StepFn to perform logging and assertions
+type T interface {
+	Error(args ...interface{})
+	Errorf(format string, args ...interface{})
+	Fail()
 
-// Helper functions to run shell commands.
+	Fatal(args ...interface{})
+	Fatalf(format string, args ...interface{})
+	FailNow()
 
-func cmd(cmdLine string) *exec.Cmd {
-	cmdSplit := strings.Split(cmdLine, " ")
-	cmd := cmdSplit[0]
-	args := cmdSplit[1:]
-	c := exec.Command(cmd, args...)
-	c.Stderr = os.Stdout // Pipe the stderr in stdout
-	return c
-}
+	Log(args ...interface{})
+	Logf(format string, args ...interface{})
 
-func runCmd(cmdLine string) (string, error) {
-	cmd := cmd(cmdLine)
-
-	cmdOut, err := cmd.Output()
-	return string(cmdOut), err
+	Skip(args ...interface{})
+	Skipf(format string, args ...interface{})
+	SkipNow()
 }
