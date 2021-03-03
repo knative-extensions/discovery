@@ -66,7 +66,7 @@ type ClusterDuckTypeSpec struct {
 	Names DuckTypeNames `json:"names"`
 
 	// Versions holds the schema and printer column mappings for specific
-	// versions fo duck types.
+	// versions for duck types.
 	Versions []DuckVersion `json:"versions" patchStrategy:"merge" patchMergeKey:"name"`
 
 	// Selectors is a list of selectors for CustomResourceDefinitions to identify a duck type.

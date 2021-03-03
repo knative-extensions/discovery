@@ -445,7 +445,7 @@ gopkg.in/inf.v0
 # gopkg.in/yaml.v2 v2.4.0
 ## explicit
 gopkg.in/yaml.v2
-# gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
+# gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 gopkg.in/yaml.v3
 # k8s.io/api v0.19.7
 ## explicit
@@ -840,10 +840,16 @@ k8s.io/utils/buffer
 k8s.io/utils/integer
 k8s.io/utils/pointer
 k8s.io/utils/trace
-# knative.dev/hack v0.0.0-20210203173706-8368e1f6eacf
+# knative.dev/hack v0.0.0-20210203173706-8368e1f6eacf => ../../knative/hack
 ## explicit
 knative.dev/hack
-# knative.dev/pkg v0.0.0-20210226182947-9039dc189ced => ../../knative/pkg
+# knative.dev/hack/schema v0.0.0 => ../../knative/hack/schema
+## explicit
+knative.dev/hack/schema/commands
+knative.dev/hack/schema/docs
+knative.dev/hack/schema/registry
+knative.dev/hack/schema/schema
+# knative.dev/pkg v0.0.0-20210226182947-9039dc189ced
 ## explicit
 knative.dev/pkg/apis
 knative.dev/pkg/apis/duck
@@ -891,10 +897,6 @@ knative.dev/pkg/profiling
 knative.dev/pkg/ptr
 knative.dev/pkg/reconciler
 knative.dev/pkg/reconciler/testing
-knative.dev/pkg/schema/commands
-knative.dev/pkg/schema/docs
-knative.dev/pkg/schema/registry
-knative.dev/pkg/schema/schema
 knative.dev/pkg/signals
 knative.dev/pkg/system
 knative.dev/pkg/system/testing
@@ -929,4 +931,5 @@ sigs.k8s.io/structured-merge-diff/v4/value
 # sigs.k8s.io/yaml v1.2.0
 sigs.k8s.io/yaml
 # github.com/prometheus/client_golang => github.com/prometheus/client_golang v0.9.2
-# knative.dev/pkg => ../../knative/pkg
+# knative.dev/hack => ../../knative/hack
+# knative.dev/hack/schema => ../../knative/hack/schema

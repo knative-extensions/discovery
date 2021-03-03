@@ -36,7 +36,7 @@ const (
 )
 
 // TODO: root needs to be dynamic based on where this is being executed in the context of gomod.
-var root = "knative.dev/pkg/schema"
+var root = "knative.dev/hack/schema"
 
 func SetRoot(r string) {
 	root = r

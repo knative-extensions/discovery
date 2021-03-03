@@ -23,9 +23,9 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 
-	"knative.dev/pkg/schema/docs"
-	"knative.dev/pkg/schema/registry"
-	"knative.dev/pkg/schema/schema"
+	"knative.dev/hack/schema/docs"
+	"knative.dev/hack/schema/registry"
+	"knative.dev/hack/schema/schema"
 )
 
 // New creates a new schema cli command set.

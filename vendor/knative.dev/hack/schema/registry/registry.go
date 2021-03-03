@@ -17,6 +17,7 @@ limitations under the License.
 package registry
 
 import (
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"reflect"
 )
 
@@ -29,9 +30,18 @@ var r = &Registry{
 	kinds: map[string]reflect.Type{},
 }
 
-func Register(kind string, obj interface{}) {
+// GVKable indicates that a particular type can return metadata about the Kind.
+type GVKable interface {
+	// GetGroupVersionKind returns a GroupVersionKind. The name is chosen
+	// to avoid collision with TypeMeta's GroupVersionKind() method.
+	// See: https://issues.k8s.io/3030
+	GetGroupVersionKind() schema.GroupVersionKind
+}
+
+func Register(obj GVKable) {
 	t := reflect.TypeOf(obj)
-	r.kinds[kind] = t
+	gvk := obj.GetGroupVersionKind()
+	r.kinds[gvk.Kind] = t.Elem()
 }
 
 func Kinds() []string {

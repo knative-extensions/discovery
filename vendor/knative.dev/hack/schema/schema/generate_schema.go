@@ -23,7 +23,7 @@ import (
 	"reflect"
 	"strings"
 
-	"knative.dev/pkg/schema/docs"
+	"knative.dev/hack/schema/docs"
 )
 
 var (
