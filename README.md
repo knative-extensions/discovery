@@ -24,7 +24,7 @@ ko apply -f ./config
 
 ## ClusterDuckType:discovery.knative.dev/v1alpha1
 
-The goal is to have a custom type that is use installable to help a developer,
+The goal is to have a custom type that is user installable to help a developer,
 cluster admin, or tooling to better understand the duck types that are installed
 in the cluster. This information could be used to understand which Kinds could
 fulfill a role for another resource.
@@ -118,7 +118,7 @@ kubectl get clusterducktypes addressable.duck.knative.dev -oyaml
 
 ```yaml
 apiVersion: discovery.knative.dev/v1alpha1
-kind: CluserDuckType
+kind: ClusterDuckType
 metadata:
   generation: 2
   name: addressables.duck.knative.dev
