@@ -102,7 +102,7 @@ clusterducktype.discovery.knative.dev/addressables.duck.knative.dev created
 After applying this, you can fetch it:
 
 ```shell
-kubectl get ducktypes addressables.duck.knative.dev
+kubectl get cducks addressables.duck.knative.dev
 ```
 
 ```text
