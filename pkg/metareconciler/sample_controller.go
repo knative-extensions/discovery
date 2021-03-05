@@ -14,13 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package clusterducktype
+package metareconciler
 
 import (
 	"context"
+	"knative.dev/discovery/pkg/metareconciler/clusterducktype"
 	"knative.dev/discovery/pkg/metareconciler/sample"
-	"sync"
-
 	"knative.dev/pkg/configmap"
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/logging"
@@ -39,14 +38,7 @@ func NewSampleController(
 
 	clusterducktypeInformer := clusterducktypeinformer.Get(ctx)
 
-	r := &Reconciler{
-		forDuck:     "addressables.duck.knative.dev",
-		duckVersion: "v1",
-		ctorDuck:    sample.NewController,
-		ogctx:       ctx,
-		ogcmw:       cmw,
-		lock:        sync.Mutex{},
-	}
+	r := clusterducktype.New(ctx, cmw, "addressables.duck.knative.dev/v1", sample.NewController)
 	impl := cluserterducktypereconciler.NewImpl(ctx, r)
 
 	logger.Info("Setting up event handlers.")

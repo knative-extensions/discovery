@@ -17,8 +17,7 @@ limitations under the License.
 package main
 
 import (
-	// The set of controllers this controller process runs.
-	"knative.dev/discovery/pkg/metareconciler/clusterducktype"
+	"knative.dev/discovery/pkg/metareconciler"
 
 	// This defines the shared main for injected controllers.
 	"knative.dev/pkg/injection/sharedmain"
@@ -26,6 +25,6 @@ import (
 
 func main() {
 	sharedmain.Main("metademo",
-		clusterducktype.NewSampleController,
+		metareconciler.NewSampleController,
 	)
 }

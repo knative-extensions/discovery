@@ -19,6 +19,7 @@ package clusterducktype
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -30,7 +31,24 @@ import (
 	"knative.dev/pkg/reconciler"
 
 	discoveryv1alpha1 "knative.dev/discovery/pkg/apis/discovery/v1alpha1"
+	cluserterducktypereconciler "knative.dev/discovery/pkg/client/injection/reconciler/discovery/v1alpha1/clusterducktype"
 )
+
+func New(ctx context.Context, cmw configmap.Watcher, dkv string, ctor DuckTypedControllerConstructor) cluserterducktypereconciler.Interface {
+	dp := strings.Split(dkv, "/")
+	if len(dp) != 2 {
+		panic("expecting duck kind version to be <ClusterDuckTypeName>/<DuckVersion>")
+	}
+	r := &Reconciler{
+		forDuck:     dp[0],
+		duckVersion: dp[1],
+		ctorDuck:    ctor,
+		ogctx:       ctx,
+		ogcmw:       cmw,
+		lock:        sync.Mutex{},
+	}
+	return r
+}
 
 type runningController struct {
 	gvk        schema.GroupVersionKind
@@ -66,6 +84,8 @@ func (r *Reconciler) enabledFor(dt *discoveryv1alpha1.ClusterDuckType) bool {
 	return false
 }
 
+// ReconcileKind reconciles cluster duck types, and for each that are enabled,
+// it manages an instance of a controller created from the
 // ReconcileKind implements Interface.ReconcileKind.
 func (r *Reconciler) ReconcileKind(ctx context.Context, dt *discoveryv1alpha1.ClusterDuckType) reconciler.Event {
 	// Jump out if this controller creation reconciler is not configured/enabled for this duck type.
@@ -113,7 +133,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, dt *discoveryv1alpha1.Cl
 
 	logging.FromContext(ctx).Debugf("----- Meta-Reconciling -------")
 	logging.FromContext(ctx).Debugf("%s@%s", r.forDuck, r.duckVersion)
-	for k, _ := range r.controllers {
+	for k := range r.controllers {
 		logging.FromContext(ctx).Debugf(" - %q", k)
 	}
 	logging.FromContext(ctx).Debugf("------------------------------")
