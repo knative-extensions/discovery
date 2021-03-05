@@ -110,10 +110,10 @@ NAME                            SHORT NAME    DUCKS   READY   REASON
 addressables.duck.knative.dev   addressable   6       True
 ```
 
-And get the full DuckType `addressable.duck.knative.dev` resource:
+And get the full DuckType `addressables.duck.knative.dev` resource:
 
 ```shell
-kubectl get clusterducktypes addressable.duck.knative.dev -oyaml
+kubectl get clusterducktypes addressables.duck.knative.dev -oyaml
 ```
 
 ```yaml
