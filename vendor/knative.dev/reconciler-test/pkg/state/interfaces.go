@@ -1,5 +1,5 @@
 /*
-Copyright 2019 The Knative Authors
+Copyright 2021 The Knative Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,19 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package system
+package state
 
-import (
-	"time"
-)
+import "context"
 
-// Mockable interface for time based testing
-type Clock interface {
-	Now() time.Time
-}
-
-type RealClock struct{}
-
-func (RealClock) Now() time.Time {
-	return time.Now()
+// This is a subset of knative.dev/pkg/kvstore.Interface
+type Store interface {
+	// Get gets the key from the Store into the provided value
+	Get(ctx context.Context, key string, value interface{}) error
+	// Set sets the key into the Store from the provided value
+	Set(ctx context.Context, key string, value interface{}) error
 }

@@ -23,7 +23,9 @@ import (
 	"testing"
 
 	corev1 "k8s.io/api/core/v1"
+
 	"knative.dev/reconciler-test/pkg/feature"
+	"knative.dev/reconciler-test/pkg/state"
 )
 
 func NewGlobalEnvironment(ctx context.Context) GlobalEnvironment {
@@ -64,7 +66,9 @@ func (mr *MagicEnvironment) References() []corev1.ObjectReference {
 }
 
 func (mr *MagicEnvironment) Finish() {
-	mr.DeleteNamespaceIfNeeded()
+	if err := mr.DeleteNamespaceIfNeeded(); err != nil {
+		panic(err)
+	}
 }
 
 func (mr *MagicGlobalEnvironment) Environment(opts ...EnvOpts) (context.Context, Environment) {
@@ -130,13 +134,22 @@ func (mr *MagicEnvironment) Prerequisite(ctx context.Context, t *testing.T, f *f
 	})
 }
 
+// Test implements Environment.Test.
+// In the MagicEnvironment implementation, the Store that is inside of the
+// Feature will be assigned to the context. If no Store is set on Feature,
+// Test will create a new store.KVStore and set it on the feature and then
+// apply it to the Context.
 func (mr *MagicEnvironment) Test(ctx context.Context, t *testing.T, f *feature.Feature) {
 	t.Helper() // Helper marks the calling function as a test helper function.
+
+	if f.State == nil {
+		f.State = &state.KVStore{}
+	}
+	ctx = state.ContextWith(ctx, f.State)
 
 	steps := feature.CollapseSteps(f.Steps)
 
 	for _, timing := range feature.Timings() {
-		// do it the slow way first.
 		wg := &sync.WaitGroup{}
 		wg.Add(1)
 
@@ -150,6 +163,9 @@ func (mr *MagicEnvironment) Test(ctx context.Context, t *testing.T, f *feature.F
 					continue
 				}
 				t.Run(s.TestName(), func(t *testing.T) {
+					ctx, cancelFn := context.WithCancel(ctx)
+					t.Cleanup(cancelFn)
+
 					wg.Add(1)
 					defer wg.Done()
 
@@ -173,6 +189,23 @@ func (mr *MagicEnvironment) Test(ctx context.Context, t *testing.T, f *feature.F
 
 		wg.Wait()
 	}
+}
+
+// TestSet implements Environment.TestSet
+func (mr *MagicEnvironment) TestSet(ctx context.Context, t *testing.T, fs *feature.FeatureSet) {
+	t.Helper() // Helper marks the calling function as a test helper function
+	wg := &sync.WaitGroup{}
+
+	for _, f := range fs.Features {
+		wg.Add(1)
+		t.Run(fs.Name, func(t *testing.T) {
+			// FeatureSets should be run in parellel.
+			mr.Test(ctx, t, &f)
+			wg.Done()
+		})
+	}
+
+	wg.Wait()
 }
 
 type envKey struct{}
