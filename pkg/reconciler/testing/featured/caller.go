@@ -19,17 +19,9 @@ package featured
 import (
 	"path/filepath"
 	"runtime"
-	"strings"
 )
 
-var prefixPath string
-
-func init() {
-	_, fileName, _, _ := runtime.Caller(0)
-	prefixPath = filepath.ToSlash(filepath.Dir(filepath.Dir(fileName))) + "/"
-}
-
-func relative() string {
-	_, fn, _, _ := runtime.Caller(1)
-	return strings.TrimPrefix(filepath.ToSlash(fn), prefixPath)
+func callerPath() string {
+	_, fn, _, _ := runtime.Caller(2)
+	return filepath.Dir(fn)
 }

@@ -24,6 +24,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -50,13 +51,11 @@ func Run(m *testing.M) {
 		flag.Parse()
 	}
 
-	fmt.Println("rel path = ", relative())
-
 	if len(flag.Args()) > 0 {
 		opt.Paths = flag.Args()
 	} else {
 		opt.Paths = []string{
-			"./testdata/features/",
+			filepath.Join(callerPath(), "testdata/features/"),
 		}
 	}
 
@@ -119,7 +118,10 @@ func ReconcileKindFeatureContext(t *testing.T, s *godog.ScenarioContext, kind st
 
 	s.Step(`^the following objects:$`, rt.theFollowingObjects)
 	s.Step(`^the following objects \(from file\):$`, rt.theFollowingObjectFiles)
-	s.Step(fmt.Sprintf(`^a %s reconciler$`, kind), factory)
+	s.Step(fmt.Sprintf(`^a %s reconciler$`, kind), func() error {
+		rt.factory = factory
+		return nil
+	})
 	s.Step(`^reconciling "([^"]*)"$`, rt.reconcilingKey)
 	s.Step(`^expect nothing$`, rt.expectNothing)
 	s.Step(`^expect status updates:$`, rt.expectStatusUpdates)
