@@ -19,17 +19,17 @@ package clusterducktype
 import (
 	"context"
 	"fmt"
-	"k8s.io/apimachinery/pkg/runtime/schema"
-	"knative.dev/pkg/injection"
-	pkgtest "knative.dev/pkg/reconciler/testing"
 	"testing"
 
-	"knative.dev/discovery/pkg/client/injection/reconciler/discovery/v1alpha1/clusterducktype"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"knative.dev/pkg/configmap"
 	"knative.dev/pkg/controller"
+	"knative.dev/pkg/injection"
 	"knative.dev/pkg/logging"
+	pkgtest "knative.dev/pkg/reconciler/testing"
 
 	"knative.dev/discovery/pkg/client/injection/client"
+	"knative.dev/discovery/pkg/client/injection/reconciler/discovery/v1alpha1/clusterducktype"
 	"knative.dev/discovery/pkg/reconciler/testing/featured"
 
 	. "knative.dev/discovery/pkg/reconciler/testing/v1alpha1"
