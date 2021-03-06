@@ -20,7 +20,6 @@ import (
 	"testing"
 
 	"knative.dev/pkg/configmap"
-
 	. "knative.dev/pkg/reconciler/testing"
 
 	// Fake injection informers

@@ -18,11 +18,13 @@ package metareconciler
 
 import (
 	"context"
-	"knative.dev/discovery/pkg/metareconciler/clusterducktype"
-	"knative.dev/discovery/pkg/metareconciler/sample"
+
 	"knative.dev/pkg/configmap"
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/logging"
+
+	"knative.dev/discovery/pkg/metareconciler/clusterducktype"
+	"knative.dev/discovery/pkg/metareconciler/sample"
 
 	clusterducktypeinformer "knative.dev/discovery/pkg/client/injection/informers/discovery/v1alpha1/clusterducktype"
 	cluserterducktypereconciler "knative.dev/discovery/pkg/client/injection/reconciler/discovery/v1alpha1/clusterducktype"
