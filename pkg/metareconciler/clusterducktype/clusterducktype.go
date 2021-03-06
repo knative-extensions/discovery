@@ -78,10 +78,7 @@ type Reconciler struct {
 }
 
 func (r *Reconciler) enabledFor(dt *discoveryv1alpha1.ClusterDuckType) bool {
-	if dt.GetName() == r.forDuck {
-		return true
-	}
-	return false
+	return dt.GetName() == r.forDuck
 }
 
 // ReconcileKind reconciles cluster duck types, and for each that are enabled,
