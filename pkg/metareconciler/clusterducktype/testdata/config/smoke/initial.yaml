@@ -1,0 +1,29 @@
+apiVersion: discovery.knative.dev/v1alpha1
+kind: ClusterDuckType
+metadata:
+  name: zhangchas.duck.knative.dev
+  generation: 1
+spec:
+  selectors:
+    - labelSelector: "duck.knative.dev/smoked=true"
+
+  names:
+    name: "Zhangchas"
+    plural: "zhangchas"
+    singular: "zhangcha"
+
+  versions:
+    - name: "v1"
+  group: duck.knative.dev
+
+status:
+  observedGeneration: 1
+  duckCount: 1
+  ducks:
+    v1:
+      - apiVersion: teachme.howto/v1
+        kind: Dougie
+        scope: Namespaced
+  conditions:
+    - type: Ready
+      status: "True"

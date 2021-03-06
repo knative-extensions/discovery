@@ -4,7 +4,7 @@ go 1.15
 
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/cucumber/godog v0.10.0
+	github.com/cucumber/godog v0.11.0
 	github.com/cucumber/messages-go/v10 v10.0.3
 	github.com/google/go-cmp v0.5.4
 	github.com/google/licenseclassifier v0.0.0-20200708223521-3d09a0ea2f39

@@ -46,6 +46,12 @@ var opt = godog.Options{
 	Output: colors.Colored(os.Stdout),
 }
 
+// Step is a wrapper for a call to godog.ScenarioContext.Step()
+type Step struct {
+	Expr         string
+	StepFuncCtor func(rt *ReconcilerTest) interface{}
+}
+
 func Run(m *testing.M) {
 	if !flag.Parsed() {
 		flag.Parse()
@@ -76,12 +82,12 @@ func InitializeTestSuite(ctx *godog.TestSuiteContext) {
 	ctx.BeforeSuite(func() {})
 }
 
-func TestReconcileKind(t *testing.T, kind string, factory pkgtest.Factory) {
+func TestReconcileKind(t *testing.T, kind string, factory pkgtest.Factory, steps ...Step) {
 	status := godog.TestSuite{
 		Name:                 kind,
 		TestSuiteInitializer: InitializeTestSuite,
 		ScenarioInitializer: func(s *godog.ScenarioContext) {
-			ReconcileKindFeatureContext(t, s, kind, factory)
+			ReconcileKindFeatureContext(t, s, kind, factory, steps...)
 		},
 		Options: &opt,
 	}.Run()
@@ -91,12 +97,12 @@ func TestReconcileKind(t *testing.T, kind string, factory pkgtest.Factory) {
 	}
 }
 
-func ReconcileKindFeatureContext(t *testing.T, s *godog.ScenarioContext, kind string, factory pkgtest.Factory) {
+func ReconcileKindFeatureContext(t *testing.T, s *godog.ScenarioContext, kind string, factory pkgtest.Factory, steps ...Step) {
 	ctx := context.Background()
 
 	rt := &ReconcilerTest{
-		t: t,
-		row: pkgtest.TableRow{
+		T: t,
+		Row: pkgtest.TableRow{
 			Name: kind,
 			Ctx:  ctx,
 			//OtherTestData:           nil,
@@ -119,7 +125,7 @@ func ReconcileKindFeatureContext(t *testing.T, s *godog.ScenarioContext, kind st
 	s.Step(`^the following objects:$`, rt.theFollowingObjects)
 	s.Step(`^the following objects \(from file\):$`, rt.theFollowingObjectFiles)
 	s.Step(fmt.Sprintf(`^a %s reconciler$`, kind), func() error {
-		rt.factory = factory
+		rt.Factory = factory
 		return nil
 	})
 	s.Step(`^reconciling "([^"]*)"$`, rt.reconcilingKey)
@@ -128,26 +134,31 @@ func ReconcileKindFeatureContext(t *testing.T, s *godog.ScenarioContext, kind st
 	s.Step(`^expect status updates \(from file\):$`, rt.expectStatusUpdateFiles)
 	s.Step(`^expect Kubernetes Events:$`, rt.expectKubernetesEvents)
 
+	// Inject custom steps.
+	for _, step := range steps {
+		s.Step(step.Expr, step.StepFuncCtor(rt))
+	}
+
 	s.AfterScenario(func(pickle *messages.Pickle, err error) {
-		originObjects := make([]runtime.Object, 0, len(rt.row.Objects))
-		for _, obj := range rt.row.Objects {
+		originObjects := make([]runtime.Object, 0, len(rt.Row.Objects))
+		for _, obj := range rt.Row.Objects {
 			originObjects = append(originObjects, obj.DeepCopyObject())
 		}
 
-		if rt.factory == nil {
-			rt.t.Fatalf("factory is not set for test %s", rt.row.Name)
+		if rt.Factory == nil {
+			rt.T.Fatalf("factory is not set for test %s", rt.Row.Name)
 		}
 
 		// Reconcile.
-		rt.row.Name = pickle.Name
-		rt.t.Run(pickle.Name, func(t *testing.T) {
+		rt.Row.Name = pickle.Name
+		rt.T.Run(pickle.Name, func(t *testing.T) {
 			t.Helper()
-			rt.row.Test(t, rt.factory)
+			rt.Row.Test(t, rt.Factory)
 		})
 
 		// Validate cached objects do not get soiled after controller loops
-		if diff := cmp.Diff(originObjects, rt.row.Objects, safeDeployDiff, cmpopts.EquateEmpty()); diff != "" {
-			rt.t.Errorf("Unexpected objects in test %s (-want, +got): %v", rt.row.Name, diff)
+		if diff := cmp.Diff(originObjects, rt.Row.Objects, safeDeployDiff, cmpopts.EquateEmpty()); diff != "" {
+			rt.T.Errorf("Unexpected objects in test %s (-want, +got): %v", rt.Row.Name, diff)
 		}
 	})
 
@@ -155,9 +166,9 @@ func ReconcileKindFeatureContext(t *testing.T, s *godog.ScenarioContext, kind st
 }
 
 type ReconcilerTest struct {
-	t       *testing.T
-	row     pkgtest.TableRow
-	factory pkgtest.Factory
+	T       *testing.T
+	Row     pkgtest.TableRow
+	Factory pkgtest.Factory
 }
 
 func (rt *ReconcilerTest) theFollowingObjectFiles(y *messages.PickleStepArgument_PickleTable) error {
@@ -231,20 +242,20 @@ func (rt *ReconcilerTest) theFollowingObjects(y *messages.PickleStepArgument_Pic
 }
 
 func (rt *ReconcilerTest) addObjects(objs []unstructured.Unstructured) {
-	if rt.row.Objects == nil {
-		rt.row.Objects = make([]runtime.Object, 0, len(objs))
+	if rt.Row.Objects == nil {
+		rt.Row.Objects = make([]runtime.Object, 0, len(objs))
 	}
 
 	for _, obj := range objs {
-		rt.row.Objects = append(rt.row.Objects, obj.DeepCopyObject())
+		rt.Row.Objects = append(rt.Row.Objects, obj.DeepCopyObject())
 	}
 
-	rt.row.Objects = ToKnownObjects(rt.row.Objects)
+	rt.Row.Objects = ToKnownObjects(rt.Row.Objects)
 }
 
 func (rt *ReconcilerTest) reconcilingKey(key string) error {
 	// Set the reconciler key
-	rt.row.Key = key
+	rt.Row.Key = key
 
 	return nil
 }
@@ -320,8 +331,8 @@ func (rt *ReconcilerTest) expectStatusUpdateFiles(y *messages.PickleStepArgument
 }
 
 func (rt *ReconcilerTest) addWantStatusUpdates(objs []unstructured.Unstructured) {
-	if rt.row.WantStatusUpdates == nil {
-		rt.row.WantStatusUpdates = make([]clientgotesting.UpdateActionImpl, 0)
+	if rt.Row.WantStatusUpdates == nil {
+		rt.Row.WantStatusUpdates = make([]clientgotesting.UpdateActionImpl, 0)
 	}
 
 	updates := make([]runtime.Object, 0, len(objs))
@@ -333,13 +344,13 @@ func (rt *ReconcilerTest) addWantStatusUpdates(objs []unstructured.Unstructured)
 		updateAction := clientgotesting.UpdateActionImpl{
 			Object: u,
 		}
-		rt.row.WantStatusUpdates = append(rt.row.WantStatusUpdates, updateAction)
+		rt.Row.WantStatusUpdates = append(rt.Row.WantStatusUpdates, updateAction)
 	}
 }
 
 func (rt *ReconcilerTest) expectKubernetesEvents(attributes *messages.PickleStepArgument_PickleTable) error {
 
-	rt.row.WantEvents = make([]string, 0)
+	rt.Row.WantEvents = make([]string, 0)
 
 	for _, row := range attributes.Rows {
 		eventType := row.Cells[0].Value
@@ -351,7 +362,7 @@ func (rt *ReconcilerTest) expectKubernetesEvents(attributes *messages.PickleStep
 			continue
 		}
 
-		rt.row.WantEvents = append(rt.row.WantEvents, fmt.Sprintf(eventType+" "+reason+" "+message))
+		rt.Row.WantEvents = append(rt.Row.WantEvents, fmt.Sprintf(eventType+" "+reason+" "+message))
 	}
 	return nil
 }
