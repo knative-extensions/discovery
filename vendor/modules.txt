@@ -71,6 +71,23 @@ github.com/census-instrumentation/opencensus-proto/gen-go/agent/trace/v1
 github.com/census-instrumentation/opencensus-proto/gen-go/metrics/v1
 github.com/census-instrumentation/opencensus-proto/gen-go/resource/v1
 github.com/census-instrumentation/opencensus-proto/gen-go/trace/v1
+# github.com/cloudevents/sdk-go/v2 v2.2.0
+github.com/cloudevents/sdk-go/v2
+github.com/cloudevents/sdk-go/v2/binding
+github.com/cloudevents/sdk-go/v2/binding/format
+github.com/cloudevents/sdk-go/v2/binding/spec
+github.com/cloudevents/sdk-go/v2/client
+github.com/cloudevents/sdk-go/v2/context
+github.com/cloudevents/sdk-go/v2/event
+github.com/cloudevents/sdk-go/v2/event/datacodec
+github.com/cloudevents/sdk-go/v2/event/datacodec/json
+github.com/cloudevents/sdk-go/v2/event/datacodec/text
+github.com/cloudevents/sdk-go/v2/event/datacodec/xml
+github.com/cloudevents/sdk-go/v2/extensions
+github.com/cloudevents/sdk-go/v2/observability
+github.com/cloudevents/sdk-go/v2/protocol
+github.com/cloudevents/sdk-go/v2/protocol/http
+github.com/cloudevents/sdk-go/v2/types
 # github.com/cucumber/gherkin-go/v11 v11.0.0
 github.com/cucumber/gherkin-go/v11
 # github.com/cucumber/godog v0.10.0
@@ -164,6 +181,9 @@ github.com/json-iterator/go
 github.com/kelseyhightower/envconfig
 # github.com/konsorten/go-windows-terminal-sequences v1.0.3
 github.com/konsorten/go-windows-terminal-sequences
+# github.com/lightstep/tracecontext.go v0.0.0-20181129014701-1757c391b1ac
+github.com/lightstep/tracecontext.go/traceparent
+github.com/lightstep/tracecontext.go/tracestate
 # github.com/mailru/easyjson v0.7.1-0.20191009090205-6c0755d89d1e
 github.com/mailru/easyjson/buffer
 github.com/mailru/easyjson/jlexer
@@ -839,7 +859,7 @@ k8s.io/utils/trace
 # knative.dev/hack v0.0.0-20210305150220-f99a25560134
 ## explicit
 knative.dev/hack
-# knative.dev/pkg v0.0.0-20210308052421-737401c38b22
+# knative.dev/pkg v0.0.0-20210309024624-0f8d8de5949d
 ## explicit
 knative.dev/pkg/apis
 knative.dev/pkg/apis/duck
@@ -909,13 +929,14 @@ knative.dev/pkg/webhook/configmaps
 knative.dev/pkg/webhook/resourcesemantics
 knative.dev/pkg/webhook/resourcesemantics/defaulting
 knative.dev/pkg/webhook/resourcesemantics/validation
-# knative.dev/reconciler-test v0.0.0-20210305172520-cdad89dfbd9d
+# knative.dev/reconciler-test v0.0.0-20210309062625-034045ba1288
 ## explicit
 knative.dev/reconciler-test/pkg/environment
 knative.dev/reconciler-test/pkg/feature
 knative.dev/reconciler-test/pkg/images
 knative.dev/reconciler-test/pkg/k8s
 knative.dev/reconciler-test/pkg/manifest
+knative.dev/reconciler-test/pkg/milestone
 knative.dev/reconciler-test/pkg/state
 # sigs.k8s.io/structured-merge-diff/v4 v4.0.1
 sigs.k8s.io/structured-merge-diff/v4/value
