@@ -1,4 +1,4 @@
-# Copyright 2020 The Knative Authors
+# Copyright 2020 The Knative Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -127,7 +127,7 @@ jobs:
         if: steps.golangci_configuration.outputs.files_exists == 'true'
         uses: golangci/golangci-lint-action@v2
         with:
-          version: v1.35
+          version: v1.38
 
       - name: misspell
         shell: bash
