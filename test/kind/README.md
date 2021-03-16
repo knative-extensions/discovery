@@ -3,6 +3,8 @@
 The following is what is needed to use KinD to run the e2e tests. Base path is
 assumed to be the top level project.
 
+See .github/workflows/kind-e2e.yaml for minimum kind version
+
 Startup a cluster:
 
 ```shell
