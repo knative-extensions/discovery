@@ -248,7 +248,6 @@ func generateSliceSchema(t reflect.Type, history ...reflect.Type) JSONSchemaProp
 	s := JSONSchemaProps{
 		Type: "array",
 	}
-
 	// Special case bad actors.
 	switch t.Elem().Name() {
 	case "JSONSchemaProps":
@@ -263,7 +262,6 @@ func generateSliceSchema(t reflect.Type, history ...reflect.Type) JSONSchemaProp
 			Schema: &is,
 		}
 	}
-
 	return s
 }
 
