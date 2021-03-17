@@ -83,11 +83,32 @@ spec:
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
                 conditions:
-                  description: Conditions the latest available observations of a resource's
-                    current state.
+                  description: Conditions the latest available observations of a resource's current state.
                   type: array
                   items:
                     type: object
+                    required:
+                      - type
+                      - status
+                    properties:
+                      lastTransitionTime:
+                        description: 'LastTransitionTime is the last time the condition transitioned from one status to another. We use VolatileTime in place of metav1.Time to exclude this from creating equality.Semantic differences (all other things held constant).'
+                        type: string
+                      message:
+                        description: 'A human readable message indicating details about the transition.'
+                        type: string
+                      reason:
+                        description: 'The reason for the condition''s last transition.'
+                        type: string
+                      severity:
+                        description: 'Severity with which to treat failures of this type of condition. When this is not specified, it defaults to Error.'
+                        type: string
+                      status:
+                        description: 'Status of the condition, one of True, False, Unknown.'
+                        type: string
+                      type:
+                        description: 'Type of condition.'
+                        type: string
                 duckCount:
                   description: DuckCount is the count of unique duck types found post-hunt.
                   type: integer
