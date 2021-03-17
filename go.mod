@@ -11,16 +11,17 @@ require (
 	github.com/sergi/go-diff v1.1.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.16.0
-	gopkg.in/yaml.v2 v2.3.0
+	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/api v0.19.7
 	k8s.io/apiextensions-apiserver v0.19.7
 	k8s.io/apimachinery v0.19.7
 	k8s.io/client-go v0.19.7
 	k8s.io/code-generator v0.19.7
 	k8s.io/kube-openapi v0.0.0-20200805222855-6aeccd4b50c6
-	knative.dev/hack v0.0.0-20210309141825-9b73a256fd9a
+	knative.dev/hack v0.0.0-20210317214554-58edbdc42966
+	knative.dev/hack/schema v0.0.0-20210317214554-58edbdc42966
 	knative.dev/pkg v0.0.0-20210315160101-6a33a1ab29ac
-	knative.dev/reconciler-test v0.0.0-20210316160942-5c85ca2ae364
+	knative.dev/reconciler-test v0.0.0-20210317002242-cfb4db568965
 )
 
 replace github.com/prometheus/client_golang => github.com/prometheus/client_golang v0.9.2

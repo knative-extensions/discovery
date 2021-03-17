@@ -56,6 +56,7 @@ var (
 )
 
 // ClusterDuckTypeSpec holds the desired state of the ClusterDuckType (from the client).
+// +k8s:openapi-gen=true
 type ClusterDuckTypeSpec struct {
 	// Group is the API group of the defined duck type.
 	// Must match the name of the ClusterDuckType (in the form `<names.plural>.<group>`).
@@ -65,7 +66,7 @@ type ClusterDuckTypeSpec struct {
 	Names DuckTypeNames `json:"names"`
 
 	// Versions holds the schema and printer column mappings for specific
-	// versions fo duck types.
+	// versions for duck types.
 	Versions []DuckVersion `json:"versions" patchStrategy:"merge" patchMergeKey:"name"`
 
 	// Selectors is a list of selectors for CustomResourceDefinitions to identify a duck type.
