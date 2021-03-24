@@ -29,7 +29,6 @@ set -o errexit
 cluster_name=knik
 reg_name='kind-registry'
 reg_port='5000'
-node_image='kindest/node:v1.16.9@sha256:7175872357bc85847ec4b1aba46ed1d12fa054c83ac7a8a11f5c268957fd5765'
 
 # Parse flags to determine any we should pass to dep.
 check=0
@@ -101,9 +100,7 @@ kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
 - role: control-plane
-  image: ${node_image}
 - role: worker
-  image: ${node_image}
 containerdConfigPatches:
 - |-
   [plugins."io.containerd.grpc.v1.cri".registry.mirrors."localhost:${reg_port}"]
