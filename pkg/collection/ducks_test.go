@@ -21,10 +21,10 @@ import (
 	"sort"
 	"testing"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
+	rbacv1 "k8s.io/api/rbac/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"knative.dev/discovery/pkg/apis/discovery/v1alpha1"
 )
@@ -78,9 +78,10 @@ func TestNewDuckHunter(t *testing.T) {
 	}{
 		"no defaultVersions": {
 			want: &duckHunter{
-				mapper:          NewResourceMapper(nil),
-				defaultVersions: []string{},
-				ducks:           map[string][]v1alpha1.ResourceMeta{},
+				mapper:                  NewResourceMapper(nil),
+				defaultVersions:         []string{},
+				ducks:                   map[string][]v1alpha1.ResourceMeta{},
+				accesbileGroupresources: map[string]bool{},
 			},
 		},
 		"one defaultVersions": {
@@ -93,6 +94,7 @@ func TestNewDuckHunter(t *testing.T) {
 				ducks: map[string][]v1alpha1.ResourceMeta{
 					"v1": {},
 				},
+				accesbileGroupresources: map[string]bool{},
 			},
 		},
 		"non nil mapper": {
@@ -120,6 +122,7 @@ func TestNewDuckHunter(t *testing.T) {
 				ducks: map[string][]v1alpha1.ResourceMeta{
 					"v1": {},
 				},
+				accesbileGroupresources: map[string]bool{},
 			},
 		},
 		"three defaultVersions": {
@@ -132,6 +135,7 @@ func TestNewDuckHunter(t *testing.T) {
 					"v2": {},
 					"v3": {},
 				},
+				accesbileGroupresources: map[string]bool{},
 			},
 		},
 		"overlapping defaultVersions": {
@@ -145,11 +149,12 @@ func TestNewDuckHunter(t *testing.T) {
 					"v1": {},
 					"v2": {},
 				},
+				accesbileGroupresources: map[string]bool{},
 			},
 		}}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			if got := NewDuckHunter(tc.mapper, tc.versions, nil); !reflect.DeepEqual(got, tc.want) {
+			if got := NewDuckHunter(tc.mapper, tc.versions, nil, nil); !reflect.DeepEqual(got, tc.want) {
 				t.Errorf("NewDuckHunter() = %v, want %v", got, tc.want)
 			}
 		})
@@ -163,7 +168,7 @@ func Test_DuckHunter_AddCRD(t *testing.T) {
 		want map[string][]v1alpha1.ResourceMeta
 	}{
 		"one duck version, one crd version": {
-			dh:  NewDuckHunter(nil, []v1alpha1.DuckVersion{{Name: "v1"}}, nil),
+			dh:  NewDuckHunter(nil, []v1alpha1.DuckVersion{{Name: "v1"}}, nil, nil),
 			crd: makeCRD("teach.me.how", "Ducky", map[string]bool{"v2": true}),
 			want: map[string][]v1alpha1.ResourceMeta{
 				"v1": {{
@@ -173,8 +178,98 @@ func Test_DuckHunter_AddCRD(t *testing.T) {
 				}},
 			},
 		},
+		"clusterrole that can access duck": {
+			dh: NewDuckHunter(nil, []v1alpha1.DuckVersion{{Name: "v1"}}, nil, &rbacv1.ClusterRole{
+				Rules: []rbacv1.PolicyRule{{
+					Verbs:     []string{rbacv1.VerbAll},
+					APIGroups: []string{"teach.me.how"},
+					Resources: []string{"Duckys"},
+				}},
+			}),
+			crd: makeCRD("teach.me.how", "Ducky", map[string]bool{"v2": true}),
+			want: map[string][]v1alpha1.ResourceMeta{
+				"v1": {{
+					APIVersion:               "teach.me.how/v2",
+					Kind:                     "Ducky",
+					Scope:                    "Namespaced",
+					AccessibleViaClusterRole: true,
+				}},
+			},
+		},
+		"clusterrole with wildcard Resource can access duck": {
+			dh: NewDuckHunter(nil, []v1alpha1.DuckVersion{{Name: "v1"}}, nil, &rbacv1.ClusterRole{
+				Rules: []rbacv1.PolicyRule{{
+					Verbs:     []string{rbacv1.VerbAll},
+					APIGroups: []string{"teach.me.how"},
+					Resources: []string{"*"},
+				}},
+			}),
+			crd: makeCRD("teach.me.how", "Ducky", map[string]bool{"v2": true}),
+			want: map[string][]v1alpha1.ResourceMeta{
+				"v1": {{
+					APIVersion:               "teach.me.how/v2",
+					Kind:                     "Ducky",
+					Scope:                    "Namespaced",
+					AccessibleViaClusterRole: true,
+				}},
+			},
+		},
+		"clusterrole with wildcard APIGroups can access duck": {
+			dh: NewDuckHunter(nil, []v1alpha1.DuckVersion{{Name: "v1"}}, nil, &rbacv1.ClusterRole{
+				Rules: []rbacv1.PolicyRule{{
+					Verbs:     []string{rbacv1.VerbAll},
+					APIGroups: []string{"*"},
+					Resources: []string{"Duckys"},
+				}},
+			}),
+			crd: makeCRD("teach.me.how", "Ducky", map[string]bool{"v2": true}),
+			want: map[string][]v1alpha1.ResourceMeta{
+				"v1": {{
+					APIVersion:               "teach.me.how/v2",
+					Kind:                     "Ducky",
+					Scope:                    "Namespaced",
+					AccessibleViaClusterRole: true,
+				}},
+			},
+		},
+		"clusterrole with wildcard Resources and APIGroups can access duck": {
+			dh: NewDuckHunter(nil, []v1alpha1.DuckVersion{{Name: "v1"}}, nil, &rbacv1.ClusterRole{
+				Rules: []rbacv1.PolicyRule{{
+					Verbs:     []string{rbacv1.VerbAll},
+					APIGroups: []string{"*"},
+					Resources: []string{"*"},
+				}},
+			}),
+			crd: makeCRD("teach.me.how", "Ducky", map[string]bool{"v2": true}),
+			want: map[string][]v1alpha1.ResourceMeta{
+				"v1": {{
+					APIVersion:               "teach.me.how/v2",
+					Kind:                     "Ducky",
+					Scope:                    "Namespaced",
+					AccessibleViaClusterRole: true,
+				}},
+			},
+		},
+		"clusterrole that CANNOT access duck": {
+			dh: NewDuckHunter(nil, []v1alpha1.DuckVersion{{Name: "v1"}}, nil, &rbacv1.ClusterRole{
+				Rules: []rbacv1.PolicyRule{{
+					Verbs:     []string{"get"},
+					APIGroups: []string{"teach.me.how"},
+					Resources: []string{"Duckys"},
+				}},
+			}),
+			crd: makeCRD("teach.me.how", "Ducky", map[string]bool{"v2": true}),
+			want: map[string][]v1alpha1.ResourceMeta{
+				"v1": {{
+					APIVersion:               "teach.me.how/v2",
+					Kind:                     "Ducky",
+					Scope:                    "Namespaced",
+					AccessibleViaClusterRole: false,
+				}},
+			},
+		},
 		"one duck version, two crd version": {
-			dh:  NewDuckHunter(nil, []v1alpha1.DuckVersion{{Name: "v1"}}, nil),
+			dh:  NewDuckHunter(nil, []v1alpha1.DuckVersion{{Name: "v1"}}, nil, nil),
 			crd: makeCRD("teach.me.how", "Ducky", map[string]bool{"v2": true, "v3": true}),
 			want: map[string][]v1alpha1.ResourceMeta{
 				"v1": {{
@@ -189,7 +284,7 @@ func Test_DuckHunter_AddCRD(t *testing.T) {
 			},
 		},
 		"three duck defaultVersions, one crd version": {
-			dh:  NewDuckHunter(nil, []v1alpha1.DuckVersion{{Name: "v1"}, {Name: "v2"}, {Name: "v3"}}, nil),
+			dh:  NewDuckHunter(nil, []v1alpha1.DuckVersion{{Name: "v1"}, {Name: "v2"}, {Name: "v3"}}, nil, nil),
 			crd: makeCRD("teach.me.how", "Ducky", map[string]bool{"v2": true}),
 			want: map[string][]v1alpha1.ResourceMeta{
 				"v1": {{
@@ -230,7 +325,7 @@ func Test_DuckHunter_AddCRD_filtered(t *testing.T) {
 			dh: NewDuckHunter(nil, nil, &DuckFilters{
 				DuckLabel:         "teach.me.how/ducky",
 				DuckVersionPrefix: "duckies.teach.me.how",
-			}),
+			}, nil),
 			crd: makeCRDAnnotated("teach.me.how", "Ducky", map[string]bool{"v2": true},
 				map[string]string{"teach.me.how/ducky": "true"}, map[string]string{"duckies.teach.me.how/v1": "v2"}),
 			want: map[string][]v1alpha1.ResourceMeta{
@@ -245,7 +340,7 @@ func Test_DuckHunter_AddCRD_filtered(t *testing.T) {
 			dh: NewDuckHunter(nil, []v1alpha1.DuckVersion{{Name: "v1"}, {Name: "v2"}}, &DuckFilters{
 				DuckLabel:         "teach.me.how/ducky",
 				DuckVersionPrefix: "duckies.teach.me.how",
-			}),
+			}, nil),
 			crd: makeCRDAnnotated("teach.me.how", "Ducky", map[string]bool{"red": true, "blue": true, "green": true},
 				map[string]string{"teach.me.how/ducky": "true"},
 				map[string]string{"duckies.teach.me.how/v1": "red,blue", "duckies.teach.me.how/v2": "green"}),
@@ -270,7 +365,7 @@ func Test_DuckHunter_AddCRD_filtered(t *testing.T) {
 			dh: NewDuckHunter(nil, nil, &DuckFilters{
 				DuckLabel:         "teach.me.how/ducky",
 				DuckVersionPrefix: "duckies.teach.me.how",
-			}),
+			}, nil),
 			crd: makeCRDAnnotated("teach.me.how", "Ducky", map[string]bool{"v2": true},
 				map[string]string{"you.know.how": "whatever", "teach.me.how/ducky": "true"}, map[string]string{"duckies.teach.me.how/v1": "v2"}),
 			want: map[string][]v1alpha1.ResourceMeta{
@@ -285,7 +380,7 @@ func Test_DuckHunter_AddCRD_filtered(t *testing.T) {
 			dh: NewDuckHunter(nil, nil, &DuckFilters{
 				DuckLabel:         "teach.me.how/ducky",
 				DuckVersionPrefix: "duckies.teach.me.how",
-			}),
+			}, nil),
 			crd: makeCRDAnnotated("teach.me.how", "Ducky", map[string]bool{"v2": true},
 				map[string]string{"teach.me.how/ducky": "false"}, map[string]string{"duckies.teach.me.how/v1": "v2"}),
 			want: nil,
@@ -293,7 +388,7 @@ func Test_DuckHunter_AddCRD_filtered(t *testing.T) {
 		"no duck label": {
 			dh: NewDuckHunter(nil, nil, &DuckFilters{
 				DuckVersionPrefix: "duckies.teach.me.how",
-			}),
+			}, nil),
 			crd: makeCRDAnnotated("teach.me.how", "Ducky", map[string]bool{"v2": true},
 				map[string]string{"totes": "unrelated"}, map[string]string{"duckies.teach.me.how/v1": "v2"}),
 			want: map[string][]v1alpha1.ResourceMeta{
@@ -307,7 +402,7 @@ func Test_DuckHunter_AddCRD_filtered(t *testing.T) {
 		"no labels": {
 			dh: NewDuckHunter(nil, nil, &DuckFilters{
 				DuckVersionPrefix: "duckies.teach.me.how",
-			}),
+			}, nil),
 			crd: makeCRDAnnotated("teach.me.how", "Ducky", map[string]bool{"v2": true},
 				nil, map[string]string{"duckies.teach.me.how/v1": "v2"}),
 			want: map[string][]v1alpha1.ResourceMeta{
@@ -322,7 +417,7 @@ func Test_DuckHunter_AddCRD_filtered(t *testing.T) {
 			dh: NewDuckHunter(nil, nil, &DuckFilters{
 				DuckLabel:         "teach.me.how/ducky",
 				DuckVersionPrefix: "duckies.teach.me.how",
-			}),
+			}, nil),
 			crd: makeCRDAnnotated("teach.me.how", "Ducky", map[string]bool{"v1": true, "v2": true},
 				map[string]string{"teach.me.how/ducky": "true"}, map[string]string{"duckies.teach.me.how/v1": "v2"}),
 			want: map[string][]v1alpha1.ResourceMeta{
@@ -337,7 +432,7 @@ func Test_DuckHunter_AddCRD_filtered(t *testing.T) {
 			dh: NewDuckHunter(nil, nil, &DuckFilters{
 				DuckLabel:         "teach.me.how/ducky",
 				DuckVersionPrefix: "duckies.teach.me.how",
-			}),
+			}, nil),
 			crd: makeCRDAnnotated("teach.me.how", "Ducky", map[string]bool{"v1": true, "v2": true},
 				map[string]string{"teach.me.how/ducky": "true"}, map[string]string{"duckies.teach.me.how/v1": "v2", "duckies.teach.me.how/v1swag": "v1"}),
 			want: map[string][]v1alpha1.ResourceMeta{
@@ -357,7 +452,7 @@ func Test_DuckHunter_AddCRD_filtered(t *testing.T) {
 			dh: NewDuckHunter(nil, nil, &DuckFilters{
 				DuckLabel:         "teach.me.how/ducky",
 				DuckVersionPrefix: "duckies.teach.me.how",
-			}),
+			}, nil),
 			crd: makeCRDAnnotated("teach.me.how", "Ducky", map[string]bool{"v1": true, "v2": true},
 				map[string]string{"teach.me.how/ducky": "true"}, map[string]string{"duckies.teach.me.how/v1": "v3"}),
 			want: nil,
@@ -392,7 +487,7 @@ func Test_DuckHunter_AddRef(t *testing.T) {
 		wantErr     bool
 	}{
 		"GVK, no default duck type version": {
-			dh:          NewDuckHunter(mapper, nil, nil),
+			dh:          NewDuckHunter(mapper, nil, nil, nil),
 			duckVersion: "v1",
 			ref: v1alpha1.ResourceRef{
 				Group:   "teach.me.how",
@@ -409,7 +504,54 @@ func Test_DuckHunter_AddRef(t *testing.T) {
 			},
 		},
 		"GVK, one duck type version": {
-			dh:          NewDuckHunter(mapper, []v1alpha1.DuckVersion{{Name: "v1"}}, nil),
+			dh:          NewDuckHunter(mapper, []v1alpha1.DuckVersion{{Name: "v1"}}, nil, nil),
+			duckVersion: "v1",
+			ref: v1alpha1.ResourceRef{
+				Group:   "teach.me.how",
+				Version: "v2",
+				Kind:    "Ducky",
+				Scope:   "Namespaced",
+			},
+			want: map[string][]v1alpha1.ResourceMeta{
+				"v1": {{
+					APIVersion: "teach.me.how/v2",
+					Kind:       "Ducky",
+					Scope:      "Namespaced",
+				}},
+			},
+		},
+		"ClusterRole that can access the duck": {
+			dh: NewDuckHunter(mapper, []v1alpha1.DuckVersion{{Name: "v1"}}, nil, &rbacv1.ClusterRole{
+				Rules: []rbacv1.PolicyRule{{
+					Verbs:     []string{rbacv1.VerbAll},
+					APIGroups: []string{"teach.me.how"},
+					Resources: []string{"Duckys"},
+				}},
+			}),
+			duckVersion: "v1",
+			ref: v1alpha1.ResourceRef{
+				Group:   "teach.me.how",
+				Version: "v2",
+				Kind:    "Ducky",
+				Scope:   "Namespaced",
+			},
+			want: map[string][]v1alpha1.ResourceMeta{
+				"v1": {{
+					APIVersion:               "teach.me.how/v2",
+					Kind:                     "Ducky",
+					Scope:                    "Namespaced",
+					AccessibleViaClusterRole: true,
+				}},
+			},
+		},
+		"ClusterRole that CANNOT access the duck": {
+			dh: NewDuckHunter(mapper, []v1alpha1.DuckVersion{{Name: "v1"}}, nil, &rbacv1.ClusterRole{
+				Rules: []rbacv1.PolicyRule{{
+					Verbs:     []string{"watch"},
+					APIGroups: []string{"teach.me.how"},
+					Resources: []string{"Duckys"},
+				}},
+			}),
 			duckVersion: "v1",
 			ref: v1alpha1.ResourceRef{
 				Group:   "teach.me.how",
@@ -426,7 +568,7 @@ func Test_DuckHunter_AddRef(t *testing.T) {
 			},
 		},
 		"GVR, one duck type version": {
-			dh:          NewDuckHunter(mapper, []v1alpha1.DuckVersion{{Name: "v1"}}, nil),
+			dh:          NewDuckHunter(mapper, []v1alpha1.DuckVersion{{Name: "v1"}}, nil, nil),
 			duckVersion: "v1",
 			ref: v1alpha1.ResourceRef{
 				Group:    "teach.me.how",
@@ -443,7 +585,7 @@ func Test_DuckHunter_AddRef(t *testing.T) {
 			},
 		},
 		"AK, one duck type version": {
-			dh:          NewDuckHunter(mapper, []v1alpha1.DuckVersion{{Name: "v1"}}, nil),
+			dh:          NewDuckHunter(mapper, []v1alpha1.DuckVersion{{Name: "v1"}}, nil, nil),
 			duckVersion: "v1",
 			ref: v1alpha1.ResourceRef{
 				APIVersion: "teach.me.how/v2",
@@ -459,7 +601,7 @@ func Test_DuckHunter_AddRef(t *testing.T) {
 			},
 		},
 		"AR, one duck type version": {
-			dh:          NewDuckHunter(mapper, []v1alpha1.DuckVersion{{Name: "v1"}}, nil),
+			dh:          NewDuckHunter(mapper, []v1alpha1.DuckVersion{{Name: "v1"}}, nil, nil),
 			duckVersion: "v1",
 			ref: v1alpha1.ResourceRef{
 				APIVersion: "teach.me.how/v2",
@@ -475,7 +617,7 @@ func Test_DuckHunter_AddRef(t *testing.T) {
 			},
 		},
 		"GVK, unknown ref": {
-			dh:          NewDuckHunter(mapper, []v1alpha1.DuckVersion{{Name: "v1"}}, nil),
+			dh:          NewDuckHunter(mapper, []v1alpha1.DuckVersion{{Name: "v1"}}, nil, nil),
 			duckVersion: "v1",
 			ref: v1alpha1.ResourceRef{
 				Group:   "already.know.how",
@@ -486,7 +628,7 @@ func Test_DuckHunter_AddRef(t *testing.T) {
 			wantErr: true,
 		},
 		"GVR, known group, unknown resource": {
-			dh:          NewDuckHunter(mapper, []v1alpha1.DuckVersion{{Name: "v1"}}, nil),
+			dh:          NewDuckHunter(mapper, []v1alpha1.DuckVersion{{Name: "v1"}}, nil, nil),
 			duckVersion: "v1",
 			ref: v1alpha1.ResourceRef{
 				Group:    "teach.me.how",
@@ -554,6 +696,118 @@ func Test_crdToResourceMeta(t *testing.T) {
 
 			if !reflect.DeepEqual(got, tc.want) {
 				t.Errorf("Ducks() = %v, want %v", got, tc.want)
+			}
+		})
+	}
+}
+
+func Test_accessibleGroupResources(t *testing.T) {
+	tests := map[string]struct {
+		cr            *rbacv1.ClusterRole
+		expectedVerbs []string
+		want          map[string]bool
+	}{
+		"nil clusterrole": {
+			cr:   nil,
+			want: map[string]bool{},
+		},
+		"clusterrole with no rules": {
+			cr: &rbacv1.ClusterRole{
+				Rules: []rbacv1.PolicyRule{},
+			},
+			want: map[string]bool{},
+		},
+		"clusterrole with rule satisfying list of verbs": {
+			cr: &rbacv1.ClusterRole{
+				Rules: []rbacv1.PolicyRule{{
+					Verbs:     []string{"get", "list"},
+					APIGroups: []string{"animal"},
+					Resources: []string{"fox"},
+				}},
+			},
+			want: map[string]bool{
+				"animal:fox": true,
+			},
+			expectedVerbs: []string{"get", "list"},
+		},
+		"clusterrole with rule NOT satisfying list of verbs": {
+			cr: &rbacv1.ClusterRole{
+				Rules: []rbacv1.PolicyRule{{
+					Verbs:     []string{"list"},
+					APIGroups: []string{"animal"},
+					Resources: []string{"fox"},
+				}},
+			},
+			want:          map[string]bool{},
+			expectedVerbs: []string{"get", "list"},
+		},
+		"clusterrole with multiple rules satisfying list of verbs": {
+			cr: &rbacv1.ClusterRole{
+				Rules: []rbacv1.PolicyRule{
+					{
+						Verbs:     []string{"get", "list"},
+						APIGroups: []string{"animal"},
+						Resources: []string{"fox"},
+					},
+					{
+						Verbs:     []string{"get", "list"},
+						APIGroups: []string{"mammal"},
+						Resources: []string{"deer"},
+					},
+					{
+						Verbs:     []string{"get"},
+						APIGroups: []string{"animal"},
+						Resources: []string{"chicken"},
+					},
+					{
+						Verbs:     []string{"*"},
+						APIGroups: []string{"*"},
+						Resources: []string{"cell"},
+					},
+				},
+			},
+			want: map[string]bool{
+				"animal:fox":  true,
+				"mammal:deer": true,
+				"*:cell":      true,
+			},
+			expectedVerbs: []string{"get", "list"},
+		},
+		"clusterrole with rule with multiple apiGroups and resources": {
+			cr: &rbacv1.ClusterRole{
+				Rules: []rbacv1.PolicyRule{{
+					Verbs:     []string{"list", "get", "watch"},
+					APIGroups: []string{"animal", "mammal"},
+					Resources: []string{"fox", "deer"},
+				}},
+			},
+			want: map[string]bool{
+				"animal:fox":  true,
+				"animal:deer": true,
+				"mammal:fox":  true,
+				"mammal:deer": true,
+			},
+			expectedVerbs: []string{"get", "list"},
+		},
+		"clusterrole with rule with wildcard verbAll": {
+			cr: &rbacv1.ClusterRole{
+				Rules: []rbacv1.PolicyRule{{
+					Verbs:     []string{rbacv1.VerbAll},
+					APIGroups: []string{"animal"},
+					Resources: []string{"fox"},
+				}},
+			},
+			want: map[string]bool{
+				"animal:fox": true,
+			},
+			expectedVerbs: []string{"get", "list"},
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			got := accessibleGroupResources(tc.expectedVerbs, tc.cr)
+			if !reflect.DeepEqual(got, tc.want) {
+				t.Errorf("accessibleGroupResources() = %v, want %v", got, tc.want)
 			}
 		})
 	}

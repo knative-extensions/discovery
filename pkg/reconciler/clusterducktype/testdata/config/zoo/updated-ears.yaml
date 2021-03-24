@@ -17,6 +17,10 @@ spec:
   group: zoo.knative.dev
 
 status:
+  clusterRoleAggregationRule:
+    clusterRoleSelectors:
+    - matchLabels:
+        zoo.knative.dev/ears: "true"
   observedGeneration: 0
   conditions:
     - type: Ready
@@ -27,3 +31,4 @@ status:
       - apiVersion: central.america/v1alpha1
         kind: Monkey
         scope: Namespaced
+        accessibleByClusterRole: true

@@ -21,6 +21,7 @@ import (
 	"sort"
 	"strings"
 
+	rbacv1 "k8s.io/api/rbac/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"knative.dev/discovery/pkg/apis/discovery/v1alpha1"
 )
@@ -61,16 +62,19 @@ type DuckFilters struct {
 
 // NewDuckHunter
 // defaultVersions are used to default all the DuckType defaultVersions that apply to unfiltered CRDs.
-func NewDuckHunter(mapper ResourceMapper, defaultVersions []v1alpha1.DuckVersion, filters *DuckFilters) DuckHunter {
+func NewDuckHunter(mapper ResourceMapper, defaultVersions []v1alpha1.DuckVersion, filters *DuckFilters, clusterRole *rbacv1.ClusterRole) DuckHunter {
 	if mapper == nil {
 		mapper = NewResourceMapper(nil)
 	}
 
+	expectedVerbsForAccess := []string{"get", "watch", "list"}
+
 	dh := &duckHunter{
-		mapper:          mapper,
-		filters:         filters,
-		defaultVersions: make([]string, 0),
-		ducks:           make(map[string][]v1alpha1.ResourceMeta, len(defaultVersions)),
+		mapper:                  mapper,
+		filters:                 filters,
+		defaultVersions:         make([]string, 0),
+		ducks:                   make(map[string][]v1alpha1.ResourceMeta, len(defaultVersions)),
+		accesbileGroupresources: accessibleGroupResources(expectedVerbsForAccess, clusterRole),
 	}
 
 	for _, v := range defaultVersions {
@@ -91,8 +95,9 @@ type duckHunter struct {
 
 	filters *DuckFilters
 	// defaultVersions are the defaultVersions to use for unfiltered CRDs being added to the ducks map.
-	defaultVersions []string
-	ducks           map[string][]v1alpha1.ResourceMeta
+	defaultVersions         []string
+	ducks                   map[string][]v1alpha1.ResourceMeta
+	accesbileGroupresources map[string]bool
 }
 
 // AddCRDs implements DuckHunter.AddCRDs
@@ -237,12 +242,47 @@ func (dh *duckHunter) Ducks() map[string][]v1alpha1.ResourceMeta {
 			delete(ducks, k)
 		} else {
 			sort.Sort(ByResourceMeta(ducks[k]))
+			setAccessibleViaClusterRole(dh.accesbileGroupresources, ducks[k])
 		}
 	}
 	if len(ducks) == 0 {
 		return nil
 	}
 	return ducks
+}
+
+// setAccessibleViaClusterRole sets the AccessibleViaClusterRole flag on each duck if
+//   the ClusterRole can preform the expected verbs on the duck
+func setAccessibleViaClusterRole(accessibleGroupResources map[string]bool, metas []v1alpha1.ResourceMeta) {
+	for index, meta := range metas {
+		// TODO: it would be nice if ResourceMeta had a version-free unique hash to do this.
+		key := strings.ToLower(fmt.Sprintf("%s:%ss", group(meta), meta.Kind))
+		wildcardKey := "*:*"
+		wildcardAPIGroupKey := strings.ToLower(fmt.Sprintf("*:%ss", meta.Kind))
+		wildcardKindKey := strings.ToLower(fmt.Sprintf("%s:*", group(meta)))
+
+		if _, ok := accessibleGroupResources[key]; ok {
+			metas[index].AccessibleViaClusterRole = true
+		} else if _, ok := accessibleGroupResources[wildcardKey]; ok {
+			metas[index].AccessibleViaClusterRole = true
+		} else if _, ok := accessibleGroupResources[wildcardAPIGroupKey]; ok {
+			metas[index].AccessibleViaClusterRole = true
+		} else if _, ok := accessibleGroupResources[wildcardKindKey]; ok {
+			metas[index].AccessibleViaClusterRole = true
+		}
+
+	}
+}
+
+// group returns the correct group for a ResourceMeta.
+// TODO: it might be better to have meta be a GVK, and display the APIVersion.
+func group(meta v1alpha1.ResourceMeta) string {
+	if strings.Contains(meta.APIVersion, "/") {
+		sp := strings.Split(meta.APIVersion, "/")
+		group := strings.TrimSuffix(meta.APIVersion, "/"+sp[len(sp)-1])
+		return group
+	}
+	return ""
 }
 
 // crdToResourceMeta takes in a CRD and converts it to a set of ResourceMeta.
@@ -281,4 +321,46 @@ func version(meta v1alpha1.ResourceMeta) string {
 		return sp[len(sp)-1]
 	}
 	return meta.APIVersion
+}
+
+// accessibleGroupResources finds the rules in the ClusterRole that satisfy the expectedVerbs
+// and returns a map of
+//   key: apiGroup + ":" + resource
+//   value: true if Rule satisfies the expectedVerbs, false otherwise
+func accessibleGroupResources(expectedVerbs []string, clusterRole *rbacv1.ClusterRole) map[string]bool {
+	groupResources := map[string]bool{}
+	if clusterRole == nil {
+		return groupResources
+	}
+	for _, rule := range clusterRole.Rules {
+		if isSubset(expectedVerbs, rule.Verbs) {
+			for _, apiGroup := range rule.APIGroups {
+				for _, resource := range rule.Resources {
+					key := strings.ToLower(fmt.Sprintf("%s:%s", apiGroup, resource))
+					groupResources[key] = true
+				}
+			}
+		}
+	}
+	return groupResources
+}
+
+// Returns true if first is a fully contained subset of second
+//   returns false otherwise
+//   supports "*" as a wildcard
+func isSubset(first, second []string) bool {
+	set := map[string]bool{}
+	for _, value := range second {
+		// Support "*" verbAll wildcard
+		if value == "*" {
+			return true
+		}
+		set[value] = true
+	}
+	for _, value := range first {
+		if !set[value] {
+			return false
+		}
+	}
+	return true
 }

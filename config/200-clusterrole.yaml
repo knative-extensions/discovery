@@ -36,3 +36,6 @@ rules:
   - apiGroups: ["discovery.knative.dev"]
     resources: ["*"]
     verbs: ["get", "list", "create", "update", "delete", "deletecollection", "patch", "watch"]
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["clusterroles"]
+    verbs: ["get", "list", "watch"]

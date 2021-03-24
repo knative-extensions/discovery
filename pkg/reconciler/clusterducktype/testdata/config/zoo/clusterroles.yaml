@@ -1,0 +1,17 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ears-resolver
+aggregationRule:
+  clusterRoleSelectors:
+  - matchLabels:
+      zoo.knative.dev/ears: "true"
+rules:
+- apiGroups:
+  - central.america
+  resources:
+  - monkeys
+  verbs:
+  - get
+  - list
+  - watch

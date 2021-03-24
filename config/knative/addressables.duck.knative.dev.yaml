@@ -21,7 +21,11 @@ metadata:
 spec:
   selectors:
     - labelSelector: "duck.knative.dev/addressable=true"
-
+  role:
+    roleRef:
+      kind: ClusterRole
+      name: addressable-resolver
+      apiGroup: rbac.authorization.k8s.io
   names:
     name: "Addressable"
     plural: "addressables"

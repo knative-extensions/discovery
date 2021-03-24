@@ -6,6 +6,7 @@ Feature: Reconcile ClusterDuckType in a Zoo
             | file                     |
             | config/zoo/animals.yaml  |
             | config/zoo/initial.yaml  |
+            | config/zoo/clusterroles.yaml  |
 
         And a ClusterDuckType reconciler
 

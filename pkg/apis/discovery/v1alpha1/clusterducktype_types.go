@@ -19,6 +19,7 @@ package v1alpha1
 import (
 	"strings"
 
+	rbacv1 "k8s.io/api/rbac/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"knative.dev/pkg/apis"
@@ -72,6 +73,17 @@ type ClusterDuckTypeSpec struct {
 	// Selectors is a list of selectors for CustomResourceDefinitions to identify a duck type.
 	// +optional
 	Selectors []CustomResourceDefinitionSelector `json:"selectors,omitempty"`
+
+	//Role holds an Aggregating Role used by the duck type to manage the ducks.
+	//  If not specified, the Selectors are used to find a Role with an aggregation rule that matches a selector
+	// +optional
+	Role *Role `json:"role,omitempty"`
+}
+
+// Role provides a way of specifying which Aggregating Role is used by the duck type to manage the ducks
+type Role struct {
+	// RoleRef is a reference to the Aggregating Role
+	RoleRef *rbacv1.RoleRef `json:"roleRef,omitempty"`
 }
 
 // DuckTypeNames provides the naming rules for this duck type.
@@ -190,6 +202,9 @@ type ResourceMeta struct {
 	// Scope indicates whether the resource is cluster- or namespace-scoped.
 	// Allowed values are `Cluster` and `Namespaced`.
 	Scope ResourceScope `json:"scope"`
+
+	// AccessibleViaClusterRole indicates whether the provided ClusterDuckType Role can perform get, list & watch on the resource
+	AccessibleViaClusterRole bool `json:"accessibleByClusterRole"`
 }
 
 // Version inspects a ResourceMeta object and returns the correct version
@@ -227,6 +242,9 @@ type ClusterDuckTypeStatus struct {
 
 	// DuckCount is the count of unique duck types found post-hunt.
 	DuckCount int `json:"duckCount"`
+
+	//ClusterRole Aggregation Rule
+	ClusterRoleAggregationRule rbacv1.AggregationRule `json:"clusterRoleAggregationRule,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
