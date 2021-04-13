@@ -55,8 +55,6 @@ spec:
                 role:
                   description: Role holds an Aggregating Role used by the duck type to manage the ducks. If not specified, the Selectors are used to find a Role with an aggregation rule that matches a selector
                   type: object
-                  required:
-                    - roleRef
                   properties:
                     roleRef:
                       description: RoleRef is a reference to the Aggregating Role

@@ -83,6 +83,7 @@ type ClusterDuckTypeSpec struct {
 // Role provides a way of specifying which Aggregating Role is used by the duck type to manage the ducks
 type Role struct {
 	// RoleRef is a reference to the Aggregating Role
+	// +optional
 	RoleRef *rbacv1.RoleRef `json:"roleRef,omitempty"`
 }
 
