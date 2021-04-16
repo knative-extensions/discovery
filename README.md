@@ -22,6 +22,8 @@ Install,
 ko apply -f ./config
 ```
 
+If you modify the ClusterDuckType definition, you may have to update the ClusterDuckType's OpenAPI Schema. Refer to [hack/schema](https://github.com/knative/hack/tree/main/schema) to help generate the schema definition.
+
 ## ClusterDuckType:discovery.knative.dev/v1alpha1
 
 The goal is to have a custom type that is user installable to help a developer,
