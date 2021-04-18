@@ -29,7 +29,11 @@ metadata:
 spec:
   selectors:
     - labelSelector: "zoo.knative.dev/furry=true"
-
+  role:
+    roleRef:
+      kind: ClusterRole
+      name: furries-resolver
+      apiGroup: rbac.authorization.k8s.io
   names:
     name: "Furry"
     plural: "furries"

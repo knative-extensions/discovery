@@ -6,12 +6,15 @@ metadata:
 spec:
   selectors:
     - labelSelector: "zoo.knative.dev/furry=true"
-
   names:
     name: "Furry"
     plural: "furries"
     singular: "furry"
-
+  role:
+    roleRef:
+      kind: ClusterRole
+      name: furries-resolver
+      apiGroup: rbac.authorization.k8s.io
   versions:
     - name: "v1alpha1"
     - name: "v1beta1"
@@ -19,6 +22,10 @@ spec:
 
 status:
   observedGeneration: 0
+  clusterRoleAggregationRule:
+    clusterRoleSelectors:
+    - matchLabels:
+        zoo.knative.dev/furries: "true"
   conditions:
     - type: Ready
       status: "True"
@@ -28,16 +35,21 @@ status:
       - apiVersion: australia/v1alpha2
         kind: Platypus
         scope: Namespaced
+        accessibleByClusterRole: true
       - apiVersion: australia/v1beta1
         kind: Platypus
         scope: Namespaced
+        accessibleByClusterRole: true
       - apiVersion: central.america/v1alpha1
         kind: Monkey
         scope: Namespaced
+        accessibleByClusterRole: false
     v1beta1:
       - apiVersion: australia/v1
         kind: Platypus
         scope: Namespaced
+        accessibleByClusterRole: true
       - apiVersion: central.america/v1alpha1
         kind: Monkey
         scope: Namespaced
+        accessibleByClusterRole: false

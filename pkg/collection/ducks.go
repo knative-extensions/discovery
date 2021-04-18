@@ -75,6 +75,7 @@ func NewDuckHunter(mapper ResourceMapper, defaultVersions []v1alpha1.DuckVersion
 		defaultVersions:         make([]string, 0),
 		ducks:                   make(map[string][]v1alpha1.ResourceMeta, len(defaultVersions)),
 		accesbileGroupresources: accessibleGroupResources(expectedVerbsForAccess, clusterRole),
+		kindToResource:          make(map[string]string),
 	}
 
 	for _, v := range defaultVersions {
@@ -98,6 +99,7 @@ type duckHunter struct {
 	defaultVersions         []string
 	ducks                   map[string][]v1alpha1.ResourceMeta
 	accesbileGroupresources map[string]bool
+	kindToResource          map[string]string
 }
 
 // AddCRDs implements DuckHunter.AddCRDs
@@ -123,6 +125,7 @@ func (dh *duckHunter) AddCRD(crd *apiextensionsv1.CustomResourceDefinition) {
 				}
 			}
 		}
+		dh.kindToResource[crd.Spec.Names.Kind] = crd.Spec.Names.Plural
 	}
 }
 
@@ -207,6 +210,8 @@ func (dh *duckHunter) AddRef(duckVersion string, ref v1alpha1.ResourceRef) error
 		Scope:      ref.Scope,
 	}
 
+	dh.kindToResource[kind] = ref.Resource
+
 	// Validate that the resource exists in this cluster.
 	if !dh.mapper.KindExists(rm.APIVersion, rm.Kind) {
 		return fmt.Errorf("resource \"%s %s\" not known to the cluster", rm.Kind, rm.APIVersion)
@@ -242,7 +247,7 @@ func (dh *duckHunter) Ducks() map[string][]v1alpha1.ResourceMeta {
 			delete(ducks, k)
 		} else {
 			sort.Sort(ByResourceMeta(ducks[k]))
-			setAccessibleViaClusterRole(dh.accesbileGroupresources, ducks[k])
+			setAccessibleViaClusterRole(ducks[k], dh.accesbileGroupresources, dh.kindToResource)
 		}
 	}
 	if len(ducks) == 0 {
@@ -253,22 +258,25 @@ func (dh *duckHunter) Ducks() map[string][]v1alpha1.ResourceMeta {
 
 // setAccessibleViaClusterRole sets the AccessibleViaClusterRole flag on each duck if
 //   the ClusterRole can preform the expected verbs on the duck
-func setAccessibleViaClusterRole(accessibleGroupResources map[string]bool, metas []v1alpha1.ResourceMeta) {
+func setAccessibleViaClusterRole(metas []v1alpha1.ResourceMeta, accessibleGroupResources map[string]bool, kindToResource map[string]string) {
 	for index, meta := range metas {
 		// TODO: it would be nice if ResourceMeta had a version-free unique hash to do this.
-		key := strings.ToLower(fmt.Sprintf("%s:%ss", group(meta), meta.Kind))
-		wildcardKey := "*:*"
-		wildcardAPIGroupKey := strings.ToLower(fmt.Sprintf("*:%ss", meta.Kind))
-		wildcardKindKey := strings.ToLower(fmt.Sprintf("%s:*", group(meta)))
+		if resource, ok := kindToResource[meta.Kind]; ok {
+			key := strings.ToLower(fmt.Sprintf("%s:%s", group(meta), resource))
+			wildcardKey := "*:*"
+			wildcardAPIGroupKey := strings.ToLower(fmt.Sprintf("*:%s", resource))
+			wildcardKindKey := strings.ToLower(fmt.Sprintf("%s:*", group(meta)))
 
-		if _, ok := accessibleGroupResources[key]; ok {
-			metas[index].AccessibleViaClusterRole = true
-		} else if _, ok := accessibleGroupResources[wildcardKey]; ok {
-			metas[index].AccessibleViaClusterRole = true
-		} else if _, ok := accessibleGroupResources[wildcardAPIGroupKey]; ok {
-			metas[index].AccessibleViaClusterRole = true
-		} else if _, ok := accessibleGroupResources[wildcardKindKey]; ok {
-			metas[index].AccessibleViaClusterRole = true
+			if _, ok := accessibleGroupResources[key]; ok {
+				metas[index].AccessibleViaClusterRole = true
+			} else if _, ok := accessibleGroupResources[wildcardKey]; ok {
+				metas[index].AccessibleViaClusterRole = true
+			} else if _, ok := accessibleGroupResources[wildcardAPIGroupKey]; ok {
+				metas[index].AccessibleViaClusterRole = true
+			} else if _, ok := accessibleGroupResources[wildcardKindKey]; ok {
+				metas[index].AccessibleViaClusterRole = true
+			}
+
 		}
 
 	}
@@ -342,6 +350,7 @@ func accessibleGroupResources(expectedVerbs []string, clusterRole *rbacv1.Cluste
 			}
 		}
 	}
+
 	return groupResources
 }
 
