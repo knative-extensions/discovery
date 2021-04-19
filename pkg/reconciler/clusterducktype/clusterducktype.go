@@ -93,7 +93,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, dt *v1alpha1.ClusterDuck
 
 	ducks := hunter.Ducks()
 
-	if clusterRole != nil {
+	if clusterRole != nil && clusterRole.AggregationRule != nil {
 		dt.Status.ClusterRoleAggregationRule = *clusterRole.AggregationRule
 	}
 	dt.Status.Ducks = ducks
