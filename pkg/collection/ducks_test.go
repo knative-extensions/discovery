@@ -82,6 +82,7 @@ func TestNewDuckHunter(t *testing.T) {
 				defaultVersions:         []string{},
 				ducks:                   map[string][]v1alpha1.ResourceMeta{},
 				accesbileGroupresources: map[string]bool{},
+				kindToResource:          map[string]string{},
 			},
 		},
 		"one defaultVersions": {
@@ -95,6 +96,7 @@ func TestNewDuckHunter(t *testing.T) {
 					"v1": {},
 				},
 				accesbileGroupresources: map[string]bool{},
+				kindToResource:          map[string]string{},
 			},
 		},
 		"non nil mapper": {
@@ -123,6 +125,7 @@ func TestNewDuckHunter(t *testing.T) {
 					"v1": {},
 				},
 				accesbileGroupresources: map[string]bool{},
+				kindToResource:          map[string]string{},
 			},
 		},
 		"three defaultVersions": {
@@ -136,6 +139,7 @@ func TestNewDuckHunter(t *testing.T) {
 					"v3": {},
 				},
 				accesbileGroupresources: map[string]bool{},
+				kindToResource:          map[string]string{},
 			},
 		},
 		"overlapping defaultVersions": {
@@ -150,6 +154,7 @@ func TestNewDuckHunter(t *testing.T) {
 					"v2": {},
 				},
 				accesbileGroupresources: map[string]bool{},
+				kindToResource:          map[string]string{},
 			},
 		}}
 	for name, tc := range tests {
@@ -183,7 +188,7 @@ func Test_DuckHunter_AddCRD(t *testing.T) {
 				Rules: []rbacv1.PolicyRule{{
 					Verbs:     []string{rbacv1.VerbAll},
 					APIGroups: []string{"teach.me.how"},
-					Resources: []string{"Duckys"},
+					Resources: []string{"duckies"},
 				}},
 			}),
 			crd: makeCRD("teach.me.how", "Ducky", map[string]bool{"v2": true}),
@@ -219,7 +224,7 @@ func Test_DuckHunter_AddCRD(t *testing.T) {
 				Rules: []rbacv1.PolicyRule{{
 					Verbs:     []string{rbacv1.VerbAll},
 					APIGroups: []string{"*"},
-					Resources: []string{"Duckys"},
+					Resources: []string{"duckies"},
 				}},
 			}),
 			crd: makeCRD("teach.me.how", "Ducky", map[string]bool{"v2": true}),
@@ -255,7 +260,7 @@ func Test_DuckHunter_AddCRD(t *testing.T) {
 				Rules: []rbacv1.PolicyRule{{
 					Verbs:     []string{"get"},
 					APIGroups: []string{"teach.me.how"},
-					Resources: []string{"Duckys"},
+					Resources: []string{"duckies"},
 				}},
 			}),
 			crd: makeCRD("teach.me.how", "Ducky", map[string]bool{"v2": true}),
@@ -525,15 +530,16 @@ func Test_DuckHunter_AddRef(t *testing.T) {
 				Rules: []rbacv1.PolicyRule{{
 					Verbs:     []string{rbacv1.VerbAll},
 					APIGroups: []string{"teach.me.how"},
-					Resources: []string{"Duckys"},
+					Resources: []string{"duckies"},
 				}},
 			}),
 			duckVersion: "v1",
 			ref: v1alpha1.ResourceRef{
-				Group:   "teach.me.how",
-				Version: "v2",
-				Kind:    "Ducky",
-				Scope:   "Namespaced",
+				Group:    "teach.me.how",
+				Version:  "v2",
+				Kind:     "Ducky",
+				Scope:    "Namespaced",
+				Resource: "Duckies",
 			},
 			want: map[string][]v1alpha1.ResourceMeta{
 				"v1": {{
@@ -549,7 +555,7 @@ func Test_DuckHunter_AddRef(t *testing.T) {
 				Rules: []rbacv1.PolicyRule{{
 					Verbs:     []string{"watch"},
 					APIGroups: []string{"teach.me.how"},
-					Resources: []string{"Duckys"},
+					Resources: []string{"duckies"},
 				}},
 			}),
 			duckVersion: "v1",
