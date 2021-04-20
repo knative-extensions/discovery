@@ -20,8 +20,8 @@ require (
 	k8s.io/kube-openapi v0.0.0-20200805222855-6aeccd4b50c6
 	knative.dev/hack v0.0.0-20210325223819-b6ab329907d3
 	knative.dev/hack/schema v0.0.0-20210325223819-b6ab329907d3
-	knative.dev/pkg v0.0.0-20210412173742-b51994e3b312
-	knative.dev/reconciler-test v0.0.0-20210412220859-730c55592c9b
+	knative.dev/pkg v0.0.0-20210420053235-1afd04993622
+	knative.dev/reconciler-test v0.0.0-20210414181401-b0c3de288f3b
 )
 
 replace github.com/prometheus/client_golang => github.com/prometheus/client_golang v0.9.2
