@@ -53,3 +53,11 @@ func TestSmoke(t *testing.T) {
 	env.Test(ctx, t, ClusterDuckTypeSmoke())
 	env.Finish()
 }
+
+// TestClusterRole makes sure a ClusterRole with an AggregationRule can be specified on a ClusterDuckType
+func TestClusterRole(t *testing.T) {
+	t.Parallel()
+	ctx, env := global.Environment()
+	env.Test(ctx, t, ClusterRole())
+	env.Finish()
+}

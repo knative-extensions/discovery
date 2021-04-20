@@ -22,6 +22,8 @@ Install,
 ko apply -f ./config
 ```
 
+If you modify the ClusterDuckType definition, you may have to update the ClusterDuckType's OpenAPI Schema. Refer to [hack/schema](https://github.com/knative/hack/tree/main/schema) to help generate the schema definition.
+
 ## ClusterDuckType:discovery.knative.dev/v1alpha1
 
 The goal is to have a custom type that is user installable to help a developer,
@@ -82,6 +84,14 @@ spec:
                   properties:
                     demo:
                       type: string
+
+  # Role holds an Aggregating Role used by the duck type to manage the ducks.
+	# If not specified, the Selectors are used to find a Role with an aggregation rule that matches a selector
+  role:
+    roleRef:
+      kind: ClusterRole
+      name: view
+      apiGroup: rbac.authorization.k8s.io
   group: example.com
 ```
 
@@ -120,60 +130,70 @@ kubectl get clusterducktypes addressables.duck.knative.dev -oyaml
 apiVersion: discovery.knative.dev/v1alpha1
 kind: ClusterDuckType
 metadata:
-  generation: 2
+  generation: 1
   name: addressables.duck.knative.dev
 spec: ...
 status:
   conditions:
-    - lastTransitionTime: "2020-08-11T22:21:57Z"
+    - lastTransitionTime: "2021-04-06T01:19:42Z"
       status: "True"
       type: Ready
-  duckCount: 6
+  clusterRoleAggregationRule:
+    clusterRoleSelectors:
+      - matchLabels:
+          duck.knative.dev/addressable: "true"
+  duckCount: 7
   ducks:
     v1:
-      - apiVersion: eventing.knative.dev/v1
+      - accessibleByClusterRole: true
+        apiVersion: eventing.knative.dev/v1
         kind: Broker
         scope: Namespaced
-      - apiVersion: eventing.knative.dev/v1beta1
+      - accessibleByClusterRole: true
+        apiVersion: eventing.knative.dev/v1beta1
         kind: Broker
         scope: Namespaced
-      - apiVersion: flows.knative.dev/v1
+      - accessibleByClusterRole: true
+        apiVersion: flows.knative.dev/v1
         kind: Parallel
         scope: Namespaced
-      - apiVersion: flows.knative.dev/v1
+      - accessibleByClusterRole: true
+        apiVersion: flows.knative.dev/v1
         kind: Sequence
         scope: Namespaced
-      - apiVersion: flows.knative.dev/v1beta1
+      - accessibleByClusterRole: true
+        apiVersion: flows.knative.dev/v1beta1
         kind: Parallel
         scope: Namespaced
-      - apiVersion: flows.knative.dev/v1beta1
+      - accessibleByClusterRole: true
+        apiVersion: flows.knative.dev/v1beta1
         kind: Sequence
         scope: Namespaced
-      - apiVersion: messaging.knative.dev/v1
+      - accessibleByClusterRole: true
+        apiVersion: messaging.knative.dev/v1
         kind: Channel
         scope: Namespaced
-      - apiVersion: messaging.knative.dev/v1beta1
+      - accessibleByClusterRole: true
+        apiVersion: messaging.knative.dev/v1
+        kind: InMemoryChannel
+        scope: Namespaced
+      - accessibleByClusterRole: true
+        apiVersion: messaging.knative.dev/v1beta1
         kind: Channel
         scope: Namespaced
-      - apiVersion: serving.knative.dev/v1
+      - accessibleByClusterRole: true
+        apiVersion: messaging.knative.dev/v1beta1
+        kind: InMemoryChannel
+        scope: Namespaced
+      - accessibleByClusterRole: true
+        apiVersion: serving.knative.dev/v1
         kind: Route
         scope: Namespaced
-      - apiVersion: serving.knative.dev/v1
+      - accessibleByClusterRole: true
+        apiVersion: serving.knative.dev/v1
         kind: Service
         scope: Namespaced
-      - apiVersion: serving.knative.dev/v1alpha1
-        kind: Route
-        scope: Namespaced
-      - apiVersion: serving.knative.dev/v1alpha1
-        kind: Service
-        scope: Namespaced
-      - apiVersion: serving.knative.dev/v1beta1
-        kind: Route
-        scope: Namespaced
-      - apiVersion: serving.knative.dev/v1beta1
-        kind: Service
-        scope: Namespaced
-  observedGeneration: 2
+  observedGeneration: 1
 ```
 
 ## Knative Duck Types
