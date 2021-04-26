@@ -91,7 +91,7 @@ function install_knative_discovery() {
     mkdir -p ${TMP_CONFIG_DIR}
     cp -r ${knd_config}/* ${TMP_CONFIG_DIR}
     find ${TMP_CONFIG_DIR} -type f -name "*.yaml" -exec sed -i "s/namespace: ${KNATIVE_DEFAULT_NAMESPACE}/namespace: ${TEST_DISCOVERY_NAMESPACE}/g" {} +
-    ko apply --strict -f "${TMP_CONFIG_DIR}" || return $?
+    ko apply -f "${TMP_CONFIG_DIR}" || return $?
   else
     local DISCOVERY_RELEASE_YAML=${TMP_DIR}/"discovery-${LATEST_RELEASE_VERSION}.yaml"
     # Download the latest release of Knative Discovery.
@@ -136,12 +136,12 @@ function unleash_quacken() {
   echo "enable debug logging"
   cat test/config/config-logging.yaml | \
     sed "s/namespace: ${KNATIVE_DEFAULT_NAMESPACE}/namespace: ${TEST_DISCOVERY_NAMESPACE}/g" | \
-    ko apply --strict -f - || return $?
+    ko apply -f - || return $?
 
   echo "unleash the quacken"
   cat test/config/quacken.yaml | \
     sed "s/namespace: ${KNATIVE_DEFAULT_NAMESPACE}/namespace: ${TEST_DISCOVERY_NAMESPACE}/g" | \
-    ko apply --strict -f - || return $?
+    ko apply -f - || return $?
 }
 
 # Teardown the Knative environment after tests finish.
