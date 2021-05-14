@@ -22,7 +22,10 @@ Install,
 ko apply -f ./config
 ```
 
-If you modify the ClusterDuckType definition, you may have to update the ClusterDuckType's OpenAPI Schema. Refer to [hack/schema](https://github.com/knative/hack/tree/main/schema) to help generate the schema definition.
+If you modify the ClusterDuckType definition, you may have to update the
+ClusterDuckType's OpenAPI Schema. Refer to
+[hack/schema](https://github.com/knative/hack/tree/main/schema) to help generate
+the schema definition.
 
 ## ClusterDuckType:discovery.knative.dev/v1alpha1
 
@@ -86,7 +89,7 @@ spec:
                       type: string
 
   # Role holds an Aggregating Role used by the duck type to manage the ducks.
-	# If not specified, the Selectors are used to find a Role with an aggregation rule that matches a selector
+  # If not specified, the Selectors are used to find a Role with an aggregation rule that matches a selector
   role:
     roleRef:
       kind: ClusterRole
