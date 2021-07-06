@@ -39,7 +39,7 @@ jobs:
     - name: Install KinD
       working-directory: ./src/knative.dev/discovery
       env:
-        KIND_VERSION: v0.8.1
+        KIND_VERSION: v0.11.1
       run: |
         set -x
 
