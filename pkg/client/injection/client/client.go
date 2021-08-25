@@ -20,25 +20,44 @@ package client
 
 import (
 	context "context"
+	json "encoding/json"
+	errors "errors"
+	fmt "fmt"
 
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	runtime "k8s.io/apimachinery/pkg/runtime"
+	schema "k8s.io/apimachinery/pkg/runtime/schema"
+	types "k8s.io/apimachinery/pkg/types"
+	watch "k8s.io/apimachinery/pkg/watch"
+	discovery "k8s.io/client-go/discovery"
+	dynamic "k8s.io/client-go/dynamic"
 	rest "k8s.io/client-go/rest"
+	v1alpha1 "knative.dev/discovery/pkg/apis/discovery/v1alpha1"
 	versioned "knative.dev/discovery/pkg/client/clientset/versioned"
+	typeddiscoveryv1alpha1 "knative.dev/discovery/pkg/client/clientset/versioned/typed/discovery/v1alpha1"
 	injection "knative.dev/pkg/injection"
+	dynamicclient "knative.dev/pkg/injection/clients/dynamicclient"
 	logging "knative.dev/pkg/logging"
 )
 
 func init() {
-	injection.Default.RegisterClient(withClient)
+	injection.Default.RegisterClient(withClientFromConfig)
 	injection.Default.RegisterClientFetcher(func(ctx context.Context) interface{} {
 		return Get(ctx)
 	})
+	injection.Dynamic.RegisterDynamicClient(withClientFromDynamic)
 }
 
 // Key is used as the key for associating information with a context.Context.
 type Key struct{}
 
-func withClient(ctx context.Context, cfg *rest.Config) context.Context {
+func withClientFromConfig(ctx context.Context, cfg *rest.Config) context.Context {
 	return context.WithValue(ctx, Key{}, versioned.NewForConfigOrDie(cfg))
+}
+
+func withClientFromDynamic(ctx context.Context) context.Context {
+	return context.WithValue(ctx, Key{}, &wrapClient{dyn: dynamicclient.Get(ctx)})
 }
 
 // Get extracts the versioned.Interface client from the context.
@@ -54,4 +73,167 @@ func Get(ctx context.Context) versioned.Interface {
 		}
 	}
 	return untyped.(versioned.Interface)
+}
+
+type wrapClient struct {
+	dyn dynamic.Interface
+}
+
+var _ versioned.Interface = (*wrapClient)(nil)
+
+func (w *wrapClient) Discovery() discovery.DiscoveryInterface {
+	panic("Discovery called on dynamic client!")
+}
+
+func convert(from interface{}, to runtime.Object) error {
+	bs, err := json.Marshal(from)
+	if err != nil {
+		return fmt.Errorf("Marshal() = %w", err)
+	}
+	if err := json.Unmarshal(bs, to); err != nil {
+		return fmt.Errorf("Unmarshal() = %w", err)
+	}
+	return nil
+}
+
+// DiscoveryV1alpha1 retrieves the DiscoveryV1alpha1Client
+func (w *wrapClient) DiscoveryV1alpha1() typeddiscoveryv1alpha1.DiscoveryV1alpha1Interface {
+	return &wrapDiscoveryV1alpha1{
+		dyn: w.dyn,
+	}
+}
+
+type wrapDiscoveryV1alpha1 struct {
+	dyn dynamic.Interface
+}
+
+func (w *wrapDiscoveryV1alpha1) RESTClient() rest.Interface {
+	panic("RESTClient called on dynamic client!")
+}
+
+func (w *wrapDiscoveryV1alpha1) ClusterDuckTypes() typeddiscoveryv1alpha1.ClusterDuckTypeInterface {
+	return &wrapDiscoveryV1alpha1ClusterDuckTypeImpl{
+		dyn: w.dyn.Resource(schema.GroupVersionResource{
+			Group:    "discovery.knative.dev",
+			Version:  "v1alpha1",
+			Resource: "clusterducktypes",
+		}),
+	}
+}
+
+type wrapDiscoveryV1alpha1ClusterDuckTypeImpl struct {
+	dyn dynamic.NamespaceableResourceInterface
+}
+
+var _ typeddiscoveryv1alpha1.ClusterDuckTypeInterface = (*wrapDiscoveryV1alpha1ClusterDuckTypeImpl)(nil)
+
+func (w *wrapDiscoveryV1alpha1ClusterDuckTypeImpl) Create(ctx context.Context, in *v1alpha1.ClusterDuckType, opts v1.CreateOptions) (*v1alpha1.ClusterDuckType, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "discovery.knative.dev",
+		Version: "v1alpha1",
+		Kind:    "ClusterDuckType",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Create(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &v1alpha1.ClusterDuckType{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapDiscoveryV1alpha1ClusterDuckTypeImpl) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+	return w.dyn.Delete(ctx, name, opts)
+}
+
+func (w *wrapDiscoveryV1alpha1ClusterDuckTypeImpl) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+	return w.dyn.DeleteCollection(ctx, opts, listOpts)
+}
+
+func (w *wrapDiscoveryV1alpha1ClusterDuckTypeImpl) Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.ClusterDuckType, error) {
+	uo, err := w.dyn.Get(ctx, name, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &v1alpha1.ClusterDuckType{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapDiscoveryV1alpha1ClusterDuckTypeImpl) List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.ClusterDuckTypeList, error) {
+	uo, err := w.dyn.List(ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &v1alpha1.ClusterDuckTypeList{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapDiscoveryV1alpha1ClusterDuckTypeImpl) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.ClusterDuckType, err error) {
+	uo, err := w.dyn.Patch(ctx, name, pt, data, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &v1alpha1.ClusterDuckType{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapDiscoveryV1alpha1ClusterDuckTypeImpl) Update(ctx context.Context, in *v1alpha1.ClusterDuckType, opts v1.UpdateOptions) (*v1alpha1.ClusterDuckType, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "discovery.knative.dev",
+		Version: "v1alpha1",
+		Kind:    "ClusterDuckType",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Update(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &v1alpha1.ClusterDuckType{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapDiscoveryV1alpha1ClusterDuckTypeImpl) UpdateStatus(ctx context.Context, in *v1alpha1.ClusterDuckType, opts v1.UpdateOptions) (*v1alpha1.ClusterDuckType, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "discovery.knative.dev",
+		Version: "v1alpha1",
+		Kind:    "ClusterDuckType",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.UpdateStatus(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &v1alpha1.ClusterDuckType{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapDiscoveryV1alpha1ClusterDuckTypeImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+	return nil, errors.New("NYI: Watch")
 }
