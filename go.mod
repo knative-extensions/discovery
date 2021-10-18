@@ -9,7 +9,7 @@ require (
 	github.com/google/go-cmp v0.5.6
 	github.com/google/licenseclassifier v0.0.0-20200708223521-3d09a0ea2f39
 	github.com/sergi/go-diff v1.1.0 // indirect
-	go.uber.org/zap v1.19.0
+	go.uber.org/zap v1.19.1
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/api v0.21.4
 	k8s.io/apiextensions-apiserver v0.21.4
@@ -17,10 +17,10 @@ require (
 	k8s.io/client-go v0.21.4
 	k8s.io/code-generator v0.21.4
 	k8s.io/kube-openapi v0.0.0-20210305001622-591a79e4bda7
-	knative.dev/hack v0.0.0-20210806075220-815cd312d65c
-	knative.dev/hack/schema v0.0.0-20210806075220-815cd312d65c
-	knative.dev/pkg v0.0.0-20210919202233-5ae482141474
-	knative.dev/reconciler-test v0.0.0-20210915181908-49fac7555086
+	knative.dev/hack v0.0.0-20211015200324-86876688e735
+	knative.dev/hack/schema v0.0.0-20211015200324-86876688e735
+	knative.dev/pkg v0.0.0-20211015194524-a5bb75923981
+	knative.dev/reconciler-test v0.0.0-20210930064245-45904ca4383d
 )
 
 replace github.com/prometheus/client_golang => github.com/prometheus/client_golang v0.9.2
