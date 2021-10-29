@@ -17,10 +17,10 @@ require (
 	k8s.io/client-go v0.21.4
 	k8s.io/code-generator v0.21.4
 	k8s.io/kube-openapi v0.0.0-20210305001622-591a79e4bda7
-	knative.dev/hack v0.0.0-20211027200727-f1228dd5e3e6
-	knative.dev/hack/schema v0.0.0-20211027200727-f1228dd5e3e6
-	knative.dev/pkg v0.0.0-20211027171921-f7b70f5ce303
-	knative.dev/reconciler-test v0.0.0-20211028081126-a4cd8030f736
+	knative.dev/hack v0.0.0-20211028194650-b96d65a5ff5e
+	knative.dev/hack/schema v0.0.0-20211028194650-b96d65a5ff5e
+	knative.dev/pkg v0.0.0-20211028235650-5d9d300c2e40
+	knative.dev/reconciler-test v0.0.0-20211029073051-cff9b538d33c
 )
 
 replace github.com/prometheus/client_golang => github.com/prometheus/client_golang v0.9.2
