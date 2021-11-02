@@ -1,5 +1,7 @@
 # Knative Discovery API
 
+**[This component is ALPHA](https://github.com/knative/community/tree/main/mechanics/MATURITY-LEVELS.md)**
+
 [![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white)](https://pkg.go.dev/knative.dev/discovery)
 [![Go Report Card](https://goreportcard.com/badge/knative.dev/discovery)](https://goreportcard.com/report/knative.dev/discovery)
 [![Releases](https://img.shields.io/github/release-pre/knative-sandbox/discovery.svg)](https://github.com/knative-sandbox/discovery/releases)
