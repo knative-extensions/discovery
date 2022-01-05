@@ -46,7 +46,7 @@ func ClusterRole() *feature.Feature {
 func clusterRoleAssert(ctx context.Context, t feature.T) {
 	env := environment.FromContext(ctx)
 	for _, ref := range env.References() {
-		if err := k8s.WaitForReadyOrDone(ctx, ref, interval, timeout); err != nil {
+		if err := k8s.WaitForReadyOrDone(ctx, t, ref); err != nil {
 			t.Fatalf("failed to wait for ready or done, %s", err)
 		}
 

@@ -18,17 +18,11 @@ package e2e
 
 import (
 	"context"
-	"time"
 
 	"knative.dev/discovery/test/e2e/config/smoke"
 	"knative.dev/reconciler-test/pkg/environment"
 	"knative.dev/reconciler-test/pkg/feature"
 	"knative.dev/reconciler-test/pkg/k8s"
-)
-
-const (
-	interval = 1 * time.Second
-	timeout  = 45 * time.Second
 )
 
 func ClusterDuckTypeSmoke() *feature.Feature {
@@ -45,7 +39,7 @@ func ClusterDuckTypeSmoke() *feature.Feature {
 func AllGoReady(ctx context.Context, t feature.T) {
 	env := environment.FromContext(ctx)
 	for _, ref := range env.References() {
-		if err := k8s.WaitForReadyOrDone(ctx, ref, interval, timeout); err != nil {
+		if err := k8s.WaitForReadyOrDone(ctx, t, ref); err != nil {
 			t.Fatalf("failed to wait for ready or done, %s", err)
 		}
 	}
