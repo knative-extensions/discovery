@@ -9,8 +9,7 @@ aliases:
   - julz
   - maximilien
   autoscaling-wg-leads:
-  - markusthoemmes
-  - vagababov
+  - julz
   client-wg-leads:
   - dsimansk
   - navidshaikh
@@ -21,7 +20,6 @@ aliases:
   - rhuss
   container-freezer-approvers:
   - julz
-  - markusthoemmes
   - psschwei
   control-protocol-approvers:
   - devguyio
@@ -34,9 +32,13 @@ aliases:
   - lberk
   - n3wscott
   docs-wg-leads:
-  - abrennan89
+  - csantanapr
+  - snneji
   docs-writers:
   - abrennan89
+  - csantanapr
+  - psschwei
+  - snneji
   eventing-autoscaler-keda-approvers:
   - zroubalik
   eventing-awssqs-approvers:
@@ -68,9 +70,11 @@ aliases:
   - lberk
   - matzew
   - phamilton
+  - pierDipi
   - steven0711dong
   - travis-minke-sap
   eventing-kafka-broker-approvers:
+  - aliok
   - matzew
   - pierDipi
   eventing-kafka-mtsource-approvers:
@@ -95,8 +99,8 @@ aliases:
   - matzew
   eventing-rabbitmq-approvers:
   - benmoss
-  - sbawaska
-  - vaikas
+  - gvmw
+  - salaboy
   - xtreme-sameer-vohra
   eventing-redis-approvers:
   - aavarghese
@@ -128,6 +132,8 @@ aliases:
   - lance
   - lkingland
   - matejvasek
+  - nainaz
+  - omerbensaadon
   - zroubalik
   kn-plugin-migration-approvers:
   - maximilien
@@ -160,8 +166,7 @@ aliases:
   - nicolaferraro
   - rhuss
   knative-admin:
-  - benmoss
-  - bsnchan
+  - csantanapr
   - dprotaso
   - evankanderson
   - julz
@@ -169,17 +174,15 @@ aliases:
   - knative-prow-robot
   - knative-prow-updater-robot
   - knative-test-reporter-robot
-  - markusthoemmes
-  - mbehrendt
+  - lance
   - pmorie
+  - psschwei
   - rhuss
-  - salaboy
   - thisisnotapril
   - vaikas
   knative-release-leads:
-  - benmoss
-  - julz
-  - salaboy
+  - dprotaso
+  - psschwei
   knative-robots:
   - knative-prow-releaser-robot
   - knative-prow-robot
@@ -195,7 +198,6 @@ aliases:
   - dprotaso
   - tcnghia
   net-gateway-api-approvers:
-  - markusthoemmes
   - nak3
   - tcnghia
   net-http01-approvers:
@@ -221,10 +223,8 @@ aliases:
   - upodroid
   productivity-wg-leads:
   - chizhg
-  - n3wscott
   productivity-writers:
   - chizhg
-  - n3wscott
   security-wg-leads:
   - evankanderson
   - julz
@@ -234,14 +234,13 @@ aliases:
   serving-writers:
   - ZhiminXiang
   - dprotaso
-  - markusthoemmes
+  - julz
   - nak3
-  - vagababov
   source-wg-leads:
   - lionelvillard
   steering-committee:
-  - bsnchan
-  - mbehrendt
+  - csantanapr
+  - lance
   - pmorie
   - thisisnotapril
   - vaikas
@@ -249,11 +248,10 @@ aliases:
   - dprotaso
   - evankanderson
   - julz
-  - markusthoemmes
   - rhuss
   ux-wg-leads:
   - csantanapr
-  - omerbensaadon
+  - snneji
   ux-writers:
   - csantanapr
-  - omerbensaadon
+  - snneji
