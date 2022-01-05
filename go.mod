@@ -3,7 +3,6 @@ module knative.dev/discovery
 go 1.16
 
 require (
-	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cucumber/godog v0.10.0
 	github.com/cucumber/messages-go/v10 v10.0.3
 	github.com/google/go-cmp v0.5.6
@@ -22,5 +21,3 @@ require (
 	knative.dev/pkg v0.0.0-20220104185830-52e42b760b54
 	knative.dev/reconciler-test v0.0.0-20211222120418-816f2192fec9
 )
-
-replace github.com/prometheus/client_golang => github.com/prometheus/client_golang v0.9.2
