@@ -19,8 +19,8 @@ package manifest
 import (
 	"bufio"
 	"context"
+	"encoding/json"
 	"io/fs"
-	"log"
 	"os"
 	"path"
 	"runtime"
@@ -28,6 +28,8 @@ import (
 
 	"k8s.io/client-go/util/retry"
 	"knative.dev/pkg/injection/clients/dynamicclient"
+	"knative.dev/pkg/logging"
+	testlog "knative.dev/reconciler-test/pkg/logging"
 
 	"knative.dev/reconciler-test/pkg/environment"
 	"knative.dev/reconciler-test/pkg/feature"
@@ -36,24 +38,32 @@ import (
 // CfgFn is the function signature of configuration mutation options.
 type CfgFn func(map[string]interface{})
 
-// Deprecated: use InstallYamlFS
+// Deprecated: use InstallYamlFS instead.
 func InstallYaml(ctx context.Context, dir string, base map[string]interface{}) (Manifest, error) {
+	log := loggingFrom(ctx, "InstallYaml")
+	log.Warn("InstallYaml is deprecated and will be removed, " +
+		"use InstallYamlFS instead.")
 	return InstallYamlFS(ctx, os.DirFS(dir), base)
 }
 
 func InstallYamlFS(ctx context.Context, fsys fs.FS, base map[string]interface{}) (Manifest, error) {
 	env := environment.FromContext(ctx)
+	images, err := environment.ProduceImages(ctx)
+	if err != nil {
+		return nil, err
+	}
 	cfg := env.TemplateConfig(base)
 	f := feature.FromContext(ctx)
+	log := loggingFrom(ctx, "InstallYamlFS")
 
-	yamls, err := ParseTemplatesFS(fsys, env.Images(), cfg)
+	yamls, err := ParseTemplatesFS(ctx, fsys, images, cfg)
 	if err != nil {
 		return nil, err
 	}
 
 	dynamicClient := dynamicclient.Get(ctx)
 
-	manifest, err := NewYamlManifest(yamls, false, dynamicClient)
+	manifest, err := NewYamlManifest(ctx, yamls, false, dynamicClient)
 	if err != nil {
 		return nil, err
 	}
@@ -76,33 +86,42 @@ func InstallYamlFS(ctx context.Context, fsys fs.FS, base map[string]interface{})
 
 	// Temp
 	refs := manifest.References()
-	log.Println("Created:")
-	for _, ref := range refs {
-		log.Println(ref)
+	if j, err := json.MarshalIndent(refs, "", "  "); err == nil {
+		log.Debug("Created: ", string(j))
+	} else {
+		log.Fatal(err)
 	}
+
 	return manifest, nil
 }
 
+// Deprecated: use InstallYamlFS instead.
 func InstallLocalYaml(ctx context.Context, base map[string]interface{}) (Manifest, error) {
+	log := loggingFrom(ctx, "InstallLocalYaml")
 	pwd, _ := os.Getwd()
-	log.Println("PWD: ", pwd)
+	log.Debug("PWD: ", pwd)
 	_, filename, _, _ := runtime.Caller(1)
-	log.Println("FILENAME: ", filename)
+	log.Debug("FILENAME: ", filename)
 
 	return InstallYamlFS(ctx, os.DirFS(path.Dir(filename)), base)
 }
 
-// Deprecated, use ImagesFromFS instead.
+// Deprecated: use ImagesFromFS instead.
 func ImagesLocalYaml() []string {
+	ctx := testlog.NewContext()
+	log := loggingFrom(ctx, "ImagesLocalYaml")
+	log.Warn("ImagesLocalYaml is deprecated and will be removed, " +
+		"use ImagesFromFS instead.")
 	pwd, _ := os.Getwd()
-	log.Println("PWD: ", pwd)
+	log.Debug("PWD: ", pwd)
 	_, filename, _, _ := runtime.Caller(1)
-	log.Println("FILENAME: ", filename)
+	log.Debug("FILENAME: ", filename)
 
-	return ImagesFromFS(os.DirFS(path.Dir(filename)))
+	return ImagesFromFS(ctx, os.DirFS(path.Dir(filename)))
 }
 
-func ImagesFromFS(fsys fs.FS) []string {
+func ImagesFromFS(ctx context.Context, fsys fs.FS) []string {
+	log := logging.FromContext(ctx)
 	var images []string
 
 	_ = fs.WalkDir(fsys, ".", func(path string, info fs.DirEntry, err error) error {
@@ -131,12 +150,22 @@ func ImagesFromFS(fsys fs.FS) []string {
 	return images
 }
 
-// isWebhookError is a workaround for https://github.com/knative/pkg/issues/1509.
 func isWebhookError(err error) bool {
 	str := err.Error()
+
+	// isEOFError is a workaround for https://github.com/knative/pkg/issues/1509.
 	// Example error:
 	// Internal error occurred: failed calling webhook "defaulting.webhook.kafka.eventing.knative.dev": Post "https://kafka-webhook-eventing.knative-eventing.svc:443/defaulting?timeout=2s": EOF
-	return strings.Contains(str, "webhook") &&
+	isEOFError := strings.Contains(str, "webhook") &&
 		strings.Contains(str, "https") &&
 		strings.Contains(str, "EOF")
+
+	// In addition to the above error we're getting a "context deadline exceeded" generic error
+	// Example error:
+	// Internal error occurred: failed calling webhook "inmemorychannel.eventing.knative.dev": failed to call webhook: Post "https://inmemorychannel-webhook.knative-eventing-9zkohswwf9.svc:443/defaulting?timeout=10s": context deadline exceeded
+	isContextDeadlineExceededError := strings.Contains(str, "webhook") &&
+		strings.Contains(str, "https") &&
+		strings.Contains(str, "context deadline exceeded")
+
+	return isEOFError || isContextDeadlineExceededError
 }
