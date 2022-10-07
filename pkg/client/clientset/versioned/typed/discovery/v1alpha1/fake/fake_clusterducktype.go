@@ -110,7 +110,7 @@ func (c *FakeClusterDuckTypes) UpdateStatus(ctx context.Context, clusterDuckType
 // Delete takes name of the clusterDuckType and deletes it. Returns an error if one occurs.
 func (c *FakeClusterDuckTypes) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewRootDeleteAction(clusterducktypesResource, name), &v1alpha1.ClusterDuckType{})
+		Invokes(testing.NewRootDeleteActionWithOptions(clusterducktypesResource, name, opts), &v1alpha1.ClusterDuckType{})
 	return err
 }
 

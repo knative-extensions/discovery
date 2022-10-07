@@ -10,14 +10,14 @@ require (
 	github.com/sergi/go-diff v1.1.0 // indirect
 	go.uber.org/zap v1.19.1
 	gopkg.in/yaml.v2 v2.4.0
-	k8s.io/api v0.22.5
-	k8s.io/apiextensions-apiserver v0.22.5
-	k8s.io/apimachinery v0.22.5
-	k8s.io/client-go v0.22.5
-	k8s.io/code-generator v0.22.5
-	k8s.io/kube-openapi v0.0.0-20211109043538-20434351676c
-	knative.dev/hack v0.0.0-20220224013837-e1785985d364
-	knative.dev/hack/schema v0.0.0-20220224013837-e1785985d364
-	knative.dev/pkg v0.0.0-20220225161142-708dc1cc48e9
-	knative.dev/reconciler-test v0.0.0-20220216192840-2c3291f210ce
+	k8s.io/api v0.24.4
+	k8s.io/apiextensions-apiserver v0.24.4
+	k8s.io/apimachinery v0.24.4
+	k8s.io/client-go v0.24.4
+	k8s.io/code-generator v0.24.4
+	k8s.io/kube-openapi v0.0.0-20220328201542-3ee0da9b0b42
+	knative.dev/hack v0.0.0-20221006013832-52a87e1514cb
+	knative.dev/hack/schema v0.0.0-20221006013832-52a87e1514cb
+	knative.dev/pkg v0.0.0-20221006211431-fb2e4fbaa477
+	knative.dev/reconciler-test v0.0.0-20221006134333-0a1020d0acdc
 )

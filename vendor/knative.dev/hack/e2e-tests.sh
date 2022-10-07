@@ -76,7 +76,7 @@ function setup_test_cluster() {
   # Setup KO_DOCKER_REPO if it is a GKE cluster. Incorporate an element of
   # randomness to ensure that each run properly publishes images. Don't
   # owerwrite KO_DOCKER_REPO if already set.
-  [ -z "${KO_DOCKER_REPO}" ] && \
+  [ -z "${KO_DOCKER_REPO:-}" ] && \
     [[ "${k8s_cluster}" =~ ^gke_.* ]] && \
     export KO_DOCKER_REPO=gcr.io/${E2E_PROJECT_ID}/${REPO_NAME}-e2e-img/${RANDOM}
 
@@ -120,12 +120,14 @@ function success() {
 }
 
 # Exit test, dumping current state info.
-# Parameters: $1 - error message (optional).
+# Parameters: $* - error message (optional).
 function fail_test() {
-  [[ -n $1 ]] && echo "ERROR: $1"
-  dump_cluster_state
-  dump_metrics
-  exit 1
+  local message="$*"
+  if [[ "X${message:-}X" == "XX" ]]; then
+    message='test failed'
+  fi
+  add_trap "dump_cluster_state;dump_metrics" EXIT
+  abort "${message}"
 }
 
 SKIP_TEARDOWNS=0
@@ -137,13 +139,17 @@ CLOUD_PROVIDER="gke"
 function initialize() {
   local run_tests=0
   local custom_flags=()
+  local parse_script_flags=0
   E2E_SCRIPT="$(get_canonical_path "$0")"
   local e2e_script_command=( "${E2E_SCRIPT}" "--run-tests" )
+
+  for i in "$@"; do
+    if [[ $i == "--run-tests" ]]; then parse_script_flags=1; fi
+  done
 
   cd "${REPO_ROOT_DIR}"
   while [[ $# -ne 0 ]]; do
     local parameter=$1
-    # TODO(chizhg): remove parse_flags logic if no repos are using it.
     # Try parsing flag as a custom one.
     if function_exists parse_flags; then
       parse_flags "$@"
@@ -152,7 +158,10 @@ function initialize() {
         # Skip parsed flag (and possibly argument) and continue
         # Also save it to it's passed through to the test script
         for ((i=1;i<=skip;i++)); do
-          e2e_script_command+=("$1")
+          # Avoid double-parsing 
+          if (( parse_script_flags )); then
+            e2e_script_command+=("$1")
+          fi
           shift
         done
         continue
