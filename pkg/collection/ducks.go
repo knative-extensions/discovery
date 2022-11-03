@@ -257,7 +257,8 @@ func (dh *duckHunter) Ducks() map[string][]v1alpha1.ResourceMeta {
 }
 
 // setAccessibleViaClusterRole sets the AccessibleViaClusterRole flag on each duck if
-//   the ClusterRole can preform the expected verbs on the duck
+//
+//	the ClusterRole can preform the expected verbs on the duck
 func setAccessibleViaClusterRole(metas []v1alpha1.ResourceMeta, accessibleGroupResources map[string]bool, kindToResource map[string]string) {
 	for index, meta := range metas {
 		// TODO: it would be nice if ResourceMeta had a version-free unique hash to do this.
@@ -333,8 +334,9 @@ func version(meta v1alpha1.ResourceMeta) string {
 
 // accessibleGroupResources finds the rules in the ClusterRole that satisfy the expectedVerbs
 // and returns a map of
-//   key: apiGroup + ":" + resource
-//   value: true if Rule satisfies the expectedVerbs, false otherwise
+//
+//	key: apiGroup + ":" + resource
+//	value: true if Rule satisfies the expectedVerbs, false otherwise
 func accessibleGroupResources(expectedVerbs []string, clusterRole *rbacv1.ClusterRole) map[string]bool {
 	groupResources := map[string]bool{}
 	if clusterRole == nil {
@@ -355,8 +357,9 @@ func accessibleGroupResources(expectedVerbs []string, clusterRole *rbacv1.Cluste
 }
 
 // Returns true if first is a fully contained subset of second
-//   returns false otherwise
-//   supports "*" as a wildcard
+//
+//	returns false otherwise
+//	supports "*" as a wildcard
 func isSubset(first, second []string) bool {
 	set := map[string]bool{}
 	for _, value := range second {

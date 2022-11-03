@@ -103,8 +103,9 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, dt *v1alpha1.ClusterDuck
 }
 
 // getAggregatingClusterRole fetches the ClusterRole specified by Spec.Role.RoleRef
-//   if not set, it will default to using the first LabelSelector in Spec.Selectors to
-//   match any ClusterRole with a matching AggregationRule
+//
+//	if not set, it will default to using the first LabelSelector in Spec.Selectors to
+//	match any ClusterRole with a matching AggregationRule
 func (r *Reconciler) getAggregatingClusterRole(ctx context.Context, dt *v1alpha1.ClusterDuckType) (*rbacv1.ClusterRole, error) {
 	if dt.Spec.Role != nil && dt.Spec.Role.RoleRef != nil {
 		return r.client.RbacV1().ClusterRoles().Get(ctx, dt.Spec.Role.RoleRef.Name, metav1.GetOptions{})
